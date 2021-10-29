@@ -1,1 +1,25 @@
-
+{
+    "config": {
+        "abort": {
+            "device_already_configured": "L'appareil est déjà configuré."
+        },
+        "error": {
+            "connection_error": "La connection à l'API Agua IOT n'est pas possible.",
+            "unauthorized": "Échec de la connexion, veuillez vérifier vos identifiants.",
+            "unknown_error": "Erreur inconue, veuillez vérifier la configuration."
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "api_url": "URL Agua IOT de la marque",
+                    "login_api_url": "URL de login (facultatif, précisez seulement si nécessaire)",
+                    "customer_code": "Code de la marque",
+                    "brand_id": "ID de la marque (par défaut: 1)",
+                    "email": "Adresse email",
+                    "password": "Mot de passe"
+                },
+                "description": "Remplissez les paramètres Agua IOT"
+            }
+        }
+    }
+}
