@@ -43,6 +43,10 @@ from .const import (
     AGUA_STATUS_FLAME,
     AGUA_STATUS_OFF,
     AGUA_STATUS_ON,
+    AGUA_STATUS_START,
+    AGUA_STATUS_PELLET_LOADING,
+ """"   AGUA_STATUS_PELLET_LACK,""""
+ """"   AGUA_STATUS_IGNITION_FAILURE,""""
 )
 
 _LOGGER = logging.getLogger(__name__)
