@@ -4,7 +4,7 @@
 [![Maintainer][maintainer-shield]][maintainer]
 [![HACS Custom][hacs-shield]][hacs-url]
 
-Home Assistant integration for controlling heating devices connected via the IOT Agua platform of Micronova.
+Home Assistant integration for controlling heating devices connected via the Agua IOT platform of Micronova.
 
 Using [py-agua-iot](https://github.com/fredericvl/py-agua-iot).
 
