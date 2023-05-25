@@ -1,9 +1,9 @@
 {
   "domain": "aguaiot",
   "name": "Micronova Agua IOT",
-  "documentation": "https://github.com/vincentwolsink/py-agua-iot/tree/master/examples/home-assistant",
+  "documentation": "https://github.com/vincentwolsink/home_assistant_micronova_agua_iot/",
   "version": "0.0.11",
-  "requirements": ["git+https://github.com/vincentwolsink/py-agua-iot.git#py-agua-iot==0.0.11"],
+  "requirements": ["py-agua-iot==0.0.11"],
   "dependencies": [],
   "codeowners": ["@vincentwolsink"],
   "iot_class": "cloud_polling",
