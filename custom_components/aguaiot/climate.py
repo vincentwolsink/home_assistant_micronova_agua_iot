@@ -69,12 +69,31 @@ async def async_setup_entry(hass, entry, async_add_entities):
     email = entry.data[CONF_EMAIL]
     password = entry.data[CONF_PASSWORD]
     gen_uuid = entry.data[CONF_UUID]
-    login_api_url = entry.data.get(CONF_LOGIN_API_URL) if entry.data.get(CONF_LOGIN_API_URL) != "" else None
-    api_login_application_version= entry.data.get(CONF_API_LOGIN_APPLICATION_VERSION) if entry.data.get(CONF_API_LOGIN_APPLICATION_VERSION) != "" else "1.6.0"
+    login_api_url = (
+        entry.data.get(CONF_LOGIN_API_URL)
+        if entry.data.get(CONF_LOGIN_API_URL) != ""
+        else None
+    )
+    api_login_application_version = (
+        entry.data.get(CONF_API_LOGIN_APPLICATION_VERSION)
+        if entry.data.get(CONF_API_LOGIN_APPLICATION_VERSION) != ""
+        else "1.6.0"
+    )
 
     try:
         debug = False
-        agua = await hass.async_add_executor_job(agua_iot, api_url, customer_code, email, password, gen_uuid, login_api_url, brand_id, debug, api_login_application_version)
+        agua = await hass.async_add_executor_job(
+            agua_iot,
+            api_url,
+            customer_code,
+            email,
+            password,
+            gen_uuid,
+            login_api_url,
+            brand_id,
+            debug,
+            api_login_application_version,
+        )
     except UnauthorizedError:
         _LOGGER.error("Wrong credentials for Agua IOT")
         return False
