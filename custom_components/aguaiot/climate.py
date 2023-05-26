@@ -75,7 +75,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
     try:
         debug = False
         agua = await hass.async_add_executor_job(agua_iot, api_url, customer_code, email, password, gen_uuid, login_api_url, brand_id, debug, api_login_application_version)
-        device = agua.devices[0]
     except UnauthorizedError:
         _LOGGER.error("Wrong credentials for Agua IOT")
         return False
@@ -86,9 +85,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         _LOGGER.error("Unknown Agua IOT error: %s", err)
         return False
 
-    async_add_entities(
-        [AguaIOTHeatingDevice(device)], True,
-    )
+    async_add_entities([AguaIOTHeatingDevice(device) for device in agua.devices], True)
 
     return True
 
