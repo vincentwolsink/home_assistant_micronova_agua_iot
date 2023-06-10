@@ -1,7 +1,7 @@
 """Support for Agua IOT heating devices."""
 import logging
 
-from py_agua_iot import (  # pylint: disable=redefined-builtin
+from py_agua_iot import (
     ConnectionError,
     Error as AguaIOTError,
     UnauthorizedError,
@@ -180,12 +180,18 @@ class AguaIOTHeatingDevice(ClimateEntity):
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        return self._device.air_temperature
+        temp = self._device.air_temperature
+        if temp is None:
+            temp = self._device.water_temperature
+        return temp
 
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        return self._device.set_air_temperature
+        set_temp = self._device.set_air_temperature
+        if set_temp is None:
+            set_temp = self._device.set_water_temperature
+        return set_temp
 
     @property
     def hvac_mode(self):
@@ -240,7 +246,10 @@ class AguaIOTHeatingDevice(ClimateEntity):
             return
 
         try:
-            self._device.set_air_temperature = temperature
+            if self._device.air_temperature is not None:
+                self._device.set_air_temperature = temperature
+            elif self._device.water_temperature is not None:
+                self._device.set_water_temperature = temperature
         except (ValueError, AguaIOTError) as err:
             _LOGGER.error("Failed to set temperature, error: %s", err)
 
