@@ -30,7 +30,7 @@ _LOGGER = logging.getLogger(__name__)
 def conf_entries(hass):
     """Return the email tuples for the domain."""
     return set(
-        entry.data[CONF_EMAIL] for entry in hass.config_entries.async_entries(DOMAIN)
+        (entry.data[CONF_EMAIL], entry.data[CONF_API_URL])  for entry in hass.config_entries.async_entries(DOMAIN)
     )
 
 
@@ -43,7 +43,8 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def _entry_in_configuration_exists(self, user_input) -> bool:
         """Return True if config already exists in configuration."""
         email = user_input[CONF_EMAIL]
-        if email in conf_entries(self.hass):
+        host_server = user_input[CONF_API_URL]
+        if (email, host_server) in conf_entries(self.hass):
             return True
         return False
 
