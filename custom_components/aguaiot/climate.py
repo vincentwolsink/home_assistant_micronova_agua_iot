@@ -81,7 +81,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     )
 
     try:
-        debug = (_LOGGER.getEffectiveLevel() == logging.DEBUG)
+        debug = _LOGGER.getEffectiveLevel() == logging.DEBUG
         agua = await hass.async_add_executor_job(
             agua_iot,
             api_url,
