@@ -20,8 +20,6 @@ from homeassistant.components.climate.const import (
 )
 from homeassistant.const import (
     ATTR_TEMPERATURE,
-    CONF_EMAIL,
-    CONF_PASSWORD,
     PRECISION_HALVES,
     TEMP_CELSIUS,
 )
