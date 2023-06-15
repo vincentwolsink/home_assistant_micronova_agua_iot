@@ -20,8 +20,6 @@ from homeassistant.components.climate.const import (
 )
 from homeassistant.const import (
     ATTR_TEMPERATURE,
-    CONF_EMAIL,
-    CONF_PASSWORD,
     PRECISION_HALVES,
     TEMP_CELSIUS,
 )
@@ -32,29 +30,16 @@ from .const import (
     ATTR_HUMAN_DEVICE_STATUS,
     ATTR_REAL_POWER,
     ATTR_SMOKE_TEMP,
-    CONF_API_URL,
-    CONF_BRAND_ID,
-    CONF_CUSTOMER_CODE,
-    CONF_LOGIN_API_URL,
-    CONF_API_LOGIN_APPLICATION_VERSION,
-    CONF_UUID,
     DOMAIN,
     AGUA_STATUS_CLEANING,
     AGUA_STATUS_CLEANING_FINAL,
     AGUA_STATUS_FLAME,
     AGUA_STATUS_OFF,
     AGUA_STATUS_ON,
+    CURRENT_HVAC_MAP_AGUA_HEAT,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-CURRENT_HVAC_MAP_AGUA_HEAT = {
-    AGUA_STATUS_ON: CURRENT_HVAC_HEAT,
-    AGUA_STATUS_CLEANING: CURRENT_HVAC_HEAT,
-    AGUA_STATUS_CLEANING_FINAL: CURRENT_HVAC_OFF,
-    AGUA_STATUS_FLAME: CURRENT_HVAC_HEAT,
-    AGUA_STATUS_OFF: CURRENT_HVAC_OFF,
-}
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -62,50 +47,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    """Add Agua IOT device entry."""
-    api_url = entry.data[CONF_API_URL]
-    customer_code = entry.data[CONF_CUSTOMER_CODE]
-    brand_id = entry.data[CONF_BRAND_ID]
-    email = entry.data[CONF_EMAIL]
-    password = entry.data[CONF_PASSWORD]
-    gen_uuid = entry.data[CONF_UUID]
-    login_api_url = (
-        entry.data.get(CONF_LOGIN_API_URL)
-        if entry.data.get(CONF_LOGIN_API_URL) != ""
-        else None
-    )
-    api_login_application_version = (
-        entry.data.get(CONF_API_LOGIN_APPLICATION_VERSION)
-        if entry.data.get(CONF_API_LOGIN_APPLICATION_VERSION) != ""
-        else "1.6.0"
-    )
-
-    try:
-        debug = _LOGGER.getEffectiveLevel() == logging.DEBUG
-        agua = await hass.async_add_executor_job(
-            agua_iot,
-            api_url,
-            customer_code,
-            email,
-            password,
-            gen_uuid,
-            login_api_url,
-            brand_id,
-            debug,
-            api_login_application_version,
-        )
-    except UnauthorizedError:
-        _LOGGER.error("Wrong credentials for Agua IOT")
-        return False
-    except ConnectionError:
-        _LOGGER.error("Connection to Agua IOT not possible")
-        return False
-    except AguaIOTError as err:
-        _LOGGER.error("Unknown Agua IOT error: %s", err)
-        return False
-
+    agua: agua_iot = hass.data[DOMAIN][entry.unique_id]
     async_add_entities([AguaIOTHeatingDevice(device) for device in agua.devices], True)
-
     return True
 
 
