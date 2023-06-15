@@ -113,12 +113,18 @@ class AguaIOTHeatingDevice(ClimateEntity):
     @property
     def min_temp(self):
         """Return the minimum temperature to set."""
-        return self._device.min_temp
+        min_temp = self._device.min_air_temp
+        if min_temp is None:
+            min_temp = self._device.min_water_temp
+        return min_temp
 
     @property
     def max_temp(self):
         """Return the maximum temperature to set."""
-        return self._device.max_temp
+        max_temp = self._device.max_air_temp
+        if max_temp is None:
+            max_temp = self._device.max_water_temp
+        return max_temp
 
     @property
     def current_temperature(self):
