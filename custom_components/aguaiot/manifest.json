@@ -8,6 +8,6 @@
   "integration_type": "hub",
   "iot_class": "cloud_polling",  
   "issue_tracker": "https://github.com/vincentwolsink/home_assistant_micronova_agua_iot/issues",
-  "requirements": ["py-agua-iot==0.0.16"],
+  "requirements": ["py-agua-iot==0.0.17"],
   "version": "0.1.4"
 }
