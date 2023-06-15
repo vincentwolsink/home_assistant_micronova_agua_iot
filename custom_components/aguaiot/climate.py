@@ -20,7 +20,7 @@ from homeassistant.components.climate.const import (
 )
 from homeassistant.const import (
     ATTR_TEMPERATURE,
-    PRECISION_HALVES,
+    PRECISION_WHOLE,
     TEMP_CELSIUS,
 )
 
@@ -98,12 +98,12 @@ class AguaIOTHeatingDevice(ClimateEntity):
     @property
     def precision(self):
         """Return the precision of the system."""
-        return PRECISION_HALVES
+        return PRECISION_WHOLE
 
     @property
     def target_temperature_step(self):
         """Return the supported step of target temperature."""
-        return PRECISION_HALVES
+        return PRECISION_WHOLE
 
     @property
     def temperature_unit(self):
