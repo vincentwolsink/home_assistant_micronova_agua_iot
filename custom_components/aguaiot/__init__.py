@@ -7,11 +7,7 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
 
-from homeassistant.const import (
-    CONF_EMAIL,
-    CONF_PASSWORD,
-	EVENT_HOMEASSISTANT_STOP
-)
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, EVENT_HOMEASSISTANT_STOP
 
 from py_agua_iot import (
     ConnectionError,
@@ -28,10 +24,11 @@ from .const import (
     CONF_API_LOGIN_APPLICATION_VERSION,
     CONF_UUID,
     DOMAIN,
-	PLATFORMS,
+    PLATFORMS,
 )
 
 _LOGGER = logging.getLogger(__name__)
+
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the AguaIOT integration."""
@@ -66,7 +63,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     try:
-        debug = (_LOGGER.getEffectiveLevel() == logging.DEBUG)
+        debug = _LOGGER.getEffectiveLevel() == logging.DEBUG
         agua = await hass.async_add_executor_job(
             agua_iot,
             api_url,
@@ -97,7 +94,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Services
     async def async_close_connection(event: Event) -> None:
         """Close AguaIOT connection on HA Stop."""
-        #await agua.close()
+        # await agua.close()
 
     entry.async_on_unload(
         hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, async_close_connection)
@@ -111,6 +108,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
         agua: agua_iot = hass.data[DOMAIN].pop(entry.unique_id)
-        #await agua.close()
+        # await agua.close()
 
     return unload_ok
