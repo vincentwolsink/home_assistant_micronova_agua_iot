@@ -36,7 +36,6 @@ CURRENT_HVAC_MAP_AGUA_HEAT = {
 }
 
 PLATFORMS = [
-    #Platform.SENSOR,
+    # Platform.SENSOR,
     Platform.CLIMATE,
-
 ]

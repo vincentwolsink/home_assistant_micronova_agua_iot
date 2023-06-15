@@ -30,7 +30,8 @@ _LOGGER = logging.getLogger(__name__)
 def conf_entries(hass):
     """Return the email tuples for the domain."""
     return set(
-        (entry.data[CONF_EMAIL], entry.data[CONF_API_URL])  for entry in hass.config_entries.async_entries(DOMAIN)
+        (entry.data[CONF_EMAIL], entry.data[CONF_API_URL])
+        for entry in hass.config_entries.async_entries(DOMAIN)
     )
 
 

@@ -38,7 +38,7 @@ from .const import (
     AGUA_STATUS_FLAME,
     AGUA_STATUS_OFF,
     AGUA_STATUS_ON,
-	CURRENT_HVAC_MAP_AGUA_HEAT,
+    CURRENT_HVAC_MAP_AGUA_HEAT,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,9 +49,9 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
-	agua: augua_iot = hass.data[DOMAIN][entry.unique_id]
-	async_add_entities([AguaIOTHeatingDevice(device) for device in agua.devices], True)
-	return True
+    agua: augua_iot = hass.data[DOMAIN][entry.unique_id]
+    async_add_entities([AguaIOTHeatingDevice(device) for device in agua.devices], True)
+    return True
 
 
 class AguaIOTHeatingDevice(ClimateEntity):
