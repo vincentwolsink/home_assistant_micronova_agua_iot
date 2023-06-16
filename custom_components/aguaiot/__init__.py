@@ -63,7 +63,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     try:
-        debug = _LOGGER.getEffectiveLevel() == logging.DEBUG
         agua = await hass.async_add_executor_job(
             agua_iot,
             api_url,
@@ -73,7 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             gen_uuid,
             login_api_url,
             brand_id,
-            debug,
+            False,
             api_login_application_version,
         )
     except UnauthorizedError:
