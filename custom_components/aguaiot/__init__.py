@@ -1,11 +1,13 @@
 """Support for Micronova Agua IOT heating devices."""
 import logging
+from datetime import timedelta
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.core import Event, HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, EVENT_HOMEASSISTANT_STOP
 
@@ -25,6 +27,7 @@ from .const import (
     CONF_UUID,
     DOMAIN,
     PLATFORMS,
+    UPDATE_INTERVAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -85,9 +88,43 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.error("Unknown Agua IOT error: %s", err)
         return False
 
-    hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.unique_id] = agua
+    async def async_update_data():
+        """Get the latest data."""
+        try:
+            await hass.async_add_executor_job(agua.fetch_device_information)
+        except UnauthorizedError:
+            _LOGGER.error(
+                "Wrong credentials for device %s (%s)",
+                self.name,
+                self._device.id_device,
+            )
+            return False
+        except ConnectionError:
+            _LOGGER.error("Connection to Agua IOT not possible")
+            return False
+        except AguaIOTError as err:
+            _LOGGER.error(
+                "Failed to update %s (%s), error: %s",
+                self.name,
+                self._device.id_device,
+                err,
+            )
+            return False
 
+    coordinator = DataUpdateCoordinator(
+        hass,
+        _LOGGER,
+        name="aguaiot",
+        update_method=async_update_data,
+        update_interval=timedelta(seconds=UPDATE_INTERVAL),
+    )
+
+    await coordinator.async_config_entry_first_refresh()
+
+    hass.data.setdefault(DOMAIN, {})[entry.unique_id] = {
+        "coordinator": coordinator,
+        "agua": agua,
+    }
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     # Services
