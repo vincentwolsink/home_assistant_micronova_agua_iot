@@ -36,7 +36,7 @@ class AguaIOTHeatingSensor(CoordinatorEntity, SensorEntity):
     @property
     def name(self):
         """Return the name of the device, if any."""
-        return self.entity_description.name
+        return f"{self._device.name} {self.entity_description.name}"
 
     @property
     def device_info(self):
