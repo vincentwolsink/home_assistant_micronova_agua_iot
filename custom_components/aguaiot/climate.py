@@ -1,13 +1,11 @@
 """Support for Agua IOT heating devices."""
 import logging
 
-from py_agua_iot import (
-    ConnectionError,
-    Error as AguaIOTError,
-    UnauthorizedError,
-    agua_iot,
+from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.update_coordinator import (
+    CoordinatorEntity,
+    DataUpdateCoordinator,
 )
-
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
     CURRENT_HVAC_HEAT,
@@ -27,9 +25,7 @@ from homeassistant.const import (
 from .const import (
     ATTR_DEVICE_ALARM,
     ATTR_DEVICE_STATUS,
-    ATTR_HUMAN_DEVICE_STATUS,
     ATTR_REAL_POWER,
-    ATTR_SMOKE_TEMP,
     DOMAIN,
     AGUA_STATUS_CLEANING,
     AGUA_STATUS_CLEANING_FINAL,
@@ -42,21 +38,22 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up Agua IOT climate, nothing to do."""
-
-
 async def async_setup_entry(hass, entry, async_add_entities):
-    agua: agua_iot = hass.data[DOMAIN][entry.unique_id]
-    async_add_entities([AguaIOTHeatingDevice(device) for device in agua.devices], True)
-    return True
+    coordinator: DataUpdateCoordinator = hass.data[DOMAIN][entry.unique_id][
+        "coordinator"
+    ]
+    agua = hass.data[DOMAIN][entry.unique_id]["agua"]
+    async_add_entities(
+        [AguaIOTHeatingDevice(coordinator, device) for device in agua.devices], True
+    )
 
 
-class AguaIOTHeatingDevice(ClimateEntity):
+class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
     """Representation of an Agua IOT heating device."""
 
-    def __init__(self, device):
+    def __init__(self, coordinator, device):
         """Initialize the thermostat."""
+        CoordinatorEntity.__init__(self, coordinator)
         self._device = device
 
     @property
@@ -70,8 +67,6 @@ class AguaIOTHeatingDevice(ClimateEntity):
         return {
             ATTR_DEVICE_ALARM: self._device.alarms,
             ATTR_DEVICE_STATUS: self._device.status,
-            ATTR_HUMAN_DEVICE_STATUS: self._device.status_translated,
-            ATTR_SMOKE_TEMP: self._device.gas_temperature,
             ATTR_REAL_POWER: self._device.real_power,
         }
 
@@ -88,12 +83,12 @@ class AguaIOTHeatingDevice(ClimateEntity):
     @property
     def device_info(self):
         """Return the device info."""
-        return {
-            "identifiers": {(DOMAIN, self.unique_id)},
-            "name": self.name,
-            "manufacturer": "Micronova",
-            "model": self._device.name_product,
-        }
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._device.id_device)},
+            name=self._device.name,
+            manufacturer="Micronova",
+            model=self._device.name_product,
+        )
 
     @property
     def precision(self):
@@ -218,28 +213,3 @@ class AguaIOTHeatingDevice(ClimateEntity):
             self.turn_off()
         elif hvac_mode == HVAC_MODE_HEAT:
             self.turn_on()
-
-    def update(self):
-        """Get the latest data."""
-        try:
-            self._device.update()
-        except UnauthorizedError:
-            _LOGGER.error(
-                "Wrong credentials for device %s (%s)",
-                self.name,
-                self._device.id_device,
-            )
-            return False
-        except ConnectionError:
-            _LOGGER.error("Connection to Agua IOT not possible")
-            return False
-        except AguaIOTError as err:
-            _LOGGER.error(
-                "Failed to update %s (%s), error: %s",
-                self.name,
-                self._device.id_device,
-                err,
-            )
-            return False
-
-        return True

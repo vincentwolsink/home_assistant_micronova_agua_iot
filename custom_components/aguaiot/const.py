@@ -1,18 +1,21 @@
 """Agua IOT constants."""
-from homeassistant.const import Platform
+from homeassistant.const import Platform, UnitOfTemperature
 from homeassistant.components.climate.const import (
     CURRENT_HVAC_HEAT,
     CURRENT_HVAC_IDLE,
     CURRENT_HVAC_OFF,
+)
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntityDescription,
+    SensorStateClass,
 )
 
 DOMAIN = "aguaiot"
 
 ATTR_DEVICE_ALARM = "alarm_code"
 ATTR_DEVICE_STATUS = "device_status"
-ATTR_HUMAN_DEVICE_STATUS = "human_device_status"
 ATTR_REAL_POWER = "real_power"
-ATTR_SMOKE_TEMP = "smoke_temperature"
 
 CONF_API_URL = "api_url"
 CONF_BRAND_ID = "brand_id"
@@ -36,6 +39,25 @@ CURRENT_HVAC_MAP_AGUA_HEAT = {
 }
 
 PLATFORMS = [
-    # Platform.SENSOR,
+    Platform.SENSOR,
     Platform.CLIMATE,
 ]
+
+UPDATE_INTERVAL = 60
+
+SENSORS = (
+    SensorEntityDescription(
+        key="gas_temperature",
+        name="Smoke Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    SensorEntityDescription(
+        key="status_translated",
+        name="Status",
+        native_unit_of_measurement=None,
+        state_class=None,
+        device_class=None,
+    ),
+)
