@@ -56,6 +56,7 @@ SENSORS = (
     SensorEntityDescription(
         key="status_translated",
         name="Status",
+        icon="mdi:fire",
         native_unit_of_measurement=None,
         state_class=None,
         device_class=None,

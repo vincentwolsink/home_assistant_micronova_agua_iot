@@ -21,7 +21,6 @@ from homeassistant.const import (
     PRECISION_WHOLE,
     TEMP_CELSIUS,
 )
-
 from .const import (
     ATTR_DEVICE_ALARM,
     ATTR_DEVICE_STATUS,
@@ -34,6 +33,7 @@ from .const import (
     AGUA_STATUS_ON,
     CURRENT_HVAC_MAP_AGUA_HEAT,
 )
+from py_agua_iot import Error as AguaIOTError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -169,21 +169,23 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
             return CURRENT_HVAC_MAP_AGUA_HEAT.get(self._device.status_translated)
         return CURRENT_HVAC_IDLE
 
-    def turn_off(self):
+    async def async_turn_off(self):
         """Turn device off."""
         try:
-            self._device.turn_off()
+            await self.hass.async_add_executor_job(self._device.turn_off)
+            await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
             _LOGGER.error("Failed to turn off device, error: %s", err)
 
-    def turn_on(self):
+    async def async_turn_on(self):
         """Turn device on."""
         try:
-            self._device.turn_on()
+            await self.hass.async_add_executor_job(self._device.turn_on)
+            await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
             _LOGGER.error("Failed to turn on device, error: %s", err)
 
-    def set_temperature(self, **kwargs):
+    async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
         temperature = kwargs.get(ATTR_TEMPERATURE)
         if temperature is None:
@@ -191,25 +193,33 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
 
         try:
             if self._device.air_temperature is not None:
-                self._device.set_air_temperature = temperature
+                await self.hass.async_add_executor_job(
+                    setattr, self._device, "set_air_temperature", temperature
+                )
             elif self._device.water_temperature is not None:
-                self._device.set_water_temperature = temperature
+                await self.hass.async_add_executor_job(
+                    setattr, self._device, "set_water_temperature", temperature
+                )
+            await self.coordinator.async_request_refresh()
         except (ValueError, AguaIOTError) as err:
             _LOGGER.error("Failed to set temperature, error: %s", err)
 
-    def set_fan_mode(self, fan_mode):
+    async def async_set_fan_mode(self, fan_mode):
         """Set new target fan mode."""
         if fan_mode is None or not fan_mode.isdigit():
             return
 
         try:
-            self._device.set_power = int(fan_mode)
+            await self.hass.async_add_executor_job(
+                setattr, self._device, "set_power", int(fan_mode)
+            )
+            await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
             _LOGGER.error("Failed to set fan mode, error: %s", err)
 
-    def set_hvac_mode(self, hvac_mode):
+    async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
         if hvac_mode == HVAC_MODE_OFF:
-            self.turn_off()
+            await self.async_turn_off()
         elif hvac_mode == HVAC_MODE_HEAT:
-            self.turn_on()
+            await self.async_turn_on()
