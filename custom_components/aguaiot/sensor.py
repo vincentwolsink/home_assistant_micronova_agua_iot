@@ -8,10 +8,10 @@ from .const import SENSORS, DOMAIN
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator: DataUpdateCoordinator = hass.data[DOMAIN][entry.unique_id][
+    coordinator: DataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
         "coordinator"
     ]
-    agua = hass.data[DOMAIN][entry.unique_id]["agua"]
+    agua = hass.data[DOMAIN][entry.entry_id]["agua"]
 
     sensors = []
     for device in agua.devices:
