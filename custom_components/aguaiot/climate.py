@@ -32,6 +32,8 @@ from .const import (
     AGUA_STATUS_OFF,
     AGUA_STATUS_ON,
     CURRENT_HVAC_MAP_AGUA_HEAT,
+    DEVICE_TYPE_AIR,
+    DEVICE_TYPE_WATER,
 )
 from py_agua_iot import Error as AguaIOTError
 
@@ -55,6 +57,11 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
         """Initialize the thermostat."""
         CoordinatorEntity.__init__(self, coordinator)
         self._device = device
+
+        if getattr(self._device, "water_temperature", 0) > 0:
+            self._device_type = DEVICE_TYPE_WATER
+        else:
+            self._device_type = DEVICE_TYPE_AIR
 
     @property
     def supported_features(self):
@@ -108,34 +115,22 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
     @property
     def min_temp(self):
         """Return the minimum temperature to set."""
-        min_temp = self._device.min_air_temp
-        if min_temp is None:
-            min_temp = self._device.min_water_temp
-        return min_temp
+        return getattr(self._device, f"min_{self._device_type}_temp")
 
     @property
     def max_temp(self):
         """Return the maximum temperature to set."""
-        max_temp = self._device.max_air_temp
-        if max_temp is None:
-            max_temp = self._device.max_water_temp
-        return max_temp
+        return getattr(self._device, f"max_{self._device_type}_temp")
 
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        temp = self._device.air_temperature
-        if temp is None:
-            temp = self._device.water_temperature
-        return temp
+        return getattr(self._device, f"{self._device_type}_temperature")
 
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        set_temp = self._device.set_air_temperature
-        if set_temp is None:
-            set_temp = self._device.set_water_temperature
-        return set_temp
+        return getattr(self._device, f"set_{self._device_type}_temperature")
 
     @property
     def hvac_mode(self):
@@ -192,14 +187,12 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
             return
 
         try:
-            if self._device.air_temperature is not None:
-                await self.hass.async_add_executor_job(
-                    setattr, self._device, "set_air_temperature", temperature
-                )
-            elif self._device.water_temperature is not None:
-                await self.hass.async_add_executor_job(
-                    setattr, self._device, "set_water_temperature", temperature
-                )
+            await self.hass.async_add_executor_job(
+                setattr,
+                self._device,
+                f"set_{self._device_type}_temperature",
+                temperature,
+            )
             await self.coordinator.async_request_refresh()
         except (ValueError, AguaIOTError) as err:
             _LOGGER.error("Failed to set temperature, error: %s", err)
