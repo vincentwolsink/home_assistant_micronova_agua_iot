@@ -54,7 +54,7 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
         CoordinatorEntity.__init__(self, coordinator)
         self._device = device
 
-        if getattr(self._device, "water_temperature", 0) > 0:
+        if self._device.water_temperature and self._device.water_temperature > 0:
             self._device_type = DEVICE_TYPE_WATER
         else:
             self._device_type = DEVICE_TYPE_AIR
