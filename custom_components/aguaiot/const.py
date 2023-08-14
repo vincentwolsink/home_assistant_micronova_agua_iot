@@ -1,10 +1,6 @@
 """Agua IOT constants."""
 from homeassistant.const import Platform, UnitOfTemperature
-from homeassistant.components.climate.const import (
-    CURRENT_HVAC_HEAT,
-    CURRENT_HVAC_IDLE,
-    CURRENT_HVAC_OFF,
-)
+from homeassistant.components.climate.const import HVACAction
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntityDescription,
@@ -31,11 +27,11 @@ AGUA_STATUS_OFF = "OFF"
 AGUA_STATUS_ON = "ON"
 
 CURRENT_HVAC_MAP_AGUA_HEAT = {
-    AGUA_STATUS_ON: CURRENT_HVAC_HEAT,
-    AGUA_STATUS_CLEANING: CURRENT_HVAC_HEAT,
-    AGUA_STATUS_CLEANING_FINAL: CURRENT_HVAC_OFF,
-    AGUA_STATUS_FLAME: CURRENT_HVAC_HEAT,
-    AGUA_STATUS_OFF: CURRENT_HVAC_OFF,
+    AGUA_STATUS_ON: HVACAction.HEATING,
+    AGUA_STATUS_CLEANING: HVACAction.HEATING,
+    AGUA_STATUS_CLEANING_FINAL: HVACAction.OFF,
+    AGUA_STATUS_FLAME: HVACAction.HEATING,
+    AGUA_STATUS_OFF: HVACAction.OFF,
 }
 
 PLATFORMS = [

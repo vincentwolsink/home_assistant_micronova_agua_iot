@@ -8,18 +8,14 @@ from homeassistant.helpers.update_coordinator import (
 )
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
-    CURRENT_HVAC_HEAT,
-    CURRENT_HVAC_IDLE,
-    CURRENT_HVAC_OFF,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_OFF,
-    SUPPORT_FAN_MODE,
-    SUPPORT_TARGET_TEMPERATURE,
+    HVACAction,
+    HVACMode,
+    ClimateEntityFeature,
 )
 from homeassistant.const import (
     ATTR_TEMPERATURE,
     PRECISION_WHOLE,
-    TEMP_CELSIUS,
+    UnitOfTemperature,
 )
 from .const import (
     ATTR_DEVICE_ALARM,
@@ -59,7 +55,7 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
     @property
     def supported_features(self):
         """Return the list of supported features."""
-        return SUPPORT_TARGET_TEMPERATURE | SUPPORT_FAN_MODE
+        return ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
 
     @property
     def extra_state_attributes(self):
@@ -103,7 +99,7 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
     @property
     def temperature_unit(self):
         """Return the unit of measurement."""
-        return TEMP_CELSIUS
+        return UnitOfTemperature.CELSIUS
 
     @property
     def min_temp(self):
@@ -141,13 +137,13 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
     def hvac_mode(self):
         """Return hvac operation ie. heat, cool mode."""
         if self._device.status not in [0, 6]:
-            return HVAC_MODE_HEAT
-        return HVAC_MODE_OFF
+            return HVACMode.HEAT
+        return HVACMode.OFF
 
     @property
     def hvac_modes(self):
         """Return the list of available hvac operation modes."""
-        return [HVAC_MODE_HEAT, HVAC_MODE_OFF]
+        return [HVACMode.HEAT, HVACMode.OFF]
 
     @property
     def fan_mode(self):
@@ -167,7 +163,7 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
         """Return the current running hvac operation."""
         if self._device.status_translated in CURRENT_HVAC_MAP_AGUA_HEAT:
             return CURRENT_HVAC_MAP_AGUA_HEAT.get(self._device.status_translated)
-        return CURRENT_HVAC_IDLE
+        return HVACAction.IDLE
 
     async def async_turn_off(self):
         """Turn device off."""
@@ -219,7 +215,7 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-        if hvac_mode == HVAC_MODE_OFF:
+        if hvac_mode == HVACMode.OFF:
             await self.async_turn_off()
-        elif hvac_mode == HVAC_MODE_HEAT:
+        elif hvac_mode == HVACMode.HEAT:
             await self.async_turn_on()
