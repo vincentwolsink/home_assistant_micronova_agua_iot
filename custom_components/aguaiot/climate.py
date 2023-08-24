@@ -54,7 +54,7 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
         CoordinatorEntity.__init__(self, coordinator)
         self._device = device
 
-        if self._device.water_temperature and self._device.water_temperature > 0:
+        if self._device.water_temp and self._device.water_temp > 0:
             self._device_type = DEVICE_TYPE_WATER
         else:
             self._device_type = DEVICE_TYPE_AIR
@@ -121,12 +121,12 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        return getattr(self._device, f"{self._device_type}_temperature")
+        return getattr(self._device, f"{self._device_type}_temp")
 
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        return getattr(self._device, f"set_{self._device_type}_temperature")
+        return getattr(self._device, f"set_{self._device_type}_temp")
 
     @property
     def hvac_mode(self):
@@ -186,7 +186,7 @@ class AguaIOTHeatingDevice(CoordinatorEntity, ClimateEntity):
             await self.hass.async_add_executor_job(
                 setattr,
                 self._device,
-                f"set_{self._device_type}_temperature",
+                f"set_{self._device_type}_temp",
                 temperature,
             )
             await self.coordinator.async_request_refresh()
