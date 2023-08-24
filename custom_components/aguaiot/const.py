@@ -6,6 +6,14 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
+from homeassistant.components.switch import (
+    SwitchDeviceClass,
+    SwitchEntityDescription,
+)
+from homeassistant.components.number import (
+    NumberDeviceClass,
+    NumberEntityDescription,
+)
 
 DOMAIN = "aguaiot"
 
@@ -38,8 +46,10 @@ DEVICE_TYPE_AIR = "air"
 DEVICE_TYPE_WATER = "water"
 
 PLATFORMS = [
-    Platform.SENSOR,
     Platform.CLIMATE,
+    Platform.SENSOR,
+    Platform.SWITCH,
+    Platform.NUMBER,
 ]
 
 UPDATE_INTERVAL = 60
@@ -59,5 +69,31 @@ SENSORS = (
         native_unit_of_measurement=None,
         state_class=None,
         device_class=None,
+    ),
+)
+
+SWITCHES = (
+    SwitchEntityDescription(
+        key="natural_mode",
+        name="Natural Mode",
+        icon="mdi:fan-off",
+        device_class=SwitchDeviceClass.SWITCH,
+    ),
+)
+
+NUMBERS = (
+    NumberEntityDescription(
+        key="energy_saving_air_start",
+        name="Energy Saving Start",
+        native_step=1,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        device_class=NumberDeviceClass.TEMPERATURE,
+    ),
+    NumberEntityDescription(
+        key="energy_saving_air_stop",
+        name="Energy Saving Stop",
+        native_step=1,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        device_class=NumberDeviceClass.TEMPERATURE,
     ),
 )
