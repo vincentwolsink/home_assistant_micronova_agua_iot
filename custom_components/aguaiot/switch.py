@@ -59,7 +59,7 @@ class AguaIOTHeatingSwitch(CoordinatorEntity, SwitchEntity):
         """Turn device off."""
         try:
             await self.hass.async_add_executor_job(
-                setattr(self._device, self.entity_description.key, False)
+                setattr, self._device, self.entity_description.key, False
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
@@ -73,7 +73,7 @@ class AguaIOTHeatingSwitch(CoordinatorEntity, SwitchEntity):
         """Turn device on."""
         try:
             await self.hass.async_add_executor_job(
-                setattr(self._device, self.entity_description.key, True)
+                setattr, self._device, self.entity_description.key, True
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
