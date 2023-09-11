@@ -20,18 +20,13 @@ async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, entry: ConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
-    coordinator: DataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
-        "coordinator"
-    ]
     agua = hass.data[DOMAIN][entry.entry_id]["agua"]
 
     devices = {}
     for device in agua.devices:
         devices[device.name] = device.full_data_map
 
-    return (
-        {
-            "entry": async_redact_data(entry.as_dict(), TO_REDACT),
-            "devices": devices,
-        },
-    )
+    return {
+        "entry": async_redact_data(entry.as_dict(), TO_REDACT),
+        "devices": devices,
+    }
