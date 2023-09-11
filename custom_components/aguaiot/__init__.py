@@ -143,7 +143,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
-        agua: agua_iot = hass.data[DOMAIN].pop(entry.entry_id)
-        # await agua.close()
+        hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
