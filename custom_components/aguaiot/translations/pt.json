@@ -1,0 +1,26 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Equipamento já configurado"
+        },
+        "error": {
+            "cannot_connect": "Falha na ligação",
+            "invalid_auth": "Falha na Autenticação ",
+            "unknown": "Erro desconhecido"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "api_url": "Agua IOT link da marca",
+                    "login_api_url": "API URL (opcional só quando necessario)",
+                    "customer_code": "Código da marca",
+                    "brand_id": "Identificador da marca  (por defeito: 1)",
+                    "api_login_application_version": "Versão de aplicação",
+                    "email": "Email",
+                    "password": "Senha"
+                },
+                "description": "Preencher com os parametros de Agua IOT "
+            }
+        }
+    }
+}
