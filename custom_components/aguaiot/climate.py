@@ -337,3 +337,17 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     def current_temperature(self):
         """Return the current temperature."""
         return self._device.get_register_value(f"{self._target}_temp_air_get")
+
+    async def async_set_temperature(self, **kwargs):
+        """Set new target temperature."""
+        temperature = kwargs.get(ATTR_TEMPERATURE)
+        if temperature is None:
+            return
+
+        try:
+            await self._device.set_register_value(
+                f"{self._target}_temp_air_set", temperature
+            )
+            await self.coordinator.async_request_refresh()
+        except (ValueError, AguaIOTError) as err:
+            _LOGGER.error("Failed to set temperature, error: %s", err)

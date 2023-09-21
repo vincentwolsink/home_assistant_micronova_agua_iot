@@ -374,7 +374,9 @@ class Device(object):
 
         for registers_map in res["device_registers_map"]["registers_map"]:
             if registers_map["id"] == self.id_registers_map:
-                registers = {reg["reg_key"]: reg for reg in registers_map["registers"]}
+                registers = {
+                    reg["reg_key"].lower(): reg for reg in registers_map["registers"]
+                }
 
         self.__register_map_dict = registers
 
