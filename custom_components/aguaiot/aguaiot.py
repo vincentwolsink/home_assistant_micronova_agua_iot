@@ -547,7 +547,7 @@ class Device(object):
             value = list(options.keys())[
                 list(options.values()).index(value_description)
             ]
-        except ValueError:
+        except (AttributeError, ValueError):
             value = value_description
 
         await self.set_register_value(key, value)
