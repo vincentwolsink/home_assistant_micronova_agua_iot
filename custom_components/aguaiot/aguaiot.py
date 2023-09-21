@@ -498,7 +498,7 @@ class Device(object):
 
             return register
         except (KeyError, ValueError):
-            return
+            return {}
 
     def get_register_value(self, key):
         return self.get_register(key).get("value")
