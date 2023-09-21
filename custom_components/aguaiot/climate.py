@@ -170,7 +170,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         """Turn device off."""
         try:
             await self._device.set_register_value_description(
-                "status_managed_set", "OFF"
+                "status_managed_get", "OFF"
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
@@ -180,7 +180,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         """Turn device on."""
         try:
             await self._device.set_register_value_description(
-                "status_managed_set", "ON"
+                "status_managed_get", "ON"
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
