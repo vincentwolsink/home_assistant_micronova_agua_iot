@@ -24,7 +24,11 @@ from .const import (
     DEVICE_TYPE_AIR,
     DEVICE_TYPE_WATER,
 )
-from py_agua_iot import Error as AguaIOTError
+from .aguaiot import (
+    ConnectionError,
+    AguaIOTError,
+    UnauthorizedError,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -271,6 +275,16 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
             )
         return fan_modes
 
+    async def async_set_fan_mode(self, fan_mode):
+        """Set new target fan mode."""
+        try:
+            await self._device.set_register_value_description(
+                f"{self._target}_vent_set", fan_mode
+            )
+            await self.coordinator.async_request_refresh()
+        except AguaIOTError as err:
+            _LOGGER.error("Failed to set fan mode, error: %s", err)
+
     @property
     def hvac_action(self):
         if (
@@ -318,3 +332,8 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     def target_temperature(self):
         """Return the temperature we try to reach."""
         return self._device.get_register_value(f"{self._target}_temp_air_set")
+
+    @property
+    def current_temperature(self):
+        """Return the current temperature."""
+        return self._device.get_register_value(f"{self._target}_temp_air_get")
