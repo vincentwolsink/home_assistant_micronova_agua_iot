@@ -74,7 +74,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             try:
                 gen_uuid = str(uuid.uuid1())
-                agua = agua_iot(
+                agua = aguaiot(
                     api_url,
                     customer_code,
                     email,

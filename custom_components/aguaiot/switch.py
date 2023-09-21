@@ -5,7 +5,11 @@ from homeassistant.helpers.update_coordinator import (
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.helpers.entity import DeviceInfo
 from .const import SWITCHES, DOMAIN
-from py_agua_iot import Error as AguaIOTError
+from .aguaiot import (
+    ConnectionError,
+    AguaIOTError,
+    UnauthorizedError,
+)
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
