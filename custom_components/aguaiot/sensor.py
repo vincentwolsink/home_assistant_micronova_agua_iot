@@ -16,7 +16,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
     sensors = []
     for device in agua.devices:
         for sensor in SENSORS:
-            sensors.append(AguaIOTHeatingSensor(coordinator, device, sensor))
+            if sensor.key in device.registers:
+                sensors.append(AguaIOTHeatingSensor(coordinator, device, sensor))
 
     async_add_entities(sensors, True)
 
@@ -51,4 +52,4 @@ class AguaIOTHeatingSensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
-        return getattr(self._device, self.entity_description.key)
+        return self._device.get_register_value_description(self.entity_description.key)

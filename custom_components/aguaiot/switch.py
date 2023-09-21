@@ -17,7 +17,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     switches = []
     for device in agua.devices:
         for switch in SWITCHES:
-            if getattr(device, switch.key, None) is not None:
+            if switch.key in device.registers:
                 switches.append(AguaIOTHeatingSwitch(coordinator, device, switch))
 
     async_add_entities(switches, True)
@@ -53,14 +53,12 @@ class AguaIOTHeatingSwitch(CoordinatorEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return the state of the sensor."""
-        return bool(getattr(self._device, self.entity_description.key))
+        return bool(self._device.get_register_value(self.entity_description.key))
 
     async def async_turn_off(self):
         """Turn device off."""
         try:
-            await self.hass.async_add_executor_job(
-                setattr, self._device, self.entity_description.key, False
-            )
+            await self._device.set_register_value(self.entity_description.key, 0)
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
             _LOGGER.error(
@@ -72,9 +70,7 @@ class AguaIOTHeatingSwitch(CoordinatorEntity, SwitchEntity):
     async def async_turn_on(self):
         """Turn device on."""
         try:
-            await self.hass.async_add_executor_job(
-                setattr, self._device, self.entity_description.key, True
-            )
+            await self._device.set_register_value(self.entity_description.key, 1)
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
             _LOGGER.error(

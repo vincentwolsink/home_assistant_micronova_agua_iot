@@ -11,11 +11,11 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, EVENT_HOMEASSISTANT_STOP
 
-from py_agua_iot import (
+from .aguaiot import (
     ConnectionError,
-    Error as AguaIOTError,
+    AguaIOTError,
     UnauthorizedError,
-    agua_iot,
+    aguaiot,
 )
 
 from .const import (
@@ -65,19 +65,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         else "1.6.0"
     )
 
+    agua = aguaiot(
+        api_url,
+        customer_code,
+        email,
+        password,
+        gen_uuid,
+        login_api_url,
+        brand_id,
+        api_login_application_version,
+    )
+
     try:
-        agua = await hass.async_add_executor_job(
-            agua_iot,
-            api_url,
-            customer_code,
-            email,
-            password,
-            gen_uuid,
-            login_api_url,
-            brand_id,
-            False,
-            api_login_application_version,
-        )
+        await agua.connect()
     except UnauthorizedError:
         _LOGGER.error("Wrong credentials for Agua IOT")
         return False
@@ -91,7 +91,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def async_update_data():
         """Get the latest data."""
         try:
-            await hass.async_add_executor_job(agua.fetch_device_information)
+            await agua.fetch_device_information()
         except UnauthorizedError:
             _LOGGER.error(
                 "Wrong credentials for device %s (%s)",

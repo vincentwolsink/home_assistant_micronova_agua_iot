@@ -16,7 +16,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     numbers = []
     for device in agua.devices:
         for number in NUMBERS:
-            if getattr(device, number.key, None) is not None:
+            if number.key in device.registers:
                 numbers.append(AguaIOTHeatingNumber(coordinator, device, number))
 
     async_add_entities(numbers, True)
@@ -52,24 +52,19 @@ class AguaIOTHeatingNumber(CoordinatorEntity, NumberEntity):
     @property
     def native_value(self):
         """Return the state of the sensor."""
-        return getattr(self._device, self.entity_description.key)
+        return self._device.get_register_value(self.entity_description.key)
 
     @property
     def native_min_value(self):
-        return getattr(self._device, f"min_{self.entity_description.key}")
+        return self._device.get_register_value_min(self.entity_description.key)
 
     @property
     def native_max_value(self):
-        return getattr(self._device, f"max_{self.entity_description.key}")
+        return self._device.get_register_value_max(self.entity_description.key)
 
     async def async_set_native_value(self, value):
         try:
-            await self.hass.async_add_executor_job(
-                setattr,
-                self._device,
-                self.entity_description.key,
-                value,
-            )
+            await self._device.set_register_value(self.entity_description.key, value)
             await self.coordinator.async_request_refresh()
         except (ValueError, AguaIOTError) as err:
             _LOGGER.error("Failed to set value, error: %s", err)

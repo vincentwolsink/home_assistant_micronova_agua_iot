@@ -24,7 +24,9 @@ async def async_get_config_entry_diagnostics(
 
     devices = {}
     for device in agua.devices:
-        devices[device.name] = device.full_data_map
+        devices[device.name] = {}
+        for reg in device.registers:
+            devices[device.name][reg] = device.get_register(reg)
 
     return {
         "entry": async_redact_data(entry.as_dict(), TO_REDACT),

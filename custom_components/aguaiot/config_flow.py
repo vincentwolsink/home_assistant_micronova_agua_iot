@@ -3,11 +3,11 @@ from collections import OrderedDict
 import logging
 import uuid
 
-from py_agua_iot import (  # pylint: disable=redefined-builtin
+from .aguaiot import (
     ConnectionError,
-    Error as AguaIOTError,
+    AguaIOTError,
     UnauthorizedError,
-    agua_iot,
+    aguaiot,
 )
 import voluptuous as vol
 
@@ -74,9 +74,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             try:
                 gen_uuid = str(uuid.uuid1())
-                debug = False
-                await self.hass.async_add_executor_job(
-                    agua_iot,
+                agua = agua_iot(
                     api_url,
                     customer_code,
                     email,
@@ -84,9 +82,9 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     gen_uuid,
                     login_api_url,
                     brand_id,
-                    debug,
                     api_login_application_version,
                 )
+                await agua.connect()
             except UnauthorizedError:
                 errors["base"] = "unauthorized"
             except ConnectionError:
