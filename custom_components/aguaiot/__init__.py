@@ -95,7 +95,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         except UnauthorizedError:
             _LOGGER.error(
                 "Wrong credentials for device %s (%s)",
-                self.name,
+                self._device.name,
                 self._device.id_device,
             )
             return False
@@ -105,7 +105,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         except AguaIOTError as err:
             _LOGGER.error(
                 "Failed to update %s (%s), error: %s",
-                self.name,
+                self._device.name,
                 self._device.id_device,
                 err,
             )

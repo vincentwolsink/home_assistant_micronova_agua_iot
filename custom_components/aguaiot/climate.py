@@ -95,12 +95,17 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         self._device = device
 
         if (
-            "temp_water_set" in self._device.registers
-            and self._device.get_register_value("temp_water_set") > 0
+            "temp_water_get" in self._device.registers
+            and self._device.get_register_value("temp_water_get")
         ):
             self._device_type = DEVICE_TYPE_WATER
         else:
-            self._device_type = DEVICE_TYPE_AIR
+            for variant in DEVICE_TYPE_AIR:
+                if (
+                    f"temp_{variant}_get" in self._device.registers
+                    and self._device.get_register_value(f"temp_{variant}_get")
+                ):
+                    self._device_type = variant
 
     @property
     def unique_id(self):
@@ -301,6 +306,9 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     @property
     def hvac_mode(self):
         return HVACMode.FAN_ONLY
+
+    async def async_set_hvac_mode(self, hvac_mode):
+        pass
 
     @property
     def preset_modes(self):
