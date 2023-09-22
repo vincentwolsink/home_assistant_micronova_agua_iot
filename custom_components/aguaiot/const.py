@@ -34,7 +34,7 @@ CURRENT_HVAC_MAP_AGUA_HEAT = {
     "OFF": HVACAction.OFF,
 }
 
-DEVICE_TYPE_AIR = "air"
+DEVICE_TYPE_AIR = ["air", "air2", "air_palm"]
 DEVICE_TYPE_WATER = "water"
 
 PLATFORMS = [
@@ -49,6 +49,13 @@ UPDATE_INTERVAL = 60
 SENSORS = (
     SensorEntityDescription(
         key="temp_gas_flue_get",
+        name="Smoke Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    SensorEntityDescription(
+        key="temp_probe_k_get",
         name="Smoke Temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
