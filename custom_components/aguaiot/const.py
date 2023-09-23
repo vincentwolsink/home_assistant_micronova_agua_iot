@@ -34,8 +34,7 @@ CURRENT_HVAC_MAP_AGUA_HEAT = {
     "OFF": HVACAction.OFF,
 }
 
-DEVICE_TYPE_AIR = ["air", "air2", "air_palm"]
-DEVICE_TYPE_WATER = "water"
+DEVICE_VARIANTS = ["water", "air", "air2", "air_palm"]
 
 PLATFORMS = [
     Platform.CLIMATE,
