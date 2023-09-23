@@ -21,8 +21,7 @@ from homeassistant.const import (
 from .const import (
     DOMAIN,
     CURRENT_HVAC_MAP_AGUA_HEAT,
-    DEVICE_TYPE_AIR,
-    DEVICE_TYPE_WATER,
+    DEVICE_VARIANTS,
 )
 from .aguaiot import (
     ConnectionError,
@@ -94,18 +93,12 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         CoordinatorEntity.__init__(self, coordinator)
         self._device = device
 
-        if (
-            "temp_water_get" in self._device.registers
-            and self._device.get_register_value("temp_water_get")
-        ):
-            self._device_type = DEVICE_TYPE_WATER
-        else:
-            for variant in DEVICE_TYPE_AIR:
-                if (
-                    f"temp_{variant}_get" in self._device.registers
-                    and self._device.get_register_value(f"temp_{variant}_get")
-                ):
-                    self._device_type = variant
+        for variant in DEVICE_VARIANTS:
+            if (
+                f"temp_{variant}_get" in self._device.registers
+                and self._device.get_register_value(f"temp_{variant}_get")
+            ):
+                self._device_type = variant
 
     @property
     def unique_id(self):
