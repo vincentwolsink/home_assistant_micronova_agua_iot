@@ -98,7 +98,14 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
                 f"temp_{variant}_get" in self._device.registers
                 and self._device.get_register_value(f"temp_{variant}_get")
             ):
-                self._device_type = variant
+                self._temperature_get_key = f"temp_{variant}_get"
+
+        for variant in DEVICE_VARIANTS:
+            if (
+                f"temp_{variant}_set" in self._device.registers
+                and self._device.get_register_value(f"temp_{variant}_set")
+            ):
+                self._temperature_set_key = f"temp_{variant}_set"
 
     @property
     def unique_id(self):
@@ -195,22 +202,22 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     @property
     def min_temp(self):
         """Return the minimum temperature to set."""
-        return self._device.get_register_value_min(f"temp_{self._device_type}_set")
+        return self._device.get_register_value_min(self._temperature_set_key)
 
     @property
     def max_temp(self):
         """Return the maximum temperature to set."""
-        return self._device.get_register_value_max(f"temp_{self._device_type}_set")
+        return self._device.get_register_value_max(self._temperature_set_key)
 
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        return self._device.get_register_value(f"temp_{self._device_type}_get")
+        return self._device.get_register_value(self._temperature_get_key)
 
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        return self._device.get_register_value(f"temp_{self._device_type}_set")
+        return self._device.get_register_value(self._temperature_set_key)
 
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
@@ -220,7 +227,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
 
         try:
             await self._device.set_register_value(
-                f"temp_{self._device_type}_set", temperature
+                self._temperature_set_key, temperature
             )
             await self.coordinator.async_request_refresh()
         except (ValueError, AguaIOTError) as err:
