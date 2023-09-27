@@ -22,7 +22,10 @@ async def async_setup_entry(hass, entry, async_add_entities):
     for device in agua.devices:
         for switch in SWITCHES:
             if switch.key in device.registers:
-                switches.append(AguaIOTHeatingSwitch(coordinator, device, switch))
+                if switch.enable_key is None:
+                    switches.append(AguaIOTHeatingSwitch(coordinator, device, switch))
+                elif device.get_register_value(switch.enable_key) == 1:
+                    switches.append(AguaIOTHeatingSwitch(coordinator, device, switch))
 
     async_add_entities(switches, True)
 
