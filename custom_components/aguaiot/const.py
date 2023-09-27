@@ -55,7 +55,7 @@ SENSORS = (
     ),
     SensorEntityDescription(
         key="temp_probe_k_get",
-        name="Smoke Temperature",
+        name="Flame Temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
