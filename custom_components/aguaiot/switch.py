@@ -24,7 +24,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
             if switch.key in device.registers:
                 if switch.enable_key is None:
                     switches.append(AguaIOTHeatingSwitch(coordinator, device, switch))
-                elif device.get_register_value(switch.enable_key) == 1:
+                elif switch.enable_key in device.registers:
+                    if device.get_register_value(switch.enable_key) == 1:
+                        switches.append(
+                            AguaIOTHeatingSwitch(coordinator, device, switch)
+                        )
+                else:
                     switches.append(AguaIOTHeatingSwitch(coordinator, device, switch))
 
     async_add_entities(switches, True)

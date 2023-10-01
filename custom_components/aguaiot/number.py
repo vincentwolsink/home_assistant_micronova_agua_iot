@@ -24,7 +24,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
             if number.key in device.registers:
                 if number.enable_key is None:
                     numbers.append(AguaIOTHeatingNumber(coordinator, device, number))
-                elif device.get_register_value(number.enable_key) == 1:
+                elif number.enable_key in device.registers:
+                    if device.get_register_value(number.enable_key) == 1:
+                        numbers.append(
+                            AguaIOTHeatingNumber(coordinator, device, number)
+                        )
+                else:
                     numbers.append(AguaIOTHeatingNumber(coordinator, device, number))
 
     async_add_entities(numbers, True)

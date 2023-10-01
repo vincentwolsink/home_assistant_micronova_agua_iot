@@ -19,8 +19,14 @@ async def async_setup_entry(hass, entry, async_add_entities):
             if sensor.key in device.registers:
                 if sensor.enable_key is None:
                     sensors.append(AguaIOTHeatingSensor(coordinator, device, sensor))
-                elif device.get_register_value(sensor.enable_key) == 1:
+                elif sensor.enable_key in device.registers:
+                    if device.get_register_value(sensor.enable_key) == 1:
+                        sensors.append(
+                            AguaIOTHeatingSensor(coordinator, device, sensor)
+                        )
+                else:
                     sensors.append(AguaIOTHeatingSensor(coordinator, device, sensor))
+
     async_add_entities(sensors, True)
 
 
