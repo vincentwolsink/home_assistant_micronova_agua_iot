@@ -78,37 +78,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     try:
         await agua.connect()
-    except UnauthorizedError:
-        _LOGGER.error("Wrong credentials for Agua IOT")
+    except UnauthorizedError as e:
+        _LOGGER.error("Agua IOT Unauthorized: %s", e)
         return False
-    except ConnectionError:
-        _LOGGER.error("Connection to Agua IOT not possible")
+    except ConnectionError as e:
+        _LOGGER.error("Connection error to Agua IOT: %s", e)
         return False
-    except AguaIOTError as err:
-        _LOGGER.error("Unknown Agua IOT error: %s", err)
+    except AguaIOTError as e:
+        _LOGGER.error("Unknown Agua IOT error: %s", e)
         return False
 
     async def async_update_data():
         """Get the latest data."""
         try:
             await agua.fetch_device_information()
-        except UnauthorizedError:
-            _LOGGER.error(
-                "Wrong credentials for device %s (%s)",
-                self._device.name,
-                self._device.id_device,
-            )
+        except UnauthorizedError as e:
+            _LOGGER.error("Agua IOT Unauthorized: %s", e)
             return False
-        except ConnectionError:
-            _LOGGER.error("Connection to Agua IOT not possible")
+        except ConnectionError as e:
+            _LOGGER.error("Connection error to Agua IOT: %s", e)
             return False
-        except AguaIOTError as err:
-            _LOGGER.error(
-                "Failed to update %s (%s), error: %s",
-                self._device.name,
-                self._device.id_device,
-                err,
-            )
+        except AguaIOTError as e:
+            _LOGGER.error("Unknown Agua IOT error: %s", e)
             return False
 
     coordinator = DataUpdateCoordinator(
