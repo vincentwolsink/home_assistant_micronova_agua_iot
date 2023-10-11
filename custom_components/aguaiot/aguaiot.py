@@ -533,6 +533,7 @@ class Device(object):
                 for item in self.get_register(key).get("enc_val")
                 if item["lang"] == "ENG"
             }
+        return {}
 
     async def set_register_value(self, key, value):
         values = [self.__prepare_value_for_writing(key, value)]
