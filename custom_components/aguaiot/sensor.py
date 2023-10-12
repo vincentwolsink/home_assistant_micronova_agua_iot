@@ -16,7 +16,9 @@ async def async_setup_entry(hass, entry, async_add_entities):
     sensors = []
     for device in agua.devices:
         for sensor in SENSORS:
-            if sensor.key in device.registers:
+            if sensor.key in device.registers and device.get_register_enabled(
+                sensor.key
+            ):
                 sensors.append(AguaIOTHeatingSensor(coordinator, device, sensor))
 
     async_add_entities(sensors, True)
@@ -57,9 +59,7 @@ class AguaIOTHeatingSensor(CoordinatorEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         """Expose plain value as extra attribute when needed."""
-        if self._device.get_register_value_description(
-            self.entity_description.key
-        ) != self._device.get_register_value(self.entity_description.key):
+        if self._device.get_register_value_options(self.entity_description.key):
             return {
                 "raw_value": self._device.get_register_value(
                     self.entity_description.key

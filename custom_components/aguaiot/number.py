@@ -21,7 +21,9 @@ async def async_setup_entry(hass, entry, async_add_entities):
     numbers = []
     for device in agua.devices:
         for number in NUMBERS:
-            if number.key in device.registers:
+            if number.key in device.registers and device.get_register_enabled(
+                number.key
+            ):
                 numbers.append(AguaIOTHeatingNumber(coordinator, device, number))
 
     async_add_entities(numbers, True)
