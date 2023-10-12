@@ -535,6 +535,23 @@ class Device(object):
             }
         return {}
 
+    def get_register_enabled(self, key):
+        enable_key = key.rsplit("_", 1)[0] + "_enable"
+        if enable_key not in self.registers:
+            # Always enabled if no enable register present
+            return True
+
+        if self.get_register(enable_key).get("reg_type") != "ENABLE":
+            raise AguaIOTError(f"Not a register of type ENABLE: {key}")
+
+        if "enable_val" in self.get_register(enable_key):
+            enabled_values = [
+                d["value"] for d in self.get_register(enable_key).get("enable_val")
+            ]
+            return self.get_register_value(enable_key) in enabled_values
+        else:
+            return self.get_register_value(enable_key) == 1
+
     async def set_register_value(self, key, value):
         values = [self.__prepare_value_for_writing(key, value)]
         try:

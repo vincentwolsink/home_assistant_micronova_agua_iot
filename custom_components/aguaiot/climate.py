@@ -46,8 +46,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 [
                     m.group(1)
                     for i in device.registers
-                    for m in [re.match(r"^(canalization_\d+)_", i.lower())]
-                    if m
+                    for m in [re.match(r"^(canalization_\d+)_temp_\w+", i.lower())]
+                    if m and device.get_register_enabled(m.group(0))
                 ]
             )
         ):
@@ -96,6 +96,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         for variant in DEVICE_VARIANTS:
             if (
                 f"temp_{variant}_get" in self._device.registers
+                and self._device.get_register_enabled(f"temp_{variant}_get")
                 and self._device.get_register_value(f"temp_{variant}_get")
             ):
                 self._temperature_get_key = f"temp_{variant}_get"
@@ -103,6 +104,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         for variant in DEVICE_VARIANTS:
             if (
                 f"temp_{variant}_set" in self._device.registers
+                and self._device.get_register_enabled(f"temp_{variant}_set")
                 and self._device.get_register_value(f"temp_{variant}_set")
             ):
                 self._temperature_set_key = f"temp_{variant}_set"
