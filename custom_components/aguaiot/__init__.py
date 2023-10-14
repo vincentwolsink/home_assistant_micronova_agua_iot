@@ -91,7 +91,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def async_update_data():
         """Get the latest data."""
         try:
-            await agua.fetch_device_information()
+            await agua.update()
         except UnauthorizedError as e:
             _LOGGER.error("Agua IOT Unauthorized: %s", e)
             return False
