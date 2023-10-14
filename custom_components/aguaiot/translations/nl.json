@@ -1,0 +1,26 @@
+{
+    "config": {
+        "abort": {
+            "device_already_configured": "Het apparaat is reeds geconfigureerd."
+        },
+        "error": {
+            "connection_error": "Verbinding met Agua IOT API is niet mogelijk.",
+            "unauthorized": "Inloggen mislukt, valideer de gebruikersdata.",
+            "unknown_error": "Onbekende fout, valideer de configuratie."
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "api_url": "Agua IOT URL behorende bij het merk",
+                    "login_api_url": "Afzonderlijke loginAPI-URL (optioneel, specificeer alleen wanneer nodig)",
+                    "customer_code": "Klant code van het merk",
+                    "brand_id": "Merk id (standaard: 1)",
+                    "api_login_application_version": "Applicatie versie",
+                    "email": "Email adres",
+                    "password": "Wachtwoord"
+                },
+                "description": "Vul Agua IOT parameters in"
+            }
+        }
+    }
+}
