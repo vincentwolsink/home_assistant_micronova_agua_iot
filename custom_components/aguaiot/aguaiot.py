@@ -160,6 +160,11 @@ class aguaiot(object):
             raise ConnectionError(str.format("Connection to {0} not possible", url))
 
         if response.status_code != 201:
+            _LOGGER.error(
+                "Failed to register app id. Code: %s, Response: %s",
+                response.status_code,
+                response.text,
+            )
             raise UnauthorizedError("Failed to register app id")
 
         return True
@@ -198,6 +203,11 @@ class aguaiot(object):
             raise ConnectionError(str.format("Connection to {0} not possible", url))
 
         if response.status_code != 200:
+            _LOGGER.error(
+                "Failed to login. Code: %s, Response: %s",
+                response.status_code,
+                response.text,
+            )
             raise UnauthorizedError("Failed to login, please check credentials")
 
         res = response.json()
@@ -284,6 +294,11 @@ class aguaiot(object):
     async def fetch_device_information(self):
         """Fetch device information of heating devices"""
         for dev in self.devices:
+            await dev.update_mapping()
+            await dev.update()
+
+    async def update(self):
+        for dev in self.devices:
             await dev.update()
 
     async def handle_webcall(self, method, url, payload):
@@ -321,6 +336,11 @@ class aguaiot(object):
             await self.do_refresh_token()
             return await self.handle_webcall(method, url, payload)
         elif response.status_code != 200:
+            _LOGGER.error(
+                "Webcall failed. Code: %s, Response: %s",
+                response.status_code,
+                response.text,
+            )
             return False
 
         return response.json()
@@ -353,8 +373,10 @@ class Device(object):
         self.__register_map_dict = dict()
         self.__information_dict = dict()
 
-    async def update(self):
+    async def update_mapping(self):
         await self.__update_device_registers_mapping()
+
+    async def update(self):
         await self.__update_device_information()
 
     async def __update_device_registers_mapping(self):
