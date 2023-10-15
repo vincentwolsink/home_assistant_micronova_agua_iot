@@ -3,7 +3,6 @@ the IOT Agua platform of Micronova
 """
 import asyncio
 import jwt
-import json
 import logging
 import re
 import time
@@ -20,7 +19,7 @@ API_PATH_DEVICE_REGISTERS_MAP = "/deviceGetRegistersMap"
 API_PATH_DEVICE_BUFFER_READING = "/deviceGetBufferReading"
 API_PATH_DEVICE_JOB_STATUS = "/deviceJobStatus/"
 API_PATH_DEVICE_WRITING = "/deviceRequestWriting"
-API_LOGIN_APPLICATION_VERSION = "1.6.0"
+API_LOGIN_APPLICATION_VERSION = "1.9.5"
 DEFAULT_TIMEOUT_VALUE = 30
 
 HEADER_ACCEPT = "application/json, text/javascript, */*; q=0.01"
@@ -148,13 +147,12 @@ class aguaiot(object):
             "push_notification_token": self.unique_id,
             "push_notification_active": False,
         }
-        payload = json.dumps(payload)
 
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     url,
-                    data=payload,
+                    json=payload,
                     headers=self._headers(),
                     follow_redirects=False,
                     timeout=DEFAULT_TIMEOUT_VALUE,
@@ -178,8 +176,6 @@ class aguaiot(object):
         url = self.api_url + API_PATH_LOGIN
 
         payload = {"email": self.email, "password": self.password}
-        payload = json.dumps(payload)
-
         extra_headers = {"local": "true", "Authorization": self.unique_id}
 
         headers = self._headers()
@@ -189,6 +185,8 @@ class aguaiot(object):
             extra_login_headers = {
                 "applicationversion": self.api_login_application_version,
                 "url": API_PATH_LOGIN.lstrip("/"),
+                "userid": "null",
+                "aguaid": "null",
             }
             headers.update(extra_login_headers)
             url = self.login_api_url
@@ -197,7 +195,7 @@ class aguaiot(object):
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     url,
-                    data=payload,
+                    json=payload,
                     headers=headers,
                     follow_redirects=False,
                     timeout=DEFAULT_TIMEOUT_VALUE,
@@ -230,13 +228,12 @@ class aguaiot(object):
         url = self.api_url + API_PATH_REFRESH_TOKEN
 
         payload = {"refresh_token": self.refresh_token}
-        payload = json.dumps(payload)
 
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     url,
-                    data=payload,
+                    json=payload,
                     headers=self._headers(),
                     follow_redirects=False,
                     timeout=DEFAULT_TIMEOUT_VALUE,
@@ -264,7 +261,6 @@ class aguaiot(object):
         url = self.api_url + API_PATH_DEVICE_LIST
 
         payload = {}
-        payload = json.dumps(payload)
 
         res = await self.handle_webcall("POST", url, payload)
         if res is False:
@@ -274,7 +270,6 @@ class aguaiot(object):
             url = self.api_url + API_PATH_DEVICE_INFO
 
             payload = {"id_device": dev["id_device"], "id_product": dev["id_product"]}
-            payload = json.dumps(payload)
 
             res2 = await self.handle_webcall("POST", url, payload)
             if res2 is False:
@@ -318,7 +313,7 @@ class aguaiot(object):
                 async with httpx.AsyncClient() as client:
                     response = await client.post(
                         url,
-                        data=payload,
+                        json=payload,
                         headers=headers,
                         follow_redirects=False,
                         timeout=DEFAULT_TIMEOUT_VALUE,
@@ -391,7 +386,6 @@ class Device(object):
             "id_product": self.id_product,
             "last_update": "2018-06-03T08:59:54.043",
         }
-        payload = json.dumps(payload)
 
         res = await self.__aguaiot.handle_webcall("POST", url, payload)
         if res is False:
@@ -413,7 +407,6 @@ class Device(object):
             "id_product": self.id_product,
             "BufferId": 1,
         }
-        payload = json.dumps(payload)
 
         res = await self.__aguaiot.handle_webcall("POST", url, payload)
         if res is False:
@@ -423,7 +416,6 @@ class Device(object):
         url = self.__aguaiot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
 
         payload = {}
-        payload = json.dumps(payload)
 
         retry_count = 0
         res = await self.__aguaiot.handle_webcall("GET", url, payload)
@@ -481,7 +473,6 @@ class Device(object):
             "Masks": masks,
             "Values": values,
         }
-        payload = json.dumps(payload)
 
         res = await self.__aguaiot.handle_webcall("POST", url, payload)
         if res is False:
@@ -492,7 +483,6 @@ class Device(object):
         url = self.__aguaiot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
 
         payload = {}
-        payload = json.dumps(payload)
 
         retry_count = 0
         res = await self.__aguaiot.handle_webcall("GET", url, payload)
