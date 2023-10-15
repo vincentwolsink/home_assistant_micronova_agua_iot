@@ -123,7 +123,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         ] = str
         data_schema[vol.Required(CONF_BRAND_ID, default="1")] = str
         data_schema[
-            vol.Required(CONF_API_LOGIN_APPLICATION_VERSION, default="1.6.0")
+            vol.Required(CONF_API_LOGIN_APPLICATION_VERSION, default="1.9.5")
         ] = str
         data_schema[vol.Required(CONF_EMAIL, default=user_input.get(CONF_EMAIL))] = str
         data_schema[
