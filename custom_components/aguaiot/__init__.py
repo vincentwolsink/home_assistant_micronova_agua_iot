@@ -62,7 +62,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     api_login_application_version = (
         entry.data.get(CONF_API_LOGIN_APPLICATION_VERSION)
         if entry.data.get(CONF_API_LOGIN_APPLICATION_VERSION) != ""
-        else "1.6.0"
+        else "1.9.5"
     )
 
     agua = aguaiot(
