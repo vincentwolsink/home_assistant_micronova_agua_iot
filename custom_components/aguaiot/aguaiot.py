@@ -86,7 +86,10 @@ def parser(string):
         elif operator == "-":
             output -= number
 
-    return int(output)
+    if not float(output).is_integer():
+        return float(output)
+    else:
+        return int(output)
 
 
 class aguaiot(object):

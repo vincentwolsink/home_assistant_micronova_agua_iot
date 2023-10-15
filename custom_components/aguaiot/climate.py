@@ -15,8 +15,8 @@ from homeassistant.components.climate.const import (
 )
 from homeassistant.const import (
     ATTR_TEMPERATURE,
-    PRECISION_WHOLE,
     UnitOfTemperature,
+    PRECISION_HALVES,
 )
 from .const import (
     DOMAIN,
@@ -70,19 +70,14 @@ class AguaIOTClimateDevice(CoordinatorEntity, ClimateEntity):
         )
 
     @property
-    def precision(self):
-        """Return the precision of the system."""
-        return PRECISION_WHOLE
-
-    @property
-    def target_temperature_step(self):
-        """Return the supported step of target temperature."""
-        return PRECISION_WHOLE
-
-    @property
     def temperature_unit(self):
         """Return the unit of measurement."""
         return UnitOfTemperature.CELSIUS
+
+    @property
+    def precision(self):
+        """Return the precision of the system."""
+        return PRECISION_HALVES
 
 
 class AguaIOTHeatingDevice(AguaIOTClimateDevice):
@@ -235,6 +230,11 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         except (ValueError, AguaIOTError) as err:
             _LOGGER.error("Failed to set temperature, error: %s", err)
 
+    @property
+    def target_temperature_step(self):
+        """Return the supported step of target temperature."""
+        return self._device.get_register(self._temperature_set_key).get("step", 1)
+
 
 class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     def __init__(self, coordinator, device, canalization):
@@ -361,3 +361,8 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
             await self.coordinator.async_request_refresh()
         except (ValueError, AguaIOTError) as err:
             _LOGGER.error("Failed to set temperature, error: %s", err)
+
+    @property
+    def target_temperature_step(self):
+        """Return the supported step of target temperature."""
+        return self._device.get_register(f"{self._target}_temp_air_set").get("step", 1)
