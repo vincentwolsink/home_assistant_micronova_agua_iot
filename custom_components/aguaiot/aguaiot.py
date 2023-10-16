@@ -148,17 +148,14 @@ class aguaiot(object):
             "push_notification_active": False,
         }
 
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    url,
-                    json=payload,
-                    headers=self._headers(),
-                    follow_redirects=False,
-                    timeout=DEFAULT_TIMEOUT_VALUE,
-                )
-        except httpx.TransportError:
-            raise ConnectionError(str.format("Connection to {0} not possible", url))
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url,
+                json=payload,
+                headers=self._headers(),
+                follow_redirects=False,
+                timeout=DEFAULT_TIMEOUT_VALUE,
+            )
 
         if response.status_code != 201:
             _LOGGER.error(
@@ -191,17 +188,14 @@ class aguaiot(object):
             headers.update(extra_login_headers)
             url = self.login_api_url
 
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    url,
-                    json=payload,
-                    headers=headers,
-                    follow_redirects=False,
-                    timeout=DEFAULT_TIMEOUT_VALUE,
-                )
-        except httpx.TransportError:
-            raise ConnectionError(str.format("Connection to {0} not possible", url))
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url,
+                json=payload,
+                headers=headers,
+                follow_redirects=False,
+                timeout=DEFAULT_TIMEOUT_VALUE,
+            )
 
         if response.status_code != 200:
             _LOGGER.error(
@@ -229,17 +223,14 @@ class aguaiot(object):
 
         payload = {"refresh_token": self.refresh_token}
 
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    url,
-                    json=payload,
-                    headers=self._headers(),
-                    follow_redirects=False,
-                    timeout=DEFAULT_TIMEOUT_VALUE,
-                )
-        except httpx.TransportError:
-            raise ConnectionError(str.format("Connection to {0} not possible", url))
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url,
+                json=payload,
+                headers=self._headers(),
+                follow_redirects=False,
+                timeout=DEFAULT_TIMEOUT_VALUE,
+            )
 
         if response.status_code != 201:
             _LOGGER.warning("Refresh auth token failed, forcing new login...")
@@ -308,27 +299,24 @@ class aguaiot(object):
         headers = self._headers()
         headers.update(extra_headers)
 
-        try:
-            if method == "POST":
-                async with httpx.AsyncClient() as client:
-                    response = await client.post(
-                        url,
-                        json=payload,
-                        headers=headers,
-                        follow_redirects=False,
-                        timeout=DEFAULT_TIMEOUT_VALUE,
-                    )
-            else:
-                async with httpx.AsyncClient() as client:
-                    response = await client.get(
-                        url,
-                        params=payload,
-                        headers=headers,
-                        follow_redirects=False,
-                        timeout=DEFAULT_TIMEOUT_VALUE,
-                    )
-        except httpx.TransportError:
-            raise ConnectionError(str.format("Connection to {0} not possible", url))
+        if method == "POST":
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    url,
+                    json=payload,
+                    headers=headers,
+                    follow_redirects=False,
+                    timeout=DEFAULT_TIMEOUT_VALUE,
+                )
+        else:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    url,
+                    params=payload,
+                    headers=headers,
+                    follow_redirects=False,
+                    timeout=DEFAULT_TIMEOUT_VALUE,
+                )
 
         if response.status_code == 401:
             await self.do_refresh_token()
