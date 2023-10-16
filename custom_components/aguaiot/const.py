@@ -88,7 +88,7 @@ SENSORS = (
 
 SWITCHES = (
     SwitchEntityDescription(
-        key="natural_mode",
+        key="natural_mode_manual_set",
         name="Natural Mode",
         icon="mdi:fan-off",
         device_class=SwitchDeviceClass.SWITCH,
@@ -103,14 +103,14 @@ SWITCHES = (
 
 NUMBERS = (
     NumberEntityDescription(
-        key="energy_saving_air_start",
+        key="es_air_start_set",
         name="Energy Saving Start",
         native_step=1,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=NumberDeviceClass.TEMPERATURE,
     ),
     NumberEntityDescription(
-        key="energy_saving_air_stop",
+        key="es_air_stop_set",
         name="Energy Saving Stop",
         native_step=1,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
