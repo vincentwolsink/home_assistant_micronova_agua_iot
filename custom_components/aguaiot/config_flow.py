@@ -86,10 +86,13 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
                 await agua.connect()
             except UnauthorizedError:
+                _LOGGER.error("Agua IOT Unauthorized: %s", e)
                 errors["base"] = "unauthorized"
             except ConnectionError:
+                _LOGGER.error("Connection error to Agua IOT: %s", e)
                 errors["base"] = "connection_error"
             except AguaIOTError:
+                _LOGGER.error("Unknown Agua IOT error: %s", e)
                 errors["base"] = "unknown_error"
 
             if "base" not in errors:

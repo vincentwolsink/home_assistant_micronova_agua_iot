@@ -5,11 +5,7 @@ from homeassistant.helpers.update_coordinator import (
 from homeassistant.components.number import NumberEntity
 from homeassistant.helpers.entity import DeviceInfo
 from .const import NUMBERS, DOMAIN
-from .aguaiot import (
-    ConnectionError,
-    AguaIOTError,
-    UnauthorizedError,
-)
+from .aguaiot import AguaIOTError
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
