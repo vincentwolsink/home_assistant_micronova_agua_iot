@@ -23,11 +23,7 @@ from .const import (
     CURRENT_HVAC_MAP_AGUA_HEAT,
     DEVICE_VARIANTS,
 )
-from .aguaiot import (
-    ConnectionError,
-    AguaIOTError,
-    UnauthorizedError,
-)
+from .aguaiot import AguaIOTError
 
 _LOGGER = logging.getLogger(__name__)
 
