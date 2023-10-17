@@ -149,7 +149,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     @property
     def fan_mode(self):
         """Return fan mode."""
-        return self._device.get_register_value_description("power_set")
+        return str(self._device.get_register_value_description("power_set"))
 
     @property
     def fan_modes(self):
@@ -160,7 +160,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
             (self._device.get_register_value_max("power_set") + 1),
         ):
             fan_modes.append(
-                self._device.get_register_value_options("power_set").get(x, x)
+                str(self._device.get_register_value_options("power_set").get(x, x))
             )
         return fan_modes
 
@@ -261,7 +261,9 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     @property
     def fan_mode(self):
         """Return fan mode."""
-        return self._device.get_register_value_description(f"{self._target}_vent_set")
+        return str(
+            self._device.get_register_value_description(f"{self._target}_vent_set")
+        )
 
     @property
     def fan_modes(self):
@@ -272,8 +274,10 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
             (self._device.get_register_value_max(f"{self._target}_vent_set") + 1),
         ):
             fan_modes.append(
-                self._device.get_register_value_options(f"{self._target}_vent_set").get(
-                    x, x
+                str(
+                    self._device.get_register_value_options(
+                        f"{self._target}_vent_set"
+                    ).get(x, x)
                 )
             )
         return fan_modes
