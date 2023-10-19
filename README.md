@@ -52,6 +52,10 @@ Or folow these steps:
 2. Install the plugin via HACS (Micronova Agua IOT)
 3. Add the integration through the home assistant configuration flow
 
+## Credits
+
+Some parts of the code are based on [py-agua-iot](https://github.com/fredericvl/py-agua-iot)
+
 [releases-shield]: https://img.shields.io/github/v/release/vincentwolsink/home_assistant_micronova_agua_iot.svg?style=for-the-badge
 [releases]: https://github.com/vincentwolsink/home_assistant_micronova_agua_iot/releases
 [maintainer-shield]: https://img.shields.io/badge/maintainer-vincentwolsink-blue.svg?style=for-the-badge
