@@ -20,7 +20,6 @@ from homeassistant.const import (
 )
 from .const import (
     DOMAIN,
-    CURRENT_HVAC_MAP_AGUA_HEAT,
     DEVICE_VARIANTS,
 )
 from .aguaiot import AguaIOTError
@@ -134,14 +133,13 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     @property
     def hvac_action(self):
         """Return the current running hvac operation."""
-        if (
-            self._device.get_register_value_description("status_get")
-            in CURRENT_HVAC_MAP_AGUA_HEAT
-        ):
-            return CURRENT_HVAC_MAP_AGUA_HEAT.get(
-                self._device.get_register_value_description("status_get")
-            )
-        return HVACAction.IDLE
+        if self._device.get_register_value("status_get") in [1, 2]:
+            return HVACAction.HEATING
+        elif self._device.get_register_value("status_get") in [3, 4, 5]:
+            return HVACAction.HEATING
+        elif self._device.get_register_value("status_get") in [7, 8, 9]:
+            return HVACAction.IDLE
+        return HVACMode.OFF
 
     @property
     def hvac_modes(self):
