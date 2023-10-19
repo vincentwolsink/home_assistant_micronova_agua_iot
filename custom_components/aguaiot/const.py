@@ -26,14 +26,6 @@ CONF_CUSTOMER_CODE = "customer_code"
 CONF_LOGIN_API_URL = "login_api_url"
 CONF_UUID = "uuid"
 
-CURRENT_HVAC_MAP_AGUA_HEAT = {
-    "WORK": HVACAction.HEATING,
-    "FIRE POT CLEANING": HVACAction.HEATING,
-    "FINAL CLEANING": HVACAction.OFF,
-    "FLAME LIGHT": HVACAction.HEATING,
-    "OFF": HVACAction.OFF,
-}
-
 DEVICE_VARIANTS = ["water", "air", "air2", "air_palm"]
 
 PLATFORMS = [
