@@ -84,6 +84,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         CoordinatorEntity.__init__(self, coordinator)
         self._device = device
 
+        self._temperature_get_key = None
         for variant in DEVICE_VARIANTS:
             if (
                 f"temp_{variant}_get" in self._device.registers
@@ -92,6 +93,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
             ):
                 self._temperature_get_key = f"temp_{variant}_get"
 
+        self._temperature_set_key = None
         for variant in DEVICE_VARIANTS:
             if (
                 f"temp_{variant}_set" in self._device.registers
