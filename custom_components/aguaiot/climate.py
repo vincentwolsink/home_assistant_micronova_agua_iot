@@ -92,6 +92,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
                 and self._device.get_register_value(f"temp_{variant}_get")
             ):
                 self._temperature_get_key = f"temp_{variant}_get"
+                break
 
         self._temperature_set_key = None
         for variant in DEVICE_VARIANTS:
@@ -101,6 +102,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
                 and self._device.get_register_value(f"temp_{variant}_set")
             ):
                 self._temperature_set_key = f"temp_{variant}_set"
+                break
 
     @property
     def unique_id(self):
