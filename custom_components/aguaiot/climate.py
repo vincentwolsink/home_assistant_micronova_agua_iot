@@ -51,6 +51,18 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 AguaIOTCanalizationDevice(coordinator, device, canalization)
             )
 
+        for multifan in list(
+            set(
+                [
+                    m.group(1)
+                    for i in device.registers
+                    for m in [re.match(r"(multifire_\d+)_\w+", i.lower())]
+                    if m and device.get_register_enabled(m.group(0))
+                ]
+            )
+        ):
+            entities.append(AguaIOTFanDevice(coordinator, device, multifan))
+
     async_add_entities(entities, True)
 
 
@@ -370,3 +382,78 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     def target_temperature_step(self):
         """Return the supported step of target temperature."""
         return self._device.get_register(f"{self._target}_temp_air_set").get("step", 1)
+
+
+class AguaIOTFanDevice(AguaIOTClimateDevice):
+    def __init__(self, coordinator, device, multifan):
+        CoordinatorEntity.__init__(self, coordinator)
+        self._device = device
+        self._target = multifan
+
+    @property
+    def unique_id(self):
+        return f"{self._device.id_device}_{self._target}"
+
+    @property
+    def name(self):
+        return f"{self._device.name} {self._target.replace('_', ' ')}"
+
+    @property
+    def supported_features(self):
+        return ClimateEntityFeature.FAN_MODE
+
+    @property
+    def icon(self):
+        return "mdi:fan"
+
+    @property
+    def fan_mode(self):
+        """Return fan mode."""
+        return str(self._device.get_register_value_description(f"{self._target}_set"))
+
+    @property
+    def fan_modes(self):
+        """Return the list of available fan modes."""
+        fan_modes = []
+        for x in range(
+            self._device.get_register_value_min(f"{self._target}_set"),
+            (self._device.get_register_value_max(f"{self._target}_set") + 1),
+        ):
+            fan_modes.append(
+                str(
+                    self._device.get_register_value_options(f"{self._target}_set").get(
+                        x, x
+                    )
+                )
+            )
+        return fan_modes
+
+    async def async_set_fan_mode(self, fan_mode):
+        """Set new target fan mode."""
+        try:
+            await self._device.set_register_value_description(
+                f"{self._target}_set", fan_mode
+            )
+            await self.coordinator.async_request_refresh()
+        except AguaIOTError as err:
+            _LOGGER.error("Failed to set fan mode, error: %s", err)
+
+    @property
+    def hvac_action(self):
+        if (
+            f"{self._target}_set" in self._device.registers
+            and int(self._device.get_register_value(f"{self._target}_set")) > 0
+        ):
+            return HVACAction.FAN
+        return HVACAction.OFF
+
+    @property
+    def hvac_modes(self):
+        return [HVACMode.FAN_ONLY]
+
+    @property
+    def hvac_mode(self):
+        return HVACMode.FAN_ONLY
+
+    async def async_set_hvac_mode(self, hvac_mode):
+        pass
