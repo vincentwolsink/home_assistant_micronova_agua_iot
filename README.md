@@ -6,7 +6,8 @@
 
 Home Assistant integration for controlling heating devices connected via the Agua IOT platform of Micronova.
 
-## API URLs / Customer codes| App name or Brand             | Customer Code | API URL                                | Separate login URL (only needed if specified)           |
+## API URLs / Customer codes
+| App name or Brand             | Customer Code | API URL                                | Separate login URL (only needed if specified)           |
 | ----------------------------- | ------------- | -------------------------------------- | ------------------------------------------------------- |
 | Alfaplam                      | 862148        | https://alfaplam.agua-iot.com          |                                                         |
 | Boreal Home                   | 173118        | https://boreal.agua-iot.com            |                                                         |
