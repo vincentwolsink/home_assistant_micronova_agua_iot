@@ -20,10 +20,8 @@ from .aguaiot import (
 
 from .const import (
     CONF_API_URL,
-    CONF_BRAND_ID,
     CONF_CUSTOMER_CODE,
     CONF_LOGIN_API_URL,
-    CONF_API_LOGIN_APPLICATION_VERSION,
     CONF_UUID,
     DOMAIN,
     PLATFORMS,
@@ -50,7 +48,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up AguaIOT entry."""
     api_url = entry.data[CONF_API_URL]
     customer_code = entry.data[CONF_CUSTOMER_CODE]
-    brand_id = entry.data[CONF_BRAND_ID]
     email = entry.data[CONF_EMAIL]
     password = entry.data[CONF_PASSWORD]
     gen_uuid = entry.data[CONF_UUID]
@@ -58,11 +55,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry.data.get(CONF_LOGIN_API_URL)
         if entry.data.get(CONF_LOGIN_API_URL) != ""
         else None
-    )
-    api_login_application_version = (
-        entry.data.get(CONF_API_LOGIN_APPLICATION_VERSION)
-        if entry.data.get(CONF_API_LOGIN_APPLICATION_VERSION) != ""
-        else "1.9.5"
     )
 
     agua = aguaiot(
@@ -72,8 +64,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         password,
         gen_uuid,
         login_api_url,
-        brand_id,
-        api_login_application_version,
     )
 
     try:
