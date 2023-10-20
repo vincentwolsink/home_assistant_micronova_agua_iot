@@ -1,6 +1,7 @@
 """Support for Agua IOT heating devices."""
 import logging
 import re
+import copy
 
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import (
@@ -40,9 +41,10 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 for m in [re.match(canalization.key, i.lower())]
                 if m and device.get_register_enabled(m.group(0))
             ]:
-                canalization.key = canalization_found
+                canalization_copy = copy.deepcopy(canalization)
+                canalization_copy.key = canalization_found
                 entities.append(
-                    AguaIOTCanalizationDevice(coordinator, device, canalization)
+                    AguaIOTCanalizationDevice(coordinator, device, canalization_copy)
                 )
 
         for fan in CLIMATE_FANS:
@@ -52,8 +54,9 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 for m in [re.match(fan.key, i.lower())]
                 if m and device.get_register_enabled(m[0])
             ]:
-                fan.key = fan_found
-                entities.append(AguaIOTFanDevice(coordinator, device, fan))
+                fan_copy = copy.deepcopy(fan)
+                fan_copy.key = fan_found
+                entities.append(AguaIOTFanDevice(coordinator, device, fan_copy))
 
     async_add_entities(entities, True)
 
