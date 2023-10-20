@@ -18,10 +18,7 @@ from homeassistant.const import (
     UnitOfTemperature,
     PRECISION_HALVES,
 )
-from .const import (
-    DOMAIN,
-    DEVICE_VARIANTS,
-)
+from .const import DOMAIN, DEVICE_VARIANTS, CLIMATE_CANALIZATIONS, CLIMATE_FANS
 from .aguaiot import AguaIOTError
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,31 +33,27 @@ async def async_setup_entry(hass, entry, async_add_entities):
     for device in agua.devices:
         entities.append(AguaIOTHeatingDevice(coordinator, device))
 
-        for canalization in list(
-            set(
-                [
-                    m.group(1)
-                    for i in device.registers
-                    for m in [re.match(r"^(canalization_\d+)_temp_\w+", i.lower())]
-                    if m and device.get_register_enabled(m.group(0))
-                ]
-            )
-        ):
-            entities.append(
-                AguaIOTCanalizationDevice(coordinator, device, canalization)
-            )
+        for canalization in CLIMATE_CANALIZATIONS:
+            for canalization_found in [
+                m.group(1)
+                for i in device.registers
+                for m in [re.match(canalization.key, i.lower())]
+                if m and device.get_register_enabled(m.group(0))
+            ]:
+                canalization.key = canalization_found
+                entities.append(
+                    AguaIOTCanalizationDevice(coordinator, device, canalization)
+                )
 
-        for multifan in list(
-            set(
-                [
-                    m.group(1)
-                    for i in device.registers
-                    for m in [re.match(r"(multifire_\d+)_\w+", i.lower())]
-                    if m and device.get_register_enabled(m.group(0))
-                ]
-            )
-        ):
-            entities.append(AguaIOTFanDevice(coordinator, device, multifan))
+        for fan in CLIMATE_FANS:
+            for fan_found in [
+                m[0]
+                for i in device.registers
+                for m in [re.match(fan.key, i.lower())]
+                if m and device.get_register_enabled(m[0])
+            ]:
+                fan.key = fan_found
+                entities.append(AguaIOTFanDevice(coordinator, device, fan))
 
     async_add_entities(entities, True)
 
@@ -247,27 +240,28 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
 
 
 class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
-    def __init__(self, coordinator, device, canalization):
+    def __init__(self, coordinator, device, description):
         CoordinatorEntity.__init__(self, coordinator)
         self._device = device
-        self._target = canalization
+        self.entity_description = description
+        self.entity_description.name = self.entity_description.key.replace("_", " ")
 
     @property
     def unique_id(self):
-        return f"{self._device.id_device}_{self._target}"
+        return f"{self._device.id_device}_{self.entity_description.key}"
 
     @property
     def name(self):
-        return f"{self._device.name} {self._target.replace('_', ' ')}"
+        return f"{self._device.name} {self.entity_description.name}"
 
     @property
     def supported_features(self):
         features = 0
-        if f"{self._target}_temp_air_set" in self._device.registers:
+        if f"{self.entity_description.key}_temp_air_set" in self._device.registers:
             features |= ClimateEntityFeature.TARGET_TEMPERATURE
-        if f"{self._target}_set" in self._device.registers:
+        if f"{self.entity_description.key}_set" in self._device.registers:
             ClimateEntityFeature.PRESET_MODE
-        if f"{self._target}_vent_set" in self._device.registers:
+        if f"{self.entity_description.key}_vent_set" in self._device.registers:
             features |= ClimateEntityFeature.FAN_MODE
 
         return features
@@ -276,7 +270,9 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     def fan_mode(self):
         """Return fan mode."""
         return str(
-            self._device.get_register_value_description(f"{self._target}_vent_set")
+            self._device.get_register_value_description(
+                f"{self.entity_description.key}_vent_set"
+            )
         )
 
     @property
@@ -284,13 +280,20 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
         """Return the list of available fan modes."""
         fan_modes = []
         for x in range(
-            self._device.get_register_value_min(f"{self._target}_vent_set"),
-            (self._device.get_register_value_max(f"{self._target}_vent_set") + 1),
+            self._device.get_register_value_min(
+                f"{self.entity_description.key}_vent_set"
+            ),
+            (
+                self._device.get_register_value_max(
+                    f"{self.entity_description.key}_vent_set"
+                )
+                + 1
+            ),
         ):
             fan_modes.append(
                 str(
                     self._device.get_register_value_options(
-                        f"{self._target}_vent_set"
+                        f"{self.entity_description.key}_vent_set"
                     ).get(x, x)
                 )
             )
@@ -300,7 +303,7 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
         """Set new target fan mode."""
         try:
             await self._device.set_register_value_description(
-                f"{self._target}_vent_set", fan_mode
+                f"{self.entity_description.key}_vent_set", fan_mode
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
@@ -309,8 +312,13 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     @property
     def hvac_action(self):
         if (
-            f"{self._target}_vent_set" in self._device.registers
-            and int(self._device.get_register_value(f"{self._target}_vent_set")) > 0
+            f"{self.entity_description.key}_vent_set" in self._device.registers
+            and int(
+                self._device.get_register_value(
+                    f"{self.entity_description.key}_vent_set"
+                )
+            )
+            > 0
         ):
             return HVACAction.FAN
         return HVACAction.OFF
@@ -330,37 +338,54 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     def preset_modes(self):
         preset_modes = []
         for x in range(
-            self._device.get_register_value_min(f"{self._target}_set"),
-            (self._device.get_register_value_max(f"{self._target}_set") + 1),
+            self._device.get_register_value_min(f"{self.entity_description.key}_set"),
+            (
+                self._device.get_register_value_max(
+                    f"{self.entity_description.key}_set"
+                )
+                + 1
+            ),
         ):
             preset_modes.append(
-                self._device.get_register_value_options(f"{self._target}_set").get(x, x)
+                self._device.get_register_value_options(
+                    f"{self.entity_description.key}_set"
+                ).get(x, x)
             )
         return preset_modes
 
     @property
     def preset_mode(self):
-        return self._device.get_register_value_description(f"{self._target}_set")
+        return self._device.get_register_value_description(
+            f"{self.entity_description.key}_set"
+        )
 
     @property
     def min_temp(self):
         """Return the minimum temperature to set."""
-        return self._device.get_register_value_min(f"{self._target}_temp_air_set")
+        return self._device.get_register_value_min(
+            f"{self.entity_description.key}_temp_air_set"
+        )
 
     @property
     def max_temp(self):
         """Return the maximum temperature to set."""
-        return self._device.get_register_value_max(f"{self._target}_temp_air_set")
+        return self._device.get_register_value_max(
+            f"{self.entity_description.key}_temp_air_set"
+        )
 
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        return self._device.get_register_value(f"{self._target}_temp_air_set")
+        return self._device.get_register_value(
+            f"{self.entity_description.key}_temp_air_set"
+        )
 
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        return self._device.get_register_value(f"{self._target}_temp_air_get")
+        return self._device.get_register_value(
+            f"{self.entity_description.key}_temp_air_get"
+        )
 
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
@@ -370,7 +395,7 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
 
         try:
             await self._device.set_register_value(
-                f"{self._target}_temp_air_set", temperature
+                f"{self.entity_description.key}_temp_air_set", temperature
             )
             await self.coordinator.async_request_refresh()
         except (ValueError, AguaIOTError) as err:
@@ -379,22 +404,27 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     @property
     def target_temperature_step(self):
         """Return the supported step of target temperature."""
-        return self._device.get_register(f"{self._target}_temp_air_set").get("step", 1)
+        return self._device.get_register(
+            f"{self.entity_description.key}_temp_air_set"
+        ).get("step", 1)
 
 
 class AguaIOTFanDevice(AguaIOTClimateDevice):
-    def __init__(self, coordinator, device, multifan):
+    def __init__(self, coordinator, device, description):
         CoordinatorEntity.__init__(self, coordinator)
         self._device = device
-        self._target = multifan
+        self.entity_description = description
+        self.entity_description.name = self.entity_description.key.rsplit("_", 1)[
+            0
+        ].replace("_", " ")
 
     @property
     def unique_id(self):
-        return f"{self._device.id_device}_{self._target}"
+        return f"{self._device.id_device}_{self.entity_description.key}"
 
     @property
     def name(self):
-        return f"{self._device.name} {self._target.replace('_', ' ')}"
+        return f"{self._device.name} {self.entity_description.name}"
 
     @property
     def supported_features(self):
@@ -407,21 +437,23 @@ class AguaIOTFanDevice(AguaIOTClimateDevice):
     @property
     def fan_mode(self):
         """Return fan mode."""
-        return str(self._device.get_register_value_description(f"{self._target}_set"))
+        return str(
+            self._device.get_register_value_description(self.entity_description.key)
+        )
 
     @property
     def fan_modes(self):
         """Return the list of available fan modes."""
         fan_modes = []
         for x in range(
-            self._device.get_register_value_min(f"{self._target}_set"),
-            (self._device.get_register_value_max(f"{self._target}_set") + 1),
+            self._device.get_register_value_min(self.entity_description.key),
+            (self._device.get_register_value_max(self.entity_description.key) + 1),
         ):
             fan_modes.append(
                 str(
-                    self._device.get_register_value_options(f"{self._target}_set").get(
-                        x, x
-                    )
+                    self._device.get_register_value_options(
+                        self.entity_description.key
+                    ).get(x, x)
                 )
             )
         return fan_modes
@@ -430,7 +462,7 @@ class AguaIOTFanDevice(AguaIOTClimateDevice):
         """Set new target fan mode."""
         try:
             await self._device.set_register_value_description(
-                f"{self._target}_set", fan_mode
+                self.entity_description.key, fan_mode
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
@@ -439,8 +471,8 @@ class AguaIOTFanDevice(AguaIOTClimateDevice):
     @property
     def hvac_action(self):
         if (
-            f"{self._target}_set" in self._device.registers
-            and int(self._device.get_register_value(f"{self._target}_set")) > 0
+            self.entity_description.key in self._device.registers
+            and int(self._device.get_register_value(self.entity_description.key)) > 0
         ):
             return HVACAction.FAN
         return HVACAction.OFF

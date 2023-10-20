@@ -17,6 +17,9 @@ from homeassistant.components.number import (
     NumberDeviceClass,
     NumberEntityDescription,
 )
+from homeassistant.components.climate import (
+    ClimateEntityDescription,
+)
 
 DOMAIN = "aguaiot"
 CONF_API_URL = "api_url"
@@ -105,5 +108,26 @@ NUMBERS = (
         native_step=1,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=NumberDeviceClass.TEMPERATURE,
+    ),
+)
+
+CLIMATE_FANS = (
+    ClimateEntityDescription(
+        key=r"multifire_\d+_set",
+        icon="mdi:fan",
+    ),
+    ClimateEntityDescription(
+        key=r"canalization_\d+_set",
+        icon="mdi:fan",
+    ),
+    ClimateEntityDescription(
+        key=r"vent_front_set",
+        icon="mdi:fan",
+    ),
+)
+
+CLIMATE_CANALIZATIONS = (
+    ClimateEntityDescription(
+        key=r"^(canalization_\d+)_temp_\w+_set",
     ),
 )
