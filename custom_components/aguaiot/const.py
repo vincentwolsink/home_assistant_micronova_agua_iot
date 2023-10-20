@@ -20,6 +20,13 @@ from homeassistant.components.number import (
 from homeassistant.components.climate import (
     ClimateEntityDescription,
 )
+from dataclasses import dataclass
+
+
+@dataclass
+class AguaIOTSensorEntityDescription(SensorEntityDescription):
+    force_enabled: bool = False
+
 
 DOMAIN = "aguaiot"
 CONF_API_URL = "api_url"
@@ -39,21 +46,21 @@ PLATFORMS = [
 UPDATE_INTERVAL = 60
 
 SENSORS = (
-    SensorEntityDescription(
+    AguaIOTSensorEntityDescription(
         key="temp_gas_flue_get",
         name="Smoke Temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
     ),
-    SensorEntityDescription(
+    AguaIOTSensorEntityDescription(
         key="temp_probe_k_get",
         name="Flame Temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
     ),
-    SensorEntityDescription(
+    AguaIOTSensorEntityDescription(
         key="status_get",
         name="Status",
         icon="mdi:fire",
@@ -61,15 +68,16 @@ SENSORS = (
         state_class=None,
         device_class=None,
     ),
-    SensorEntityDescription(
+    AguaIOTSensorEntityDescription(
         key="alarms_get",
         name="Alarm",
         icon="mdi:alert-outline",
         native_unit_of_measurement=None,
         state_class=None,
         device_class=None,
+        force_enabled=True,
     ),
-    SensorEntityDescription(
+    AguaIOTSensorEntityDescription(
         key="real_power_get",
         name="Real Power",
         icon="mdi:gauge",
