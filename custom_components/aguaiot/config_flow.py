@@ -77,13 +77,13 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     login_api_url,
                 )
                 await agua.connect()
-            except UnauthorizedError:
+            except UnauthorizedError as e:
                 _LOGGER.error("Agua IOT Unauthorized: %s", e)
                 errors["base"] = "unauthorized"
-            except ConnectionError:
+            except ConnectionError as e:
                 _LOGGER.error("Connection error to Agua IOT: %s", e)
                 errors["base"] = "connection_error"
-            except AguaIOTError:
+            except AguaIOTError as e:
                 _LOGGER.error("Unknown Agua IOT error: %s", e)
                 errors["base"] = "unknown_error"
 
