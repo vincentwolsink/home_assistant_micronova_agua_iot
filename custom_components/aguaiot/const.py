@@ -4,6 +4,10 @@ from homeassistant.const import (
     UnitOfTemperature,
 )
 from homeassistant.components.climate.const import HVACAction
+from homeassistant.components.binary_sensor import (
+    BinarySensorDeviceClass,
+    BinarySensorEntityDescription,
+)
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntityDescription,
@@ -38,12 +42,21 @@ DEVICE_VARIANTS = ["water", "air", "air2", "air_palm"]
 
 PLATFORMS = [
     Platform.CLIMATE,
+    Platform.BINARY_SENSOR,
     Platform.SENSOR,
     Platform.SWITCH,
     Platform.NUMBER,
 ]
 
 UPDATE_INTERVAL = 60
+
+BINARY_SENSORS = (
+    BinarySensorEntityDescription(
+        key="ris_pellet_ris_get",
+        name="Pellets Depleted",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+    ),
+)
 
 SENSORS = (
     AguaIOTSensorEntityDescription(
