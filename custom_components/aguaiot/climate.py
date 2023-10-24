@@ -135,7 +135,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
             return HVACAction.HEATING
         elif self._device.get_register_value("status_get") in [7, 8, 9]:
             return HVACAction.IDLE
-        return HVACMode.OFF
+        return HVACAction.OFF
 
     @property
     def hvac_modes(self):
