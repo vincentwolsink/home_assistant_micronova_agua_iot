@@ -5,3 +5,4 @@ dist
 test.py
 .vscode
 venv/
+*/mocks/
