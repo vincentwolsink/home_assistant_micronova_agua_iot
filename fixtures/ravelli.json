@@ -1,0 +1,6510 @@
+{
+    "accensioni_get": {
+        "app_image_name": "default",
+        "reg_key": "accensioni_get",
+        "reg_name": "Accensioni",
+        "reg_name_app": "Accensioni",
+        "reg_key_group": "accensioni_get",
+        "reg_type": "GET",
+        "offset": 33006,
+        "eeprom": true,
+        "is_word": true,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 65535,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": true,
+        "use_cat": true,
+        "display_order": 27,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "752",
+        "value": 752
+    },
+    "alarms_get": {
+        "app_image_name": "alarms_get",
+        "reg_key": "alarms_get",
+        "reg_name": "Allarmi",
+        "reg_name_app": "Allarmi",
+        "reg_key_group": "alarms",
+        "reg_type": "GET",
+        "offset": 64,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 255,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": true,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 92,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 0,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 0,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 0,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 0,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 0,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 0,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 0,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 1,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 1,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 1,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 1,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 1,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 1,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 1,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 3,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 3,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 3,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 3,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 3,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 3,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 3,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 4,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 4,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 4,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 4,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 4,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 4,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 4,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 5,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 5,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 5,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 5,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 5,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 5,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 5,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 7,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 7,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 7,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 7,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 7,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 7,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 7,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 8,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 8,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 8,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 8,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 8,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 8,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 8,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 9,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 9,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 9,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 9,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 9,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 9,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 9,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 10,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 10,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 10,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 10,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 10,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 10,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 10,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 11,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 11,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 11,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 11,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 11,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 11,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 11,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 12,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 12,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 12,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 12,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 12,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 12,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 12,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 13,
+            "lang": "BHS",
+            "description": "AL 09"
+        },
+        {
+            "value": 13,
+            "lang": "DEU",
+            "description": "AL 09"
+        },
+        {
+            "value": 13,
+            "lang": "ENG",
+            "description": "AL 09"
+        },
+        {
+            "value": 13,
+            "lang": "FRE",
+            "description": "AL 09"
+        },
+        {
+            "value": 13,
+            "lang": "ITA",
+            "description": "AL 09"
+        },
+        {
+            "value": 13,
+            "lang": "PRT",
+            "description": "AL 09"
+        },
+        {
+            "value": 13,
+            "lang": "SPA",
+            "description": "AL 09"
+        },
+        {
+            "value": 14,
+            "lang": "BHS",
+            "description": "HOT FUMI"
+        },
+        {
+            "value": 14,
+            "lang": "DEU",
+            "description": "HOT FUMI"
+        },
+        {
+            "value": 14,
+            "lang": "ENG",
+            "description": "HOT FUMI"
+        },
+        {
+            "value": 14,
+            "lang": "FRE",
+            "description": "HOT FUMI"
+        },
+        {
+            "value": 14,
+            "lang": "ITA",
+            "description": "HOT FUMI"
+        },
+        {
+            "value": 14,
+            "lang": "PRT",
+            "description": "HOT FUMI"
+        },
+        {
+            "value": 14,
+            "lang": "SPA",
+            "description": "HOT FUMI"
+        },
+        {
+            "value": 15,
+            "lang": "BHS",
+            "description": "GEN."
+        },
+        {
+            "value": 15,
+            "lang": "DEU",
+            "description": "GEN."
+        },
+        {
+            "value": 15,
+            "lang": "ENG",
+            "description": "GEN."
+        },
+        {
+            "value": 15,
+            "lang": "FRE",
+            "description": "GEN."
+        },
+        {
+            "value": 15,
+            "lang": "ITA",
+            "description": "GEN."
+        },
+        {
+            "value": 15,
+            "lang": "PRT",
+            "description": "GEN."
+        },
+        {
+            "value": 15,
+            "lang": "SPA",
+            "description": "GEN."
+        },
+        {
+            "value": 16,
+            "lang": "BHS",
+            "description": "AL 01"
+        },
+        {
+            "value": 16,
+            "lang": "DEU",
+            "description": "AL 01"
+        },
+        {
+            "value": 16,
+            "lang": "ENG",
+            "description": "AL 01"
+        },
+        {
+            "value": 16,
+            "lang": "FRE",
+            "description": "AL 01"
+        },
+        {
+            "value": 16,
+            "lang": "ITA",
+            "description": "AL 01"
+        },
+        {
+            "value": 16,
+            "lang": "PRT",
+            "description": "AL 01"
+        },
+        {
+            "value": 16,
+            "lang": "SPA",
+            "description": "AL 01"
+        },
+        {
+            "value": 17,
+            "lang": "BHS",
+            "description": "AL 02"
+        },
+        {
+            "value": 17,
+            "lang": "DEU",
+            "description": "AL 02"
+        },
+        {
+            "value": 17,
+            "lang": "ENG",
+            "description": "AL 02"
+        },
+        {
+            "value": 17,
+            "lang": "FRE",
+            "description": "AL 02"
+        },
+        {
+            "value": 17,
+            "lang": "ITA",
+            "description": "AL 02"
+        },
+        {
+            "value": 17,
+            "lang": "PRT",
+            "description": "AL 02"
+        },
+        {
+            "value": 17,
+            "lang": "SPA",
+            "description": "AL 02"
+        },
+        {
+            "value": 18,
+            "lang": "BHS",
+            "description": "AL 03"
+        },
+        {
+            "value": 18,
+            "lang": "DEU",
+            "description": "AL 03"
+        },
+        {
+            "value": 18,
+            "lang": "ENG",
+            "description": "AL 03"
+        },
+        {
+            "value": 18,
+            "lang": "FRE",
+            "description": "AL 03"
+        },
+        {
+            "value": 18,
+            "lang": "ITA",
+            "description": "AL 03"
+        },
+        {
+            "value": 18,
+            "lang": "PRT",
+            "description": "AL 03"
+        },
+        {
+            "value": 18,
+            "lang": "SPA",
+            "description": "AL 03"
+        },
+        {
+            "value": 19,
+            "lang": "BHS",
+            "description": "AL 04"
+        },
+        {
+            "value": 19,
+            "lang": "DEU",
+            "description": "AL 04"
+        },
+        {
+            "value": 19,
+            "lang": "ENG",
+            "description": "AL 04"
+        },
+        {
+            "value": 19,
+            "lang": "FRE",
+            "description": "AL 04"
+        },
+        {
+            "value": 19,
+            "lang": "ITA",
+            "description": "AL 04"
+        },
+        {
+            "value": 19,
+            "lang": "PRT",
+            "description": "AL 04"
+        },
+        {
+            "value": 19,
+            "lang": "SPA",
+            "description": "AL 04"
+        },
+        {
+            "value": 20,
+            "lang": "BHS",
+            "description": "AL 05"
+        },
+        {
+            "value": 20,
+            "lang": "DEU",
+            "description": "AL 05"
+        },
+        {
+            "value": 20,
+            "lang": "ENG",
+            "description": "AL 05"
+        },
+        {
+            "value": 20,
+            "lang": "FRE",
+            "description": "AL 05"
+        },
+        {
+            "value": 20,
+            "lang": "ITA",
+            "description": "AL 05"
+        },
+        {
+            "value": 20,
+            "lang": "PRT",
+            "description": "AL 05"
+        },
+        {
+            "value": 20,
+            "lang": "SPA",
+            "description": "AL 05"
+        },
+        {
+            "value": 21,
+            "lang": "BHS",
+            "description": "AL 06"
+        },
+        {
+            "value": 21,
+            "lang": "DEU",
+            "description": "AL 06"
+        },
+        {
+            "value": 21,
+            "lang": "ENG",
+            "description": "AL 06"
+        },
+        {
+            "value": 21,
+            "lang": "FRE",
+            "description": "AL 06"
+        },
+        {
+            "value": 21,
+            "lang": "ITA",
+            "description": "AL 06"
+        },
+        {
+            "value": 21,
+            "lang": "PRT",
+            "description": "AL 06"
+        },
+        {
+            "value": 21,
+            "lang": "SPA",
+            "description": "AL 06"
+        },
+        {
+            "value": 22,
+            "lang": "BHS",
+            "description": "AL 07"
+        },
+        {
+            "value": 22,
+            "lang": "DEU",
+            "description": "AL 07"
+        },
+        {
+            "value": 22,
+            "lang": "ENG",
+            "description": "AL 07"
+        },
+        {
+            "value": 22,
+            "lang": "FRE",
+            "description": "AL 07"
+        },
+        {
+            "value": 22,
+            "lang": "ITA",
+            "description": "AL 07"
+        },
+        {
+            "value": 22,
+            "lang": "PRT",
+            "description": "AL 07"
+        },
+        {
+            "value": 22,
+            "lang": "SPA",
+            "description": "AL 07"
+        },
+        {
+            "value": 23,
+            "lang": "BHS",
+            "description": "AL 08"
+        },
+        {
+            "value": 23,
+            "lang": "DEU",
+            "description": "AL 08"
+        },
+        {
+            "value": 23,
+            "lang": "ENG",
+            "description": "AL 08"
+        },
+        {
+            "value": 23,
+            "lang": "FRE",
+            "description": "AL 08"
+        },
+        {
+            "value": 23,
+            "lang": "ITA",
+            "description": "AL 08"
+        },
+        {
+            "value": 23,
+            "lang": "PRT",
+            "description": "AL 08"
+        },
+        {
+            "value": 23,
+            "lang": "SPA",
+            "description": "AL 08"
+        },
+        {
+            "value": 24,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 24,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 24,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 24,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 24,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 24,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 24,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 25,
+            "lang": "BHS",
+            "description": " --"
+        },
+        {
+            "value": 25,
+            "lang": "DEU",
+            "description": " --"
+        },
+        {
+            "value": 25,
+            "lang": "ENG",
+            "description": " --"
+        },
+        {
+            "value": 25,
+            "lang": "FRE",
+            "description": " --"
+        },
+        {
+            "value": 25,
+            "lang": "ITA",
+            "description": " --"
+        },
+        {
+            "value": 25,
+            "lang": "PRT",
+            "description": " --"
+        },
+        {
+            "value": 25,
+            "lang": "SPA",
+            "description": " --"
+        },
+        {
+            "value": 26,
+            "lang": "BHS",
+            "description": "AL 11"
+        },
+        {
+            "value": 26,
+            "lang": "DEU",
+            "description": "AL 11"
+        },
+        {
+            "value": 26,
+            "lang": "ENG",
+            "description": "AL 11"
+        },
+        {
+            "value": 26,
+            "lang": "FRE",
+            "description": "AL 11"
+        },
+        {
+            "value": 26,
+            "lang": "ITA",
+            "description": "AL 11"
+        },
+        {
+            "value": 26,
+            "lang": "PRT",
+            "description": "AL 11"
+        },
+        {
+            "value": 26,
+            "lang": "SPA",
+            "description": "AL 11"
+        },
+        {
+            "value": 27,
+            "lang": "BHS",
+            "description": "AL 12"
+        },
+        {
+            "value": 27,
+            "lang": "DEU",
+            "description": "AL 12"
+        },
+        {
+            "value": 27,
+            "lang": "ENG",
+            "description": "AL 12"
+        },
+        {
+            "value": 27,
+            "lang": "FRE",
+            "description": "AL 12"
+        },
+        {
+            "value": 27,
+            "lang": "ITA",
+            "description": "AL 12"
+        },
+        {
+            "value": 27,
+            "lang": "PRT",
+            "description": "AL 12"
+        },
+        {
+            "value": 27,
+            "lang": "SPA",
+            "description": "AL 12"
+        },
+        {
+            "value": 28,
+            "lang": "BHS",
+            "description": "AL 13"
+        },
+        {
+            "value": 28,
+            "lang": "DEU",
+            "description": "AL 13"
+        },
+        {
+            "value": 28,
+            "lang": "ENG",
+            "description": "AL 13"
+        },
+        {
+            "value": 28,
+            "lang": "FRE",
+            "description": "AL 13"
+        },
+        {
+            "value": 28,
+            "lang": "ITA",
+            "description": "AL 13"
+        },
+        {
+            "value": 28,
+            "lang": "PRT",
+            "description": "AL 13"
+        },
+        {
+            "value": 28,
+            "lang": "SPA",
+            "description": "AL 13"
+        },
+        {
+            "value": 29,
+            "lang": "BHS",
+            "description": "AL 13"
+        },
+        {
+            "value": 29,
+            "lang": "DEU",
+            "description": "AL 13"
+        },
+        {
+            "value": 29,
+            "lang": "ENG",
+            "description": "AL 13"
+        },
+        {
+            "value": 29,
+            "lang": "FRE",
+            "description": "AL 13"
+        },
+        {
+            "value": 29,
+            "lang": "ITA",
+            "description": "AL 13"
+        },
+        {
+            "value": 29,
+            "lang": "PRT",
+            "description": "AL 13"
+        },
+        {
+            "value": 29,
+            "lang": "SPA",
+            "description": "AL 13"
+        },
+        {
+            "value": 30,
+            "lang": "BHS",
+            "description": "AL 14"
+        },
+        {
+            "value": 30,
+            "lang": "DEU",
+            "description": "AL 14"
+        },
+        {
+            "value": 30,
+            "lang": "ENG",
+            "description": "AL 14"
+        },
+        {
+            "value": 30,
+            "lang": "FRE",
+            "description": "AL 14"
+        },
+        {
+            "value": 30,
+            "lang": "ITA",
+            "description": "AL 14"
+        },
+        {
+            "value": 30,
+            "lang": "PRT",
+            "description": "AL 14"
+        },
+        {
+            "value": 30,
+            "lang": "SPA",
+            "description": "AL 14"
+        },
+        {
+            "value": 31,
+            "lang": "BHS",
+            "description": "AL 15"
+        },
+        {
+            "value": 31,
+            "lang": "DEU",
+            "description": "AL 15"
+        },
+        {
+            "value": 31,
+            "lang": "ENG",
+            "description": "AL 15"
+        },
+        {
+            "value": 31,
+            "lang": "FRE",
+            "description": "AL 15"
+        },
+        {
+            "value": 31,
+            "lang": "ITA",
+            "description": "AL 15"
+        },
+        {
+            "value": 31,
+            "lang": "PRT",
+            "description": "AL 15"
+        },
+        {
+            "value": 31,
+            "lang": "SPA",
+            "description": "AL 15"
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "calendar_day_set": {
+        "app_image_name": "default",
+        "reg_key": "calendar_day_set",
+        "reg_name": "Giorno Mese",
+        "reg_name_app": "Giorno mese",
+        "reg_key_group": "calendar_day",
+        "reg_type": "SET",
+        "offset": 33019,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 1,
+        "set_max": 31,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": true,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "32",
+        "value": 32
+    },
+    "calendar_day_week_set": {
+        "app_image_name": "default",
+        "reg_key": "calendar_day_week_set",
+        "reg_name": "Giorno Settimana",
+        "reg_name_app": "Giorno sett.",
+        "reg_key_group": "calendar_day_week",
+        "reg_type": "SET",
+        "offset": 33016,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 1,
+        "set_max": 7,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": true,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "5",
+        "value": 5
+    },
+    "calendar_month_set": {
+        "app_image_name": "default",
+        "reg_key": "calendar_month_set",
+        "reg_name": "Mese",
+        "reg_name_app": "Mese",
+        "reg_key_group": "calendar_month",
+        "reg_type": "SET",
+        "offset": 33020,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 1,
+        "set_max": 12,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": true,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "16",
+        "value": 16
+    },
+    "calendar_year_set": {
+        "app_image_name": "default",
+        "reg_key": "calendar_year_set",
+        "reg_name": "Anno",
+        "reg_name_app": "Anno",
+        "reg_key_group": "calendar_year",
+        "reg_type": "SET",
+        "offset": 33021,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#+2000",
+        "formula_inverse": "#-2000",
+        "format_string": "{0}",
+        "set_min": 15,
+        "set_max": 50,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": true,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "35",
+        "value": 2035
+    },
+    "canalization_1_2_vent_enable": {
+        "app_image_name": "default",
+        "reg_key": "canalization_1_2_vent_enable",
+        "reg_name": "Canalizzazione 1_2 Vent. Enable",
+        "reg_name_app": "Can. 1_2 Vent. Enable",
+        "reg_key_group": "canalization_1_2_vent",
+        "reg_type": "ENABLE",
+        "offset": 32817,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 2,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 32,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enable_val": [
+        {
+            "value": 2
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "canalization_1_2_vent_set": {
+        "app_image_name": "fan",
+        "reg_key": "canalization_1_2_vent_set",
+        "reg_name": "Canalizzazione 1_2 Vent. Set",
+        "reg_name_app": "Can. 1_2 Vent.",
+        "reg_key_group": "canalization_1_2_vent",
+        "reg_type": "SET",
+        "offset": 32808,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 6,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": true,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 93,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 0,
+            "lang": "BHS",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "DEU",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "ENG",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "FRE",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "ITA",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "PRT",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "SPA",
+            "description": "OFF"
+        },
+        {
+            "value": 1,
+            "lang": "BHS",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "DEU",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "ENG",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "FRE",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "ITA",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "PRT",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "SPA",
+            "description": "V 1"
+        },
+        {
+            "value": 2,
+            "lang": "BHS",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "DEU",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "ENG",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "FRE",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "ITA",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "PRT",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "SPA",
+            "description": "V 2"
+        },
+        {
+            "value": 3,
+            "lang": "BHS",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "DEU",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "ENG",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "FRE",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "ITA",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "PRT",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "SPA",
+            "description": "V 3"
+        },
+        {
+            "value": 4,
+            "lang": "BHS",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "DEU",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "ENG",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "FRE",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "ITA",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "PRT",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "SPA",
+            "description": "V 4"
+        },
+        {
+            "value": 5,
+            "lang": "BHS",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "DEU",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "ENG",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "FRE",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "ITA",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "PRT",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "SPA",
+            "description": "V 5"
+        },
+        {
+            "value": 6,
+            "lang": "BHS",
+            "description": "A"
+        },
+        {
+            "value": 6,
+            "lang": "DEU",
+            "description": "A"
+        },
+        {
+            "value": 6,
+            "lang": "ENG",
+            "description": "A"
+        },
+        {
+            "value": 6,
+            "lang": "FRE",
+            "description": "A"
+        },
+        {
+            "value": 6,
+            "lang": "ITA",
+            "description": "A"
+        },
+        {
+            "value": 6,
+            "lang": "PRT",
+            "description": "A"
+        },
+        {
+            "value": 6,
+            "lang": "SPA",
+            "description": "A"
+        }
+        ],
+        "value_raw": "6",
+        "value": 6
+    },
+    "canalization_1_2_verso_enable": {
+        "app_image_name": "default",
+        "reg_key": "canalization_1_2_verso_enable",
+        "reg_name": "Canalizzazione 1_2 verso Enable",
+        "reg_name_app": "Can. 1_2 verso Enable",
+        "reg_key_group": "canalization_1_2_verso",
+        "reg_type": "ENABLE",
+        "offset": 32817,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 2,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 31,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enable_val": [
+        {
+            "value": 2
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "canalization_1_2_verso_set": {
+        "app_image_name": "call-split",
+        "reg_key": "canalization_1_2_verso_set",
+        "reg_name": "Canalizzazione 1_2 verso Set",
+        "reg_name_app": "Can. 1_2 verso",
+        "reg_key_group": "canalization_1_2_verso",
+        "reg_type": "SET",
+        "offset": 32892,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 2,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": true,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 91,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 0,
+            "lang": "BHS",
+            "description": "R.L."
+        },
+        {
+            "value": 0,
+            "lang": "DEU",
+            "description": "R.L."
+        },
+        {
+            "value": 0,
+            "lang": "ENG",
+            "description": "R.L."
+        },
+        {
+            "value": 0,
+            "lang": "FRE",
+            "description": "R.L."
+        },
+        {
+            "value": 0,
+            "lang": "ITA",
+            "description": "R.L."
+        },
+        {
+            "value": 0,
+            "lang": "PRT",
+            "description": "R.L."
+        },
+        {
+            "value": 0,
+            "lang": "SPA",
+            "description": "R.L."
+        },
+        {
+            "value": 1,
+            "lang": "BHS",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "DEU",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "ENG",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "FRE",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "ITA",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "PRT",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "SPA",
+            "description": "EQUAL"
+        },
+        {
+            "value": 2,
+            "lang": "BHS",
+            "description": "R.R"
+        },
+        {
+            "value": 2,
+            "lang": "DEU",
+            "description": "R.R"
+        },
+        {
+            "value": 2,
+            "lang": "ENG",
+            "description": "R.R"
+        },
+        {
+            "value": 2,
+            "lang": "FRE",
+            "description": "R.R"
+        },
+        {
+            "value": 2,
+            "lang": "ITA",
+            "description": "R.R"
+        },
+        {
+            "value": 2,
+            "lang": "PRT",
+            "description": "R.R"
+        },
+        {
+            "value": 2,
+            "lang": "SPA",
+            "description": "R.R"
+        }
+        ],
+        "value_raw": "1",
+        "value": 1
+    },
+    "canalization_1_temp_air_enable": {
+        "app_image_name": "default",
+        "reg_key": "canalization_1_temp_air_enable",
+        "reg_name": "Canalizzazione 1 Temperatura aria visibile",
+        "reg_name_app": "Can. 1 Temp.",
+        "reg_key_group": "canalization_1_temp_air",
+        "reg_type": "ENABLE",
+        "offset": 32817,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 2,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 35,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enable_val": [
+        {
+            "value": 1
+        },
+        {
+            "value": 2
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "canalization_1_temp_air_get": {
+        "app_image_name": "temp_air_get",
+        "reg_key": "canalization_1_temp_air_get",
+        "reg_name": "Canalizzazione 1 Temperatura aria letta",
+        "reg_name_app": "Can. 1 T. aria",
+        "reg_key_group": "canalization_1_temp_air",
+        "reg_type": "GET",
+        "offset": 3,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/2",
+        "formula_inverse": "#*2",
+        "format_string": "{0} \u00b0C",
+        "set_min": 0,
+        "set_max": 100,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": true,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 94,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 0,
+            "lang": "BHS",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "DEU",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "ENG",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "FRE",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "ITA",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "PRT",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "SPA",
+            "description": "T OFF"
+        },
+        {
+            "value": 110,
+            "lang": "BHS",
+            "description": "T ON"
+        },
+        {
+            "value": 110,
+            "lang": "DEU",
+            "description": "T ON"
+        },
+        {
+            "value": 110,
+            "lang": "ENG",
+            "description": "T ON"
+        },
+        {
+            "value": 110,
+            "lang": "FRE",
+            "description": "T ON"
+        },
+        {
+            "value": 110,
+            "lang": "ITA",
+            "description": "T ON"
+        },
+        {
+            "value": 110,
+            "lang": "PRT",
+            "description": "T ON"
+        },
+        {
+            "value": 110,
+            "lang": "SPA",
+            "description": "T ON"
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "canalization_1_temp_air_set": {
+        "app_image_name": "temp_air_get",
+        "reg_key": "canalization_1_temp_air_set",
+        "reg_name": "Canalizzazione 1 Temperatura aria impostata",
+        "reg_name_app": "Can. 1 T. aria set",
+        "reg_key_group": "canalization_1_temp_air",
+        "reg_type": "SET",
+        "offset": 32896,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0} \u00b0C",
+        "set_min": 6,
+        "set_max": 41,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": true,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 96,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 6,
+            "lang": "BHS",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "DEU",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "ENG",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "FRE",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "ITA",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "PRT",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "SPA",
+            "description": "- EXT"
+        },
+        {
+            "value": 41,
+            "lang": "BHS",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "DEU",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ENG",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "FRE",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ITA",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "PRT",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "SPA",
+            "description": "MAN"
+        }
+        ],
+        "value_raw": "24",
+        "value": 24
+    },
+    "canalization_2_temp_air_enable": {
+        "app_image_name": "default",
+        "reg_key": "canalization_2_temp_air_enable",
+        "reg_name": "Canalizzazione 2 Temperatura aria visibile",
+        "reg_name_app": "Can. 2 Temp.",
+        "reg_key_group": "canalization_2_temp_air",
+        "reg_type": "ENABLE",
+        "offset": 32817,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 2,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 34,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enable_val": [
+        {
+            "value": 2
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "canalization_2_temp_air_get": {
+        "app_image_name": "temp_air_get",
+        "reg_key": "canalization_2_temp_air_get",
+        "reg_name": "Canalizzazione 2 Temperatura aria letta",
+        "reg_name_app": "Can. 2 T. aria",
+        "reg_key_group": "canalization_2_temp_air",
+        "reg_type": "GET",
+        "offset": 56,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/2",
+        "formula_inverse": "#*2",
+        "format_string": "{0} \u00b0C",
+        "set_min": 0,
+        "set_max": 100,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": true,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 93,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 0,
+            "lang": "BHS",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "DEU",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "ENG",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "FRE",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "ITA",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "PRT",
+            "description": "T OFF"
+        },
+        {
+            "value": 0,
+            "lang": "SPA",
+            "description": "T OFF"
+        },
+        {
+            "value": 110,
+            "lang": "BHS",
+            "description": " T ON"
+        },
+        {
+            "value": 110,
+            "lang": "DEU",
+            "description": " T ON"
+        },
+        {
+            "value": 110,
+            "lang": "ENG",
+            "description": " T ON"
+        },
+        {
+            "value": 110,
+            "lang": "FRE",
+            "description": " T ON"
+        },
+        {
+            "value": 110,
+            "lang": "ITA",
+            "description": " T ON"
+        },
+        {
+            "value": 110,
+            "lang": "PRT",
+            "description": " T ON"
+        },
+        {
+            "value": 110,
+            "lang": "SPA",
+            "description": " T ON"
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "canalization_2_temp_air_set": {
+        "app_image_name": "temp_air_get",
+        "reg_key": "canalization_2_temp_air_set",
+        "reg_name": "Canalizzazione 2 Temperatura aria impostata",
+        "reg_name_app": "Can. 2 T. aria set",
+        "reg_key_group": "canalization_2_temp_air",
+        "reg_type": "SET",
+        "offset": 32897,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0} \u00b0C",
+        "set_min": 6,
+        "set_max": 41,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": true,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 95,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 6,
+            "lang": "BHS",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "DEU",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "ENG",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "FRE",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "ITA",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "PRT",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "SPA",
+            "description": "- EXT"
+        },
+        {
+            "value": 41,
+            "lang": "BHS",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "DEU",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ENG",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "FRE",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ITA",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "PRT",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "SPA",
+            "description": "MAN"
+        }
+        ],
+        "value_raw": "24",
+        "value": 24
+    },
+    "canalization_man_auto_enable": {
+        "app_image_name": "default",
+        "reg_key": "canalization_man_auto_enable",
+        "reg_name": "Canalizzazione man. auto Enable",
+        "reg_name_app": "Can. man. Auto Enable",
+        "reg_key_group": "canalization_man_auto",
+        "reg_type": "ENABLE",
+        "offset": 32835,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 3,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 33,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enable_val": [
+        {
+            "value": 1
+        },
+        {
+            "value": 2
+        }
+        ],
+        "value_raw": "10",
+        "value": 10
+    },
+    "canalization_man_auto_set": {
+        "app_image_name": "default",
+        "reg_key": "canalization_man_auto_set",
+        "reg_name": "Canalizzazione man. Auto Set",
+        "reg_name_app": "Can. man. Auto",
+        "reg_key_group": "canalization_man_auto",
+        "reg_type": "SET",
+        "offset": 32855,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": true,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 90,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 0,
+            "lang": "BHS",
+            "description": "MANUAL"
+        },
+        {
+            "value": 0,
+            "lang": "DEU",
+            "description": "MANUAL"
+        },
+        {
+            "value": 0,
+            "lang": "ENG",
+            "description": "MANUAL"
+        },
+        {
+            "value": 0,
+            "lang": "FRE",
+            "description": "MANUAL"
+        },
+        {
+            "value": 0,
+            "lang": "ITA",
+            "description": "MANUALE"
+        },
+        {
+            "value": 0,
+            "lang": "PRT",
+            "description": "MANUAL"
+        },
+        {
+            "value": 0,
+            "lang": "SPA",
+            "description": "MANUAL"
+        },
+        {
+            "value": 1,
+            "lang": "BHS",
+            "description": "AUTO"
+        },
+        {
+            "value": 1,
+            "lang": "DEU",
+            "description": "AUTO"
+        },
+        {
+            "value": 1,
+            "lang": "ENG",
+            "description": "AUTO"
+        },
+        {
+            "value": 1,
+            "lang": "FRE",
+            "description": "AUTO"
+        },
+        {
+            "value": 1,
+            "lang": "ITA",
+            "description": "AUTO"
+        },
+        {
+            "value": 1,
+            "lang": "PRT",
+            "description": "AUTO"
+        },
+        {
+            "value": 1,
+            "lang": "SPA",
+            "description": "AUTO"
+        }
+        ],
+        "value_raw": "144",
+        "value": 144
+    },
+    "canalization_single_temp_air_get": {
+        "app_image_name": "temp_air_get",
+        "reg_key": "canalization_single_temp_air_get",
+        "reg_name": "Canalizzazione singola Temperatura aria letta",
+        "reg_name_app": "Can. Singola T. aria",
+        "reg_key_group": "canalization_single_temp_air",
+        "reg_type": "GET",
+        "offset": 3,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/2",
+        "formula_inverse": "#*2",
+        "format_string": "{0} \u00b0C",
+        "set_min": 0,
+        "set_max": 100,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": true,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 95,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "canalization_single_temp_air_set": {
+        "app_image_name": "temp_air_get",
+        "reg_key": "canalization_single_temp_air_set",
+        "reg_name": "Canalizzazione singola Temperatura aria impostata",
+        "reg_name_app": "Can. Singola T. aria set",
+        "reg_key_group": "canalization_single_temp_air",
+        "reg_type": "SET",
+        "offset": 32896,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}\u00b0C",
+        "set_min": 5,
+        "set_max": 41,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": true,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 97,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 5,
+            "lang": "BHS",
+            "description": "OFF"
+        },
+        {
+            "value": 5,
+            "lang": "DEU",
+            "description": "OFF"
+        },
+        {
+            "value": 5,
+            "lang": "ENG",
+            "description": "OFF"
+        },
+        {
+            "value": 5,
+            "lang": "FRE",
+            "description": "OFF"
+        },
+        {
+            "value": 5,
+            "lang": "ITA",
+            "description": "OFF"
+        },
+        {
+            "value": 5,
+            "lang": "PRT",
+            "description": "OFF"
+        },
+        {
+            "value": 5,
+            "lang": "SPA",
+            "description": "OFF"
+        },
+        {
+            "value": 6,
+            "lang": "BHS",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "DEU",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "ENG",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "FRE",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "ITA",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "PRT",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "SPA",
+            "description": "- EXT"
+        },
+        {
+            "value": 41,
+            "lang": "BHS",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "DEU",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ENG",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "FRE",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ITA",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "PRT",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "SPA",
+            "description": "MAN"
+        }
+        ],
+        "value_raw": "24",
+        "value": 24
+    },
+    "canalization_single_temp_enable": {
+        "app_image_name": "default",
+        "reg_key": "canalization_single_temp_enable",
+        "reg_name": "Canalizzazione singola Temp. aria vis",
+        "reg_name_app": "Can. Singola Temp.",
+        "reg_key_group": "canalization_single_temp_air",
+        "reg_type": "ENABLE",
+        "offset": 32835,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 3,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 30,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enable_val": [
+        {
+            "value": 1
+        }
+        ],
+        "value_raw": "10",
+        "value": 10
+    },
+    "canalization_single_vent_enable": {
+        "app_image_name": "default",
+        "reg_key": "canalization_single_vent_enable",
+        "reg_name": "Canalizzazione singola Vent. Enable",
+        "reg_name_app": "Can. singola Vent. Enable",
+        "reg_key_group": "canalization_single_vent",
+        "reg_type": "ENABLE",
+        "offset": 32817,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 2,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 29,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "canalization_single_vent_set": {
+        "app_image_name": "fan",
+        "reg_key": "canalization_single_vent_set",
+        "reg_name": "Canalizzazione singola Vent. Set",
+        "reg_name_app": "Can. Singola Vent.",
+        "reg_key_group": "canalization_single_vent",
+        "reg_type": "SET",
+        "offset": 32808,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 6,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 94,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 0,
+            "lang": "BHS",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "DEU",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "ENG",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "FRE",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "ITA",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "PRT",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "SPA",
+            "description": "OFF"
+        },
+        {
+            "value": 1,
+            "lang": "BHS",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "DEU",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "ENG",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "FRE",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "ITA",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "PRT",
+            "description": "V 1"
+        },
+        {
+            "value": 1,
+            "lang": "SPA",
+            "description": "V 1"
+        },
+        {
+            "value": 2,
+            "lang": "BHS",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "DEU",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "ENG",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "FRE",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "ITA",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "PRT",
+            "description": "V 2"
+        },
+        {
+            "value": 2,
+            "lang": "SPA",
+            "description": "V 2"
+        },
+        {
+            "value": 3,
+            "lang": "BHS",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "DEU",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "ENG",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "FRE",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "ITA",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "PRT",
+            "description": "V 3"
+        },
+        {
+            "value": 3,
+            "lang": "SPA",
+            "description": "V 3"
+        },
+        {
+            "value": 4,
+            "lang": "BHS",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "DEU",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "ENG",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "FRE",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "ITA",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "PRT",
+            "description": "V 4"
+        },
+        {
+            "value": 4,
+            "lang": "SPA",
+            "description": "V 4"
+        },
+        {
+            "value": 5,
+            "lang": "BHS",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "DEU",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "ENG",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "FRE",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "ITA",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "PRT",
+            "description": "V 5"
+        },
+        {
+            "value": 5,
+            "lang": "SPA",
+            "description": "V 5"
+        },
+        {
+            "value": 6,
+            "lang": "BHS",
+            "description": "AUTO"
+        },
+        {
+            "value": 6,
+            "lang": "DEU",
+            "description": "AUTO"
+        },
+        {
+            "value": 6,
+            "lang": "ENG",
+            "description": "AUTO"
+        },
+        {
+            "value": 6,
+            "lang": "FRE",
+            "description": "AUTO"
+        },
+        {
+            "value": 6,
+            "lang": "ITA",
+            "description": "AUTO"
+        },
+        {
+            "value": 6,
+            "lang": "PRT",
+            "description": "AUTO"
+        },
+        {
+            "value": 6,
+            "lang": "SPA",
+            "description": "AUTO"
+        }
+        ],
+        "value_raw": "6",
+        "value": 6
+    },
+    "canalization_single_verso_enable": {
+        "app_image_name": "default",
+        "reg_key": "canalization_single_verso_enable",
+        "reg_name": "Canalizzazione singola verso Enable",
+        "reg_name_app": "Can. Singola verso Enable",
+        "reg_key_group": "canalization_single_verso",
+        "reg_type": "ENABLE",
+        "offset": 32817,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 2,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 31,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enable_val": [
+        {
+            "value": 1
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "canalization_single_verso_set": {
+        "app_image_name": "call-split",
+        "reg_key": "canalization_single_verso_set",
+        "reg_name": "Canalizzazione singola verso Set",
+        "reg_name_app": "Canalizzata Singola verso",
+        "reg_key_group": "canalization_single_verso",
+        "reg_type": "SET",
+        "offset": 32892,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 2,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": true,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 92,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 0,
+            "lang": "BHS",
+            "description": "FRONT"
+        },
+        {
+            "value": 0,
+            "lang": "DEU",
+            "description": "FRONT"
+        },
+        {
+            "value": 0,
+            "lang": "ENG",
+            "description": "FRONT"
+        },
+        {
+            "value": 0,
+            "lang": "FRE",
+            "description": "FRONT"
+        },
+        {
+            "value": 0,
+            "lang": "ITA",
+            "description": "FRONT"
+        },
+        {
+            "value": 0,
+            "lang": "PRT",
+            "description": "FRONT"
+        },
+        {
+            "value": 0,
+            "lang": "SPA",
+            "description": "FRONT"
+        },
+        {
+            "value": 1,
+            "lang": "BHS",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "DEU",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "ENG",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "FRE",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "ITA",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "PRT",
+            "description": "EQUAL"
+        },
+        {
+            "value": 1,
+            "lang": "SPA",
+            "description": "EQUAL"
+        },
+        {
+            "value": 2,
+            "lang": "BHS",
+            "description": "REAR"
+        },
+        {
+            "value": 2,
+            "lang": "DEU",
+            "description": "REAR"
+        },
+        {
+            "value": 2,
+            "lang": "ENG",
+            "description": "REAR"
+        },
+        {
+            "value": 2,
+            "lang": "FRE",
+            "description": "REAR"
+        },
+        {
+            "value": 2,
+            "lang": "ITA",
+            "description": "REAR"
+        },
+        {
+            "value": 2,
+            "lang": "PRT",
+            "description": "REAR"
+        },
+        {
+            "value": 2,
+            "lang": "SPA",
+            "description": "REAR"
+        }
+        ],
+        "value_raw": "1",
+        "value": 1
+    },
+    "chrono_general_enable_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_general_enable_set",
+        "reg_name": "Abilitazione Chrono Generale",
+        "reg_name_app": "Abilitazione chrono",
+        "reg_key_group": "chrono_general_enable",
+        "reg_type": "SET",
+        "offset": 32848,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p1_day_friday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p1_day_friday_set",
+        "reg_name": "Chrono Abilitazione Venerd\u00ec P1",
+        "reg_name_app": "Abilit. venerd\u00ec P1",
+        "reg_key_group": "chrono_p1_day_friday",
+        "reg_type": "SET",
+        "offset": 32851,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/16",
+        "formula_inverse": "#*16",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 16,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p1_day_monday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p1_day_monday_set",
+        "reg_name": "Chrono Abilitazione Luned\u00ec P1",
+        "reg_name_app": "Abilit. luned\u00ec P1",
+        "reg_key_group": "chrono_p1_day_monday",
+        "reg_type": "SET",
+        "offset": 32851,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 1,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p1_day_saturday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p1_day_saturday_set",
+        "reg_name": "Chrono Abilitazione Sabato P1",
+        "reg_name_app": "Abilit. sabato P1",
+        "reg_key_group": "chrono_p1_day_saturday",
+        "reg_type": "SET",
+        "offset": 32851,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/32",
+        "formula_inverse": "#*32",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 32,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p1_day_sunday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p1_day_sunday_set",
+        "reg_name": "Chrono Abilitazione Domenica P1",
+        "reg_name_app": "Abilit. domenica P1",
+        "reg_key_group": "chrono_p1_day_sunday",
+        "reg_type": "SET",
+        "offset": 32851,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/64",
+        "formula_inverse": "#*64",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 64,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p1_day_thursday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p1_day_thursday_set",
+        "reg_name": "Chrono Abilitazione Gioved\u00ec P1",
+        "reg_name_app": "Abilit. gioved\u00ec P1",
+        "reg_key_group": "chrono_p1_day_thursday",
+        "reg_type": "SET",
+        "offset": 32851,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/8",
+        "formula_inverse": "#*8",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 8,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p1_day_tuesday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p1_day_tuesday_set",
+        "reg_name": "Chrono Abilitazione Marted\u00ec P1",
+        "reg_name_app": "Abilit. marted\u00ec P1",
+        "reg_key_group": "chrono_p1_day_tuesday",
+        "reg_type": "SET",
+        "offset": 32851,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/2",
+        "formula_inverse": "#*2",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 2,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p1_day_wednesday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p1_day_wednesday_set",
+        "reg_name": "Chrono Abilitazione Mercoled\u00ec P1",
+        "reg_name_app": "Abilit. mercoled\u00ec P1",
+        "reg_key_group": "chrono_p1_day_wednesday",
+        "reg_type": "SET",
+        "offset": 32851,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/4",
+        "formula_inverse": "#*4",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 4,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p1_power_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p1_power_set",
+        "reg_name": "Set potenza Chrono P1",
+        "reg_name_app": "Imposta potenza P1",
+        "reg_key_group": "chrono_p1_power",
+        "reg_type": "SET",
+        "offset": 32852,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 1,
+        "set_max": 5,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "3",
+        "value": 3
+    },
+    "chrono_p1_start_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p1_start_set",
+        "reg_name": "Avvio Programma P1",
+        "reg_name_app": "Accensione P1",
+        "reg_key_group": "chrono_p1_start",
+        "reg_type": "SET",
+        "offset": 32849,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 144,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "144",
+        "value": 144
+    },
+    "chrono_p1_stop_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p1_stop_set",
+        "reg_name": "Fine Programma P1",
+        "reg_name_app": "Spegnimento P1",
+        "reg_key_group": "chrono_p1_stop",
+        "reg_type": "SET",
+        "offset": 32850,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 144,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "144",
+        "value": 144
+    },
+    "chrono_p1_temperature_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p1_temperature_set",
+        "reg_name": "Set Temperatura Chrono P1",
+        "reg_name_app": "Temperatura aria P1",
+        "reg_key_group": "chrono_p1_temperature",
+        "reg_type": "SET",
+        "offset": 32853,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}\u00b0C",
+        "set_min": 7,
+        "set_max": 41,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 41,
+            "lang": "BHS",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "DEU",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ENG",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "FRE",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ITA",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "PRT",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "SPA",
+            "description": "MAN"
+        }
+        ],
+        "value_raw": "20",
+        "value": 20
+    },
+    "chrono_p2_day_friday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p2_day_friday_set",
+        "reg_name": "Chrono Abilitazione Venerd\u00ec P2",
+        "reg_name_app": "Abilit. venerd\u00ec P2",
+        "reg_key_group": "chrono_p2_day_friday",
+        "reg_type": "SET",
+        "offset": 32856,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/16",
+        "formula_inverse": "#*16",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 16,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p2_day_monday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p2_day_monday_set",
+        "reg_name": "Chrono Abilitazione Luned\u00ec P2",
+        "reg_name_app": "Abilit. luned\u00ec P2",
+        "reg_key_group": "chrono_p2_day_monday",
+        "reg_type": "SET",
+        "offset": 32856,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 1,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p2_day_saturday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p2_day_saturday_set",
+        "reg_name": "Chrono Abilitazione Sabato P2",
+        "reg_name_app": "Abilit. sabato P2",
+        "reg_key_group": "chrono_p2_day_saturday",
+        "reg_type": "SET",
+        "offset": 32856,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/32",
+        "formula_inverse": "#*32",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 32,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p2_day_sunday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p2_day_sunday_set",
+        "reg_name": "Chrono Abilitazione Domenica P2",
+        "reg_name_app": "Abilit. domenica P2",
+        "reg_key_group": "chrono_p2_day_sunday",
+        "reg_type": "SET",
+        "offset": 32856,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/64",
+        "formula_inverse": "#*64",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 64,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p2_day_thursday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p2_day_thursday_set",
+        "reg_name": "Chrono Abilitazione Gioved\u00ec P2",
+        "reg_name_app": "Abilit. gioved\u00ec P2",
+        "reg_key_group": "chrono_p2_day_thursday",
+        "reg_type": "SET",
+        "offset": 32856,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/8",
+        "formula_inverse": "#*8",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 8,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p2_day_tuesday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p2_day_tuesday_set",
+        "reg_name": "Chrono Abilitazione Marted\u00ec P2",
+        "reg_name_app": "Abilit. marted\u00ec P2",
+        "reg_key_group": "chrono_p2_day_tuesday",
+        "reg_type": "SET",
+        "offset": 32856,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/2",
+        "formula_inverse": "#*2",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 2,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p2_day_wednesday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p2_day_wednesday_set",
+        "reg_name": "Chrono Abilitazione Mercoled\u00ec P2",
+        "reg_name_app": "Abilit. mercoled\u00ec P2",
+        "reg_key_group": "chrono_p2_day_wednesday",
+        "reg_type": "SET",
+        "offset": 32856,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/4",
+        "formula_inverse": "#*4",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 4,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p2_power_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p2_power_set",
+        "reg_name": "Set potenza Chrono P2",
+        "reg_name_app": "Imposta potenza P2",
+        "reg_key_group": "chrono_p2_power",
+        "reg_type": "SET",
+        "offset": 32857,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 1,
+        "set_max": 5,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "3",
+        "value": 3
+    },
+    "chrono_p2_start_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p2_start_set",
+        "reg_name": "Avvio Programma P2",
+        "reg_name_app": "Accensione P2",
+        "reg_key_group": "chrono_p2_start",
+        "reg_type": "SET",
+        "offset": 32854,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 144,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "144",
+        "value": 144
+    },
+    "chrono_p2_stop_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p2_stop_set",
+        "reg_name": "Fine Programma P2",
+        "reg_name_app": "Spegnimento P2",
+        "reg_key_group": "chrono_p2_stop",
+        "reg_type": "SET",
+        "offset": 32855,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 144,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "144",
+        "value": 144
+    },
+    "chrono_p2_temperature_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p2_temperature_set",
+        "reg_name": "Set Temperatura Chrono P2",
+        "reg_name_app": "Temperatura aria P2",
+        "reg_key_group": "chrono_p2_temperature",
+        "reg_type": "SET",
+        "offset": 32858,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}\u00b0C",
+        "set_min": 7,
+        "set_max": 41,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 41,
+            "lang": "BHS",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "DEU",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ENG",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "FRE",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ITA",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "PRT",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "SPA",
+            "description": "MAN"
+        }
+        ],
+        "value_raw": "20",
+        "value": 20
+    },
+    "chrono_p3_day_friday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p3_day_friday_set",
+        "reg_name": "Chrono Abilitazione Venerd\u00ec P3",
+        "reg_name_app": "Abilit. venerd\u00ec P3",
+        "reg_key_group": "chrono_p3_day_friday",
+        "reg_type": "SET",
+        "offset": 32861,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/16",
+        "formula_inverse": "#*16",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 16,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p3_day_monday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p3_day_monday_set",
+        "reg_name": "Chrono Abilitazione Luned\u00ec P3",
+        "reg_name_app": "Abilit. luned\u00ec P3",
+        "reg_key_group": "chrono_p3_day_monday",
+        "reg_type": "SET",
+        "offset": 32861,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 1,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p3_day_saturday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p3_day_saturday_set",
+        "reg_name": "Chrono Abilitazione Sabato P3",
+        "reg_name_app": "Abilit. sabato P3",
+        "reg_key_group": "chrono_p3_day_saturday",
+        "reg_type": "SET",
+        "offset": 32861,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/32",
+        "formula_inverse": "#*32",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 32,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p3_day_sunday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p3_day_sunday_set",
+        "reg_name": "Chrono Abilitazione Domenica P3",
+        "reg_name_app": "Abilit. domenica P3",
+        "reg_key_group": "chrono_p3_day_sunday",
+        "reg_type": "SET",
+        "offset": 32861,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/64",
+        "formula_inverse": "#*64",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 64,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p3_day_thursday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p3_day_thursday_set",
+        "reg_name": "Chrono Abilitazione Gioved\u00ec P3",
+        "reg_name_app": "Abilit. gioved\u00ec P3",
+        "reg_key_group": "chrono_p3_day_thursday",
+        "reg_type": "SET",
+        "offset": 32861,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/8",
+        "formula_inverse": "#*8",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 8,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p3_day_tuesday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p3_day_tuesday_set",
+        "reg_name": "Chrono Abilitazione Marted\u00ec P3",
+        "reg_name_app": "Abilit. marted\u00ec P3",
+        "reg_key_group": "chrono_p3_day_tuesday",
+        "reg_type": "SET",
+        "offset": 32861,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/2",
+        "formula_inverse": "#*2",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 2,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p3_day_wednesday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p3_day_wednesday_set",
+        "reg_name": "Chrono Abilitazione Mercoled\u00ec P3",
+        "reg_name_app": "Abilit. mercoled\u00ec P3",
+        "reg_key_group": "chrono_p3_day_wednesday",
+        "reg_type": "SET",
+        "offset": 32861,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/4",
+        "formula_inverse": "#*4",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 4,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p3_power_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p3_power_set",
+        "reg_name": "Set potenza Chrono P3",
+        "reg_name_app": "Imposta potenza P3",
+        "reg_key_group": "chrono_p3_power",
+        "reg_type": "SET",
+        "offset": 32862,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 1,
+        "set_max": 5,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "3",
+        "value": 3
+    },
+    "chrono_p3_start_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p3_start_set",
+        "reg_name": "Avvio Programma P3",
+        "reg_name_app": "Accensione P3",
+        "reg_key_group": "chrono_p3_start",
+        "reg_type": "SET",
+        "offset": 32859,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 144,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "144",
+        "value": 144
+    },
+    "chrono_p3_stop_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p3_stop_set",
+        "reg_name": "Fine Programma P3",
+        "reg_name_app": "Spegnimento P3",
+        "reg_key_group": "chrono_p3_stop",
+        "reg_type": "SET",
+        "offset": 32860,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 144,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "144",
+        "value": 144
+    },
+    "chrono_p3_temperature_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p3_temperature_set",
+        "reg_name": "Set Temperatura Chrono P3",
+        "reg_name_app": "Temperatura aria P3",
+        "reg_key_group": "chrono_p3_temperature",
+        "reg_type": "SET",
+        "offset": 32863,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}\u00b0C",
+        "set_min": 7,
+        "set_max": 41,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 41,
+            "lang": "BHS",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "DEU",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ENG",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "FRE",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ITA",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "PRT",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "SPA",
+            "description": "MAN"
+        }
+        ],
+        "value_raw": "20",
+        "value": 20
+    },
+    "chrono_p4_day_friday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p4_day_friday_set",
+        "reg_name": "Chrono Abilitazione Venerd\u00ec P4",
+        "reg_name_app": "Abilit. venerd\u00ec P4",
+        "reg_key_group": "chrono_p4_day_friday",
+        "reg_type": "SET",
+        "offset": 32866,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/16",
+        "formula_inverse": "#*16",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 16,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p4_day_monday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p4_day_monday_set",
+        "reg_name": "Chrono Abilitazione Luned\u00ec P4",
+        "reg_name_app": "Abilit. luned\u00ec P4",
+        "reg_key_group": "chrono_p4_day_monday",
+        "reg_type": "SET",
+        "offset": 32866,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 1,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p4_day_saturday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p4_day_saturday_set",
+        "reg_name": "Chrono Abilitazione Sabato P4",
+        "reg_name_app": "Abilit. sabato P4",
+        "reg_key_group": "chrono_p4_day_saturday",
+        "reg_type": "SET",
+        "offset": 32866,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/32",
+        "formula_inverse": "#*32",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 32,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p4_day_sunday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p4_day_sunday_set",
+        "reg_name": "Chrono Abilitazione Domenica P4",
+        "reg_name_app": "Abilit. domenica P4",
+        "reg_key_group": "chrono_p4_day_sunday",
+        "reg_type": "SET",
+        "offset": 32866,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/64",
+        "formula_inverse": "#*64",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 64,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p4_day_thursday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p4_day_thursday_set",
+        "reg_name": "Chrono Abilitazione Gioved\u00ec P4",
+        "reg_name_app": "Abilit. gioved\u00ec P4",
+        "reg_key_group": "chrono_p4_day_thursday",
+        "reg_type": "SET",
+        "offset": 32866,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/8",
+        "formula_inverse": "#*8",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 8,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p4_day_tuesday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p4_day_tuesday_set",
+        "reg_name": "Chrono Abilitazione Marted\u00ec P4",
+        "reg_name_app": "Abilit. marted\u00ec P4",
+        "reg_key_group": "chrono_p4_day_tuesday",
+        "reg_type": "SET",
+        "offset": 32866,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/2",
+        "formula_inverse": "#*2",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 2,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p4_day_wednesday_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p4_day_wednesday_set",
+        "reg_name": "Chrono Abilitazione Mercoled\u00ec P4",
+        "reg_name_app": "Abilit. mercoled\u00ec P4",
+        "reg_key_group": "chrono_p4_day_wednesday",
+        "reg_type": "SET",
+        "offset": 32866,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/4",
+        "formula_inverse": "#*4",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 1,
+        "readonly": false,
+        "mask": 4,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "chrono_p4_power_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p4_power_set",
+        "reg_name": "Set potenza Chrono P4",
+        "reg_name_app": "Imposta potenza P4",
+        "reg_key_group": "chrono_p4_power",
+        "reg_type": "SET",
+        "offset": 32867,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 1,
+        "set_max": 5,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "3",
+        "value": 3
+    },
+    "chrono_p4_start_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p4_start_set",
+        "reg_name": "Avvio Programma P4",
+        "reg_name_app": "Accensione P4",
+        "reg_key_group": "chrono_p4_start",
+        "reg_type": "SET",
+        "offset": 32864,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 144,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "144",
+        "value": 144
+    },
+    "chrono_p4_stop_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p4_stop_set",
+        "reg_name": "Fine Programma P4",
+        "reg_name_app": "Spegnimento P4",
+        "reg_key_group": "chrono_p4_stop",
+        "reg_type": "SET",
+        "offset": 32865,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 144,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "144",
+        "value": 144
+    },
+    "chrono_p4_temperature_set": {
+        "app_image_name": "default",
+        "reg_key": "chrono_p4_temperature_set",
+        "reg_name": "Set Temperatura Chrono P4",
+        "reg_name_app": "Temperatura aria P4",
+        "reg_key_group": "chrono_p4_temperature",
+        "reg_type": "SET",
+        "offset": 32868,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}\u00b0C",
+        "set_min": 7,
+        "set_max": 41,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 41,
+            "lang": "BHS",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "DEU",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ENG",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "FRE",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ITA",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "PRT",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "SPA",
+            "description": "MAN"
+        }
+        ],
+        "value_raw": "20",
+        "value": 20
+    },
+    "clock_hour_set": {
+        "app_image_name": "default",
+        "reg_key": "clock_hour_set",
+        "reg_name": "Ora",
+        "reg_name_app": "Ora",
+        "reg_key_group": "clock_hour",
+        "reg_type": "SET",
+        "offset": 33017,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 23,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": true,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "33",
+        "value": 33
+    },
+    "clock_minute_set": {
+        "app_image_name": "default",
+        "reg_key": "clock_minute_set",
+        "reg_name": "Minuti",
+        "reg_name_app": "Minuti",
+        "reg_key_group": "clock_minute",
+        "reg_type": "SET",
+        "offset": 33018,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 59,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": true,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "52",
+        "value": 52
+    },
+    "hw_power_fw_revision_get": {
+        "app_image_name": "default",
+        "reg_key": "hw_power_fw_revision_get",
+        "reg_name": "Revisione FW Scheda potenza",
+        "reg_name_app": "FW rev. Scheda potenza",
+        "reg_key_group": "hw_power_fw_revision",
+        "reg_type": "GET",
+        "offset": 241,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 255,
+        "readonly": false,
+        "mask": 255,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 25,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "hw_power_fw_type_get": {
+        "app_image_name": "default",
+        "reg_key": "hw_power_fw_type_get",
+        "reg_name": "FW Scheda Potenza",
+        "reg_name_app": "FW scheda potenza",
+        "reg_key_group": "hw_power_fw_type",
+        "reg_type": "GET",
+        "offset": 240,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 255,
+        "readonly": false,
+        "mask": 255,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 26,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "ore_lavoro_par_get": {
+        "app_image_name": "default",
+        "reg_key": "ore_lavoro_par_get",
+        "reg_name": "Ore lavoro parziali",
+        "reg_name_app": "Ore Lav. Parz.",
+        "reg_key_group": "ore_lavoro_par_get",
+        "reg_type": "GET",
+        "offset": 33004,
+        "eeprom": true,
+        "is_word": true,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0} h",
+        "set_min": 0,
+        "set_max": 65535,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": true,
+        "use_cat": true,
+        "display_order": 28,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "207",
+        "value": 207
+    },
+    "ore_lavoro_tot_get": {
+        "app_image_name": "default",
+        "reg_key": "ore_lavoro_tot_get",
+        "reg_name": "Ore lavoro totali",
+        "reg_name_app": "Ore Lav. Tot.",
+        "reg_key_group": "ore_lavoro_tot_get",
+        "reg_type": "GET",
+        "offset": 33002,
+        "eeprom": true,
+        "is_word": true,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 65535,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 29,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "2727",
+        "value": 2727
+    },
+    "power_set": {
+        "app_image_name": "real_power_get",
+        "reg_key": "power_set",
+        "reg_name": "Set Potenza",
+        "reg_name_app": "Potenza",
+        "reg_key_group": "power",
+        "reg_type": "SET",
+        "offset": 32895,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 1,
+        "set_max": 5,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": true,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 100,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 1,
+            "lang": "BHS",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "DEU",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "ENG",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "FRE",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "ITA",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "PRT",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "SPA",
+            "description": "1 - Min"
+        },
+        {
+            "value": 5,
+            "lang": "BHS",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "DEU",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "ENG",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "FRE",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "ITA",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "PRT",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "SPA",
+            "description": "5 - Max"
+        }
+        ],
+        "value_raw": "3",
+        "value": 3
+    },
+    "real_power_get": {
+        "app_image_name": "real_power_get",
+        "reg_key": "real_power_get",
+        "reg_name": "Potenza Reale",
+        "reg_name_app": "Potenza reale",
+        "reg_key_group": "real_power",
+        "reg_type": "GET",
+        "offset": 52,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 5,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": true,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 99,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 1,
+            "lang": "BHS",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "DEU",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "ENG",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "FRE",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "ITA",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "PRT",
+            "description": "1 - Min"
+        },
+        {
+            "value": 1,
+            "lang": "SPA",
+            "description": "1 - Min"
+        },
+        {
+            "value": 5,
+            "lang": "BHS",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "DEU",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "ENG",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "FRE",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "ITA",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "PRT",
+            "description": "5 - Max"
+        },
+        {
+            "value": 5,
+            "lang": "SPA",
+            "description": "5 - Max"
+        }
+        ],
+        "value_raw": "1",
+        "value": 1
+    },
+    "status_get": {
+        "app_image_name": "status_get",
+        "reg_key": "status_get",
+        "reg_name": "Stato",
+        "reg_name_app": "Stato",
+        "reg_key_group": "status",
+        "reg_type": "GET",
+        "offset": 33,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 255,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": true,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 100,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 0,
+            "lang": "BHS",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "DEU",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "ENG",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "FRE",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "ITA",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "PRT",
+            "description": "OFF"
+        },
+        {
+            "value": 0,
+            "lang": "SPA",
+            "description": "OFF"
+        },
+        {
+            "value": 1,
+            "lang": "DEU",
+            "description": "ANZUENDUNG"
+        },
+        {
+            "value": 1,
+            "lang": "ENG",
+            "description": "IGNITION"
+        },
+        {
+            "value": 1,
+            "lang": "FRE",
+            "description": "ALLUMAGE"
+        },
+        {
+            "value": 1,
+            "lang": "ITA",
+            "description": "ACCENSIONE"
+        },
+        {
+            "value": 1,
+            "lang": "SPA",
+            "description": "ENCENDIDO"
+        },
+        {
+            "value": 2,
+            "lang": "DEU",
+            "description": "WARTE AUF FLAMME"
+        },
+        {
+            "value": 2,
+            "lang": "ENG",
+            "description": "WAITING FLAME"
+        },
+        {
+            "value": 2,
+            "lang": "FRE",
+            "description": "ATTEINTE FLAMME"
+        },
+        {
+            "value": 2,
+            "lang": "ITA",
+            "description": "ATTESA FIAMMA"
+        },
+        {
+            "value": 2,
+            "lang": "SPA",
+            "description": "ESPERA LLAMA"
+        },
+        {
+            "value": 3,
+            "lang": "DEU",
+            "description": "FLAMME VORHANDEN"
+        },
+        {
+            "value": 3,
+            "lang": "ENG",
+            "description": "FLAME LIGHT"
+        },
+        {
+            "value": 3,
+            "lang": "FRE",
+            "description": "FLAMME PRESENTE"
+        },
+        {
+            "value": 3,
+            "lang": "ITA",
+            "description": "FIAMMA PRESENTE"
+        },
+        {
+            "value": 3,
+            "lang": "SPA",
+            "description": "LLAMA PRESENTE"
+        },
+        {
+            "value": 4,
+            "lang": "DEU",
+            "description": "BETRIEB"
+        },
+        {
+            "value": 4,
+            "lang": "ENG",
+            "description": "WORK"
+        },
+        {
+            "value": 4,
+            "lang": "FRE",
+            "description": "TRAVAIL"
+        },
+        {
+            "value": 4,
+            "lang": "ITA",
+            "description": "LAVORO"
+        },
+        {
+            "value": 4,
+            "lang": "SPA",
+            "description": "TRABAJO"
+        },
+        {
+            "value": 5,
+            "lang": "DEU",
+            "description": "BRENNTOPF REINIGUNG"
+        },
+        {
+            "value": 5,
+            "lang": "ENG",
+            "description": "FIRE POT CLEANING"
+        },
+        {
+            "value": 5,
+            "lang": "FRE",
+            "description": "NETTOYAGE BRASIER"
+        },
+        {
+            "value": 5,
+            "lang": "ITA",
+            "description": "PULIZIA BRACERE"
+        },
+        {
+            "value": 5,
+            "lang": "SPA",
+            "description": "LIMPIEZA BRASERO"
+        },
+        {
+            "value": 6,
+            "lang": "DEU",
+            "description": "ENDREINIGUNG"
+        },
+        {
+            "value": 6,
+            "lang": "ENG",
+            "description": "FINAL CLEANING"
+        },
+        {
+            "value": 6,
+            "lang": "FRE",
+            "description": "NETTOYAGE FINAL"
+        },
+        {
+            "value": 6,
+            "lang": "ITA",
+            "description": "PULIZIA FINALE"
+        },
+        {
+            "value": 6,
+            "lang": "SPA",
+            "description": "LIMPIEZA FINAL"
+        },
+        {
+            "value": 7,
+            "lang": "DEU",
+            "description": "ECO STOP"
+        },
+        {
+            "value": 7,
+            "lang": "ENG",
+            "description": "ECO STOP"
+        },
+        {
+            "value": 7,
+            "lang": "FRE",
+            "description": "ECO STOP"
+        },
+        {
+            "value": 7,
+            "lang": "ITA",
+            "description": "ECO STOP"
+        },
+        {
+            "value": 7,
+            "lang": "SPA",
+            "description": "ECO STOP"
+        },
+        {
+            "value": 8,
+            "lang": "DEU",
+            "description": "ALARM"
+        },
+        {
+            "value": 8,
+            "lang": "ENG",
+            "description": "ALARM"
+        },
+        {
+            "value": 8,
+            "lang": "FRE",
+            "description": "ALARME"
+        },
+        {
+            "value": 8,
+            "lang": "ITA",
+            "description": "ALLARME"
+        },
+        {
+            "value": 8,
+            "lang": "SPA",
+            "description": "ALARMA"
+        },
+        {
+            "value": 9,
+            "lang": "DEU",
+            "description": "MEMORY ALARM"
+        },
+        {
+            "value": 9,
+            "lang": "ENG",
+            "description": "MEMORY ALARM"
+        },
+        {
+            "value": 9,
+            "lang": "FRE",
+            "description": "MEMOIRE ALARME"
+        },
+        {
+            "value": 9,
+            "lang": "ITA",
+            "description": "MEMORIA ALLARME"
+        },
+        {
+            "value": 9,
+            "lang": "SPA",
+            "description": "MEMORIA ALARMA"
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "status_managed_get": {
+        "app_image_name": "status_get",
+        "reg_key": "status_managed_get",
+        "reg_name": "Stato Gestito",
+        "reg_name_app": "Stato Gestito",
+        "reg_key_group": "status_managed",
+        "reg_type": "GET",
+        "offset": 232,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 255,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 100,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 85,
+            "lang": "BHS",
+            "description": "ON"
+        },
+        {
+            "value": 85,
+            "lang": "DEU",
+            "description": "ON"
+        },
+        {
+            "value": 85,
+            "lang": "ENG",
+            "description": "ON"
+        },
+        {
+            "value": 85,
+            "lang": "FRE",
+            "description": "ON"
+        },
+        {
+            "value": 85,
+            "lang": "ITA",
+            "description": "ON"
+        },
+        {
+            "value": 85,
+            "lang": "NLD",
+            "description": "ON"
+        },
+        {
+            "value": 85,
+            "lang": "PRT",
+            "description": "ON"
+        },
+        {
+            "value": 85,
+            "lang": "SPA",
+            "description": "ON"
+        },
+        {
+            "value": 170,
+            "lang": "BHS",
+            "description": "OFF"
+        },
+        {
+            "value": 170,
+            "lang": "DEU",
+            "description": "OFF"
+        },
+        {
+            "value": 170,
+            "lang": "ENG",
+            "description": "OFF"
+        },
+        {
+            "value": 170,
+            "lang": "FRE",
+            "description": "OFF"
+        },
+        {
+            "value": 170,
+            "lang": "ITA",
+            "description": "OFF"
+        },
+        {
+            "value": 170,
+            "lang": "NLD",
+            "description": "OFF"
+        },
+        {
+            "value": 170,
+            "lang": "PRT",
+            "description": "OFF"
+        },
+        {
+            "value": 170,
+            "lang": "SPA",
+            "description": "OFF"
+        }
+        ],
+        "value_raw": "113",
+        "value": 113
+    },
+    "status_managed_off_enable": {
+        "app_image_name": "default",
+        "reg_key": "status_managed_off_enable",
+        "reg_name": "OFF",
+        "reg_name_app": "OFF",
+        "reg_key_group": "status_managed_off",
+        "reg_type": "ENABLE",
+        "offset": 33,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 255,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 100,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enable_val": [
+        {
+            "value": 3
+        },
+        {
+            "value": 4
+        },
+        {
+            "value": 5
+        },
+        {
+            "value": 7
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "status_managed_on_enable": {
+        "app_image_name": "default",
+        "reg_key": "status_managed_on_enable",
+        "reg_name": "ON",
+        "reg_name_app": "ON",
+        "reg_key_group": "status_managed_on",
+        "reg_type": "ENABLE",
+        "offset": 33,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 255,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 100,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enable_val": [
+        {
+            "value": 0
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "temp_air_enable": {
+        "app_image_name": "default",
+        "reg_key": "temp_air_enable",
+        "reg_name": "Temperatura Ambiente Enable",
+        "reg_name_app": "Temp. Amb. Enable",
+        "reg_key_group": "temp_air",
+        "reg_type": "ENABLE",
+        "offset": 1,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 255,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enable_val": [
+        {
+            "value": 1
+        },
+        {
+            "value": 2
+        },
+        {
+            "value": 3
+        },
+        {
+            "value": 4
+        },
+        {
+            "value": 5
+        },
+        {
+            "value": 6
+        },
+        {
+            "value": 7
+        },
+        {
+            "value": 8
+        },
+        {
+            "value": 9
+        },
+        {
+            "value": 10
+        },
+        {
+            "value": 11
+        },
+        {
+            "value": 12
+        },
+        {
+            "value": 13
+        },
+        {
+            "value": 14
+        },
+        {
+            "value": 15
+        },
+        {
+            "value": 16
+        },
+        {
+            "value": 17
+        },
+        {
+            "value": 18
+        },
+        {
+            "value": 19
+        },
+        {
+            "value": 20
+        },
+        {
+            "value": 21
+        },
+        {
+            "value": 22
+        },
+        {
+            "value": 23
+        },
+        {
+            "value": 24
+        },
+        {
+            "value": 25
+        },
+        {
+            "value": 26
+        },
+        {
+            "value": 27
+        },
+        {
+            "value": 28
+        },
+        {
+            "value": 29
+        },
+        {
+            "value": 30
+        },
+        {
+            "value": 31
+        },
+        {
+            "value": 32
+        },
+        {
+            "value": 33
+        },
+        {
+            "value": 34
+        },
+        {
+            "value": 35
+        },
+        {
+            "value": 36
+        },
+        {
+            "value": 37
+        },
+        {
+            "value": 38
+        },
+        {
+            "value": 39
+        },
+        {
+            "value": 40
+        },
+        {
+            "value": 41
+        },
+        {
+            "value": 42
+        },
+        {
+            "value": 43
+        },
+        {
+            "value": 44
+        },
+        {
+            "value": 45
+        },
+        {
+            "value": 46
+        },
+        {
+            "value": 47
+        },
+        {
+            "value": 48
+        },
+        {
+            "value": 49
+        },
+        {
+            "value": 50
+        },
+        {
+            "value": 51
+        },
+        {
+            "value": 52
+        },
+        {
+            "value": 53
+        },
+        {
+            "value": 54
+        },
+        {
+            "value": 55
+        },
+        {
+            "value": 56
+        },
+        {
+            "value": 57
+        },
+        {
+            "value": 58
+        },
+        {
+            "value": 59
+        },
+        {
+            "value": 60
+        },
+        {
+            "value": 61
+        },
+        {
+            "value": 62
+        },
+        {
+            "value": 63
+        },
+        {
+            "value": 64
+        },
+        {
+            "value": 65
+        },
+        {
+            "value": 66
+        },
+        {
+            "value": 67
+        },
+        {
+            "value": 68
+        },
+        {
+            "value": 69
+        },
+        {
+            "value": 70
+        },
+        {
+            "value": 71
+        },
+        {
+            "value": 72
+        },
+        {
+            "value": 73
+        },
+        {
+            "value": 74
+        },
+        {
+            "value": 75
+        },
+        {
+            "value": 76
+        },
+        {
+            "value": 77
+        },
+        {
+            "value": 78
+        },
+        {
+            "value": 79
+        },
+        {
+            "value": 80
+        },
+        {
+            "value": 81
+        },
+        {
+            "value": 82
+        },
+        {
+            "value": 83
+        },
+        {
+            "value": 84
+        },
+        {
+            "value": 85
+        },
+        {
+            "value": 86
+        },
+        {
+            "value": 87
+        },
+        {
+            "value": 88
+        },
+        {
+            "value": 89
+        },
+        {
+            "value": 90
+        },
+        {
+            "value": 91
+        },
+        {
+            "value": 92
+        },
+        {
+            "value": 93
+        },
+        {
+            "value": 94
+        },
+        {
+            "value": 95
+        },
+        {
+            "value": 96
+        },
+        {
+            "value": 97
+        },
+        {
+            "value": 98
+        },
+        {
+            "value": 99
+        },
+        {
+            "value": 100
+        }
+        ],
+        "value_raw": "31",
+        "value": 31
+    },
+    "temp_air_get": {
+        "app_image_name": "temp_air_get",
+        "reg_key": "temp_air_get",
+        "reg_name": "Temperatura Ambiente",
+        "reg_name_app": "Temp. ambiente",
+        "reg_key_group": "temp_air",
+        "reg_type": "GET",
+        "offset": 1,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#/2",
+        "formula_inverse": "#*2",
+        "format_string": "{0} \u00b0C",
+        "set_min": 0,
+        "set_max": 100,
+        "readonly": false,
+        "mask": 255,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": true,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 98,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "31",
+        "value": 15.5
+    },
+    "temp_air_palm_enable": {
+        "app_image_name": "default",
+        "reg_key": "temp_air_palm_enable",
+        "reg_name": "T. Amb. Palmare Enable",
+        "reg_name_app": "Temp. Palm. Enable",
+        "reg_key_group": "temp_air_palm",
+        "reg_type": "ENABLE",
+        "offset": 1,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0}",
+        "set_min": 0,
+        "set_max": 255,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": false,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 0,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "31",
+        "value": 31
+    },
+    "temp_air_palm_get": {
+        "app_image_name": "temp_air_get",
+        "reg_key": "temp_air_palm_get",
+        "reg_name": "T. Amb. Palmare",
+        "reg_name_app": "Temp. Palm.",
+        "reg_key_group": "temp_air_palm",
+        "reg_type": "GET",
+        "offset": 13,
+        "eeprom": false,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0} \u00b0C",
+        "set_min": 0,
+        "set_max": 255,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": false,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 76,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "0",
+        "value": 0
+    },
+    "temp_air_palm_set": {
+        "app_image_name": "temp_air_get",
+        "reg_key": "temp_air_palm_set",
+        "reg_name": "T. Amb. Palmare Set",
+        "reg_name_app": "Temp. Palm. Set",
+        "reg_key_group": "temp_air_palm",
+        "reg_type": "SET",
+        "offset": 32851,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0} \u00b0C",
+        "set_min": 7,
+        "set_max": 41,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": false,
+        "display_dashboard": false,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 65,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 41,
+            "lang": "ITA",
+            "description": "MAN"
+        }
+        ],
+        "value_raw": "0",
+        "value": 0
+    },
+    "temp_air_set": {
+        "app_image_name": "temp_air_get",
+        "reg_key": "temp_air_set",
+        "reg_name": "Set Temperatura Ambiente",
+        "reg_name_app": "Temp. ambiente",
+        "reg_key_group": "temp_air",
+        "reg_type": "SET",
+        "offset": 32893,
+        "eeprom": true,
+        "is_word": false,
+        "big_endian": false,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0} \u00b0C",
+        "set_min": 6,
+        "set_max": 41,
+        "readonly": false,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": false,
+        "display_manage": true,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 99,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "enc_val": [
+        {
+            "value": 6,
+            "lang": "BHS",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "DEU",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "ENG",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "FRE",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "ITA",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "PRT",
+            "description": "- EXT"
+        },
+        {
+            "value": 6,
+            "lang": "SPA",
+            "description": "- EXT"
+        },
+        {
+            "value": 41,
+            "lang": "BHS",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "DEU",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ENG",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "FRE",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "ITA",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "PRT",
+            "description": "MAN"
+        },
+        {
+            "value": 41,
+            "lang": "SPA",
+            "description": "MAN"
+        }
+        ],
+        "value_raw": "20",
+        "value": 20
+    },
+    "temp_gas_flue_get": {
+        "app_image_name": "temp_gas_flue_get",
+        "reg_key": "temp_gas_flue_get",
+        "reg_name": "Temperatura Fumi",
+        "reg_name_app": "Temp. fumi",
+        "reg_key_group": "temp_gas_flue",
+        "reg_type": "GET",
+        "offset": 68,
+        "eeprom": false,
+        "is_word": true,
+        "big_endian": true,
+        "formula": "#",
+        "formula_inverse": "#",
+        "format_string": "{0} \u00b0C",
+        "set_min": 0,
+        "set_max": 65535,
+        "readonly": true,
+        "mask": 65535,
+        "is_hex": false,
+        "is_temperature": false,
+        "use_app": true,
+        "display_dashboard": true,
+        "display_manage": false,
+        "display_info": false,
+        "use_cat": true,
+        "display_order": 96,
+        "step": 1,
+        "use_history": true,
+        "use_history_output": true,
+        "with_sign": false,
+        "from_char_code": false,
+        "notify_on_change": false,
+        "is_test": false,
+        "value_raw": "17",
+        "value": 17
+    }
+}
