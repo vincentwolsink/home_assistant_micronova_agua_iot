@@ -552,7 +552,7 @@ class Device(object):
 
     def get_register_enabled(self, key):
         enable_key = key.rsplit("_", 1)[0] + "_enable"
-        if enable_key not in self.registers:
+        if enable_key not in self.registers or not self.get_register(enable_key):
             # Always enabled if no enable register present
             return True
 
