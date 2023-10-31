@@ -443,7 +443,7 @@ class Device(object):
         self.__information_dict = information_dict
 
     def __prepare_value_for_writing(self, item, value):
-        value = int(value)
+        value = float(value)
         set_min = self.__register_map_dict[item]["set_min"]
         set_max = self.__register_map_dict[item]["set_max"]
 
