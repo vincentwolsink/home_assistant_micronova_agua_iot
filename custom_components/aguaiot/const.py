@@ -63,7 +63,7 @@ BINARY_SENSORS = (
     ),
     AguaIOTBinarySensorEntityDescription(
         key="popup_riserva_wood_get",
-        name="Wood reserve",
+        name="Wood Reserve",
         icon="mdi:fire-alert",
         device_class=BinarySensorDeviceClass.PROBLEM,
         force_enabled=True,
@@ -104,7 +104,7 @@ SENSORS = (
     ),
     AguaIOTSensorEntityDescription(
         key="real_power_get",
-        name="Real Pellet Power",
+        name="Real Power",
         icon="mdi:gauge",
         native_unit_of_measurement=None,
         state_class=None,
