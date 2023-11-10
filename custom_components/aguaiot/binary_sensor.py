@@ -16,8 +16,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
     sensors = []
     for device in agua.devices:
         for sensor in BINARY_SENSORS:
-            if sensor.key in device.registers and device.get_register_enabled(
-                sensor.key
+            if sensor.key in device.registers and (
+                sensor.force_enabled or device.get_register_enabled(sensor.key)
             ):
                 sensors.append(AguaIOTHeatingBinarySensor(coordinator, device, sensor))
 
