@@ -44,6 +44,8 @@ CONF_LOGIN_API_URL = "login_api_url"
 CONF_UUID = "uuid"
 
 DEVICE_VARIANTS = ["water", "air", "air2", "air_palm"]
+MODE_WOOD = "Wood"
+MODE_PELLETS = "Pellets"
 
 PLATFORMS = [
     Platform.CLIMATE,
@@ -151,16 +153,6 @@ NUMBERS = (
         native_step=1,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=NumberDeviceClass.TEMPERATURE,
-    ),
-    NumberEntityDescription(
-        key="power_set",
-        name="Pellet Power",
-        native_step=1,
-    ),
-    NumberEntityDescription(
-        key="power_wood_set",
-        name="Wood Power",
-        native_step=1,
     ),
 )
 

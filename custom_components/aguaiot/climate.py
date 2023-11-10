@@ -19,7 +19,14 @@ from homeassistant.const import (
     UnitOfTemperature,
     PRECISION_HALVES,
 )
-from .const import DOMAIN, DEVICE_VARIANTS, CLIMATE_CANALIZATIONS, CLIMATE_FANS
+from .const import (
+    DOMAIN,
+    DEVICE_VARIANTS,
+    CLIMATE_CANALIZATIONS,
+    CLIMATE_FANS,
+    MODE_PELLETS,
+    MODE_WOOD,
+)
 from .aguaiot import AguaIOTError
 
 _LOGGER = logging.getLogger(__name__)
@@ -90,6 +97,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         """Initialize the thermostat."""
         CoordinatorEntity.__init__(self, coordinator)
         self._device = device
+        self._hybrid = "power_wood_set" in self._device.registers
 
         self._temperature_get_key = None
         for variant in DEVICE_VARIANTS:
@@ -124,7 +132,12 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     @property
     def supported_features(self):
         """Return the list of supported features."""
-        return ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
+        features = (
+            ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
+        )
+        if self._hybrid:
+            features = features | ClimateEntityFeature.PRESET_MODE
+        return features
 
     @property
     def hvac_action(self):
@@ -157,22 +170,48 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
             await self.async_turn_on()
 
     @property
+    def hybrid_mode(self):
+        return (
+            MODE_WOOD
+            if self._hybrid and self._device.get_register_enabled("power_wood_set")
+            else MODE_PELLETS
+        )
+
+    @property
     def fan_mode(self):
         """Return fan mode."""
-        return str(self._device.get_register_value_description("power_set"))
+        power_register = (
+            "power_wood_set" if self.hybrid_mode == MODE_WOOD else "power_set"
+        )
+        return str(self._device.get_register_value_description(power_register))
 
     @property
     def fan_modes(self):
         """Return the list of available fan modes."""
         fan_modes = []
+        power_register = (
+            "power_wood_set" if self.hybrid_mode == MODE_WOOD else "power_set"
+        )
         for x in range(
-            self._device.get_register_value_min("power_set"),
-            (self._device.get_register_value_max("power_set") + 1),
+            self._device.get_register_value_min(power_register),
+            (self._device.get_register_value_max(power_register) + 1),
         ):
             fan_modes.append(
-                str(self._device.get_register_value_options("power_set").get(x, x))
+                str(self._device.get_register_value_options(power_register).get(x, x))
             )
         return fan_modes
+
+    @property
+    def preset_modes(self):
+        return [self.hybrid_mode]
+
+    @property
+    def preset_mode(self):
+        return self.hybrid_mode
+
+    async def async_set_preset_mode(self, preset_mode):
+        # The stove will pick the correct mode.
+        pass
 
     async def async_turn_off(self):
         """Turn device off."""
