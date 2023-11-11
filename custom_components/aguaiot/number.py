@@ -16,9 +16,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     numbers = []
     for device in agua.devices:
+        hybrid = "power_wood_set" in device.registers
+
         for number in NUMBERS:
-            if number.key in device.registers and device.get_register_enabled(
-                number.key
+            if (
+                number.key in device.registers
+                and (number.force_enabled or device.get_register_enabled(number.key))
+                and (not number.hybrid_only or hybrid)
             ):
                 numbers.append(AguaIOTHeatingNumber(coordinator, device, number))
 

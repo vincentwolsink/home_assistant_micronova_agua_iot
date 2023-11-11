@@ -30,11 +30,19 @@ from dataclasses import dataclass
 @dataclass
 class AguaIOTBinarySensorEntityDescription(BinarySensorEntityDescription):
     force_enabled: bool = False
+    hybrid_only: bool = False
 
 
 @dataclass
 class AguaIOTSensorEntityDescription(SensorEntityDescription):
     force_enabled: bool = False
+    hybrid_only: bool = False
+
+
+@dataclass
+class AguaIOTNumberEntityDescription(NumberEntityDescription):
+    force_enabled: bool = False
+    hybrid_only: bool = False
 
 
 DOMAIN = "aguaiot"
@@ -44,6 +52,8 @@ CONF_LOGIN_API_URL = "login_api_url"
 CONF_UUID = "uuid"
 
 DEVICE_VARIANTS = ["water", "air", "air2", "air_palm"]
+MODE_WOOD = "Wood"
+MODE_PELLETS = "Pellet"
 
 PLATFORMS = [
     Platform.CLIMATE,
@@ -119,6 +129,7 @@ SENSORS = (
         state_class=None,
         device_class=None,
         force_enabled=True,
+        hybrid_only=True,
     ),
 )
 
@@ -138,29 +149,31 @@ SWITCHES = (
 )
 
 NUMBERS = (
-    NumberEntityDescription(
+    AguaIOTNumberEntityDescription(
         key="es_air_start_set",
         name="Energy Saving Start",
         native_step=1,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=NumberDeviceClass.TEMPERATURE,
     ),
-    NumberEntityDescription(
+    AguaIOTNumberEntityDescription(
         key="es_air_stop_set",
         name="Energy Saving Stop",
         native_step=1,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=NumberDeviceClass.TEMPERATURE,
     ),
-    NumberEntityDescription(
+    AguaIOTNumberEntityDescription(
         key="power_set",
         name="Pellet Power",
         native_step=1,
+        hybrid_only=True,
     ),
-    NumberEntityDescription(
+    AguaIOTNumberEntityDescription(
         key="power_wood_set",
         name="Wood Power",
         native_step=1,
+        hybrid_only=True,
     ),
 )
 
