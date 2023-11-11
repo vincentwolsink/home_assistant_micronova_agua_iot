@@ -97,7 +97,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         """Initialize the thermostat."""
         CoordinatorEntity.__init__(self, coordinator)
         self._device = device
-        self._hybrid = "power_wood_set" in self._device.registers
+        self._hybrid = "power_wood_set" in device.registers
 
         self._temperature_get_key = None
         for variant in DEVICE_VARIANTS:

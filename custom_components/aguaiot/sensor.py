@@ -15,9 +15,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     sensors = []
     for device in agua.devices:
+        hybrid = "power_wood_set" in device.registers
+
         for sensor in SENSORS:
-            if sensor.key in device.registers and (
-                sensor.force_enabled or device.get_register_enabled(sensor.key)
+            if (
+                sensor.key in device.registers
+                and (sensor.force_enabled or device.get_register_enabled(sensor.key))
+                and (not sensor.hybrid_only or hybrid)
             ):
                 sensors.append(AguaIOTHeatingSensor(coordinator, device, sensor))
 
