@@ -142,13 +142,11 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     @property
     def hvac_action(self):
         """Return the current running hvac operation."""
-        if self._device.get_register_value("status_get") in [1, 2]:
+        if self._device.get_register_value("status_get") in [1, 2, 3, 4, 5, 13, 14]:
             return HVACAction.HEATING
-        elif self._device.get_register_value("status_get") in [3, 4, 5]:
-            return HVACAction.HEATING
-        elif self._device.get_register_value("status_get") in [7, 8, 9]:
-            return HVACAction.IDLE
-        return HVACAction.OFF
+        elif self._device.get_register_value("status_get") in [0, 6]:
+            return HVACAction.OFF
+        return HVACAction.IDLE
 
     @property
     def hvac_modes(self):
