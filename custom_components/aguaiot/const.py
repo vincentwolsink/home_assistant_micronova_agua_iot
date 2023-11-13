@@ -45,6 +45,12 @@ class AguaIOTNumberEntityDescription(NumberEntityDescription):
     hybrid_only: bool = False
 
 
+@dataclass
+class AguaIOTCanalizationEntityDescription(ClimateEntityDescription):
+    key_temp_set: str | None = None
+    key_temp_get: str | None = None
+
+
 DOMAIN = "aguaiot"
 CONF_API_URL = "api_url"
 CONF_CUSTOMER_CODE = "customer_code"
@@ -177,23 +183,29 @@ NUMBERS = (
     ),
 )
 
-CLIMATE_FANS = (
-    ClimateEntityDescription(
-        key=r"multifire_\d+_set",
-        icon="mdi:fan",
-    ),
-    ClimateEntityDescription(
-        key=r"canalization_\d+_set",
-        icon="mdi:fan",
-    ),
-    ClimateEntityDescription(
-        key=r"vent_front_set",
-        icon="mdi:fan",
-    ),
-)
-
 CLIMATE_CANALIZATIONS = (
-    ClimateEntityDescription(
-        key=r"^(canalization_\d+)_temp_\w+_set",
+    AguaIOTCanalizationEntityDescription(
+        name="Multifire {id}",
+        key=r"multifire_(?P<id>\d+)_set",
+        icon="mdi:fan",
+    ),
+    AguaIOTCanalizationEntityDescription(
+        name="Canalization {id}",
+        key=r"canalization_(?P<id>\d+)_set",
+        icon="mdi:fan",
+    ),
+    AguaIOTCanalizationEntityDescription(
+        name="Canalization {id}",
+        key=r"canalization_(?P<id>\d+)_vent_set",
+        key_temp_set="canalization_{id}_temp_air_set",
+        key_temp_get="canalization_{id}_temp_air_get",
+        icon="mdi:fan",
+    ),
+    AguaIOTCanalizationEntityDescription(
+        name="Vent {id}",
+        key=r"vent_(?P<id>\w+)_set",
+        key_temp_set="temp_{id}_set",
+        key_temp_get="temp_{id}_get",
+        icon="mdi:fan",
     ),
 )
