@@ -203,7 +203,22 @@ CLIMATE_CANALIZATIONS = (
     ),
     AguaIOTCanalizationEntityDescription(
         name="Vent {id}",
-        key=r"vent_(?P<id>\w+)_set",
+        key=r"vent_(?P<id>front)_set",
+        key_temp_set="temp_{id}_set",
+        key_temp_get="temp_{id}_get",
+        icon="mdi:fan",
+    ),
+    # Weird nobis habit of having temp_rear_set and temp_rear2_get
+    AguaIOTCanalizationEntityDescription(
+        name="Vent {id}",
+        key=r"vent_(?P<id>rear)_set",
+        key_temp_set="temp_{id}_set",
+        key_temp_get="temp_{id}2_get",
+        icon="mdi:fan",
+    ),
+    AguaIOTCanalizationEntityDescription(
+        name="Vent {id}",
+        key=r"vent_(?!(front|rear))(?P<id>\w+)_set",
         key_temp_set="temp_{id}_set",
         key_temp_get="temp_{id}_get",
         icon="mdi:fan",
