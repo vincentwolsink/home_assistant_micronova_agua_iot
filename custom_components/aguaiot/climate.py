@@ -38,7 +38,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
     agua = hass.data[DOMAIN][entry.entry_id]["agua"]
     entities = []
     for device in agua.devices:
-        entities.append(AguaIOTHeatingDevice(coordinator, device))
+        stove = AguaIOTHeatingDevice(coordinator, device)
+        entities.append(stove)
 
         for canalization in CLIMATE_CANALIZATIONS:
             for c_found in [
@@ -57,7 +58,9 @@ async def async_setup_entry(hass, entry, async_add_entities):
                             getattr(c_copy, key).format_map(c_found.groupdict()),
                         )
 
-                entities.append(AguaIOTCanalizationDevice(coordinator, device, c_copy))
+                entities.append(
+                    AguaIOTCanalizationDevice(coordinator, device, c_copy, stove)
+                )
 
     async_add_entities(entities, True)
 
@@ -274,9 +277,10 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
 
 
 class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
-    def __init__(self, coordinator, device, description):
+    def __init__(self, coordinator, device, description, parent):
         CoordinatorEntity.__init__(self, coordinator)
         self._device = device
+        self._parent = parent
         self.entity_description = description
 
     @property
@@ -335,16 +339,20 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     @property
     def hvac_action(self):
         if int(self._device.get_register_value(self.entity_description.key)) > 0:
-            return HVACAction.FAN
+            return self._parent.hvac_action
         return HVACAction.OFF
 
     @property
     def hvac_modes(self):
-        return [HVACMode.FAN_ONLY]
+        if int(self._device.get_register_value(self.entity_description.key)) > 0:
+            return [self._parent.hvac_mode]
+        return [HVACMode.OFF]
 
     @property
     def hvac_mode(self):
-        return HVACMode.FAN_ONLY
+        if int(self._device.get_register_value(self.entity_description.key)) > 0:
+            return self._parent.hvac_mode
+        return HVACMode.OFF
 
     async def async_set_hvac_mode(self, hvac_mode):
         pass
