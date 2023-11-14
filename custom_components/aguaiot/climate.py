@@ -230,8 +230,11 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
 
     async def async_set_fan_mode(self, fan_mode):
         """Set new target fan mode."""
+        power_register = (
+            "power_wood_set" if self.hybrid_mode == MODE_WOOD else "power_set"
+        )
         try:
-            await self._device.set_register_value_description("power_set", fan_mode)
+            await self._device.set_register_value_description(power_register, fan_mode)
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
             _LOGGER.error("Failed to set fan mode, error: %s", err)
