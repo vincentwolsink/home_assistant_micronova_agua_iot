@@ -13898,8 +13898,8 @@
                 "description": "ON"
             }
         ],
-        "value_raw": "0",
-        "value": 0
+        "value_raw": "1",
+        "value": 1
     },
     "thermostat_contact_rear_enable": {
         "app_image_name": "default",
