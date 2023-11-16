@@ -31,6 +31,7 @@ from dataclasses import dataclass
 class AguaIOTBinarySensorEntityDescription(BinarySensorEntityDescription):
     force_enabled: bool = False
     hybrid_only: bool = False
+    icon_on: str | None = None
 
 
 @dataclass
@@ -75,14 +76,29 @@ BINARY_SENSORS = (
     AguaIOTBinarySensorEntityDescription(
         key="ris_pellet_ris_get",
         name="Pellets Depleted",
+        icon="mdi:fire",
+        icon_on="mdi:fire-alert",
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     AguaIOTBinarySensorEntityDescription(
         key="popup_riserva_wood_get",
         name="Wood Reserve",
-        icon="mdi:fire-alert",
+        icon="mdi:fire",
+        icon_on="mdi:fire-alert",
         device_class=BinarySensorDeviceClass.PROBLEM,
         force_enabled=True,
+    ),
+    AguaIOTBinarySensorEntityDescription(
+        key="thermostat_contact_get",
+        name="External Thermostat",
+        icon="mdi:electric-switch",
+        icon_on="mdi:electric-switch-closed",
+    ),
+    AguaIOTBinarySensorEntityDescription(
+        key="thermostat_contact_rear_get",
+        name="External Thermostat Rear",
+        icon="mdi:electric-switch",
+        icon_on="mdi:electric-switch-closed",
     ),
 )
 

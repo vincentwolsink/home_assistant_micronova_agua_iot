@@ -46,6 +46,13 @@ class AguaIOTHeatingBinarySensor(CoordinatorEntity, BinarySensorEntity):
         return f"{self._device.name} {self.entity_description.name}"
 
     @property
+    def icon(self):
+        if self.is_on:
+            return self.entity_description.icon_on or self.entity_description.icon
+        else:
+            return self.entity_description.icon
+
+    @property
     def device_info(self):
         """Return the device info."""
         return DeviceInfo(
