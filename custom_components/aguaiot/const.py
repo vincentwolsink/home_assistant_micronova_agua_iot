@@ -188,12 +188,14 @@ NUMBERS = (
     AguaIOTNumberEntityDescription(
         key="power_set",
         name="Pellet Power",
+        icon="mdi:fire",
         native_step=1,
         hybrid_only=True,
     ),
     AguaIOTNumberEntityDescription(
         key="power_wood_set",
         name="Wood Power",
+        icon="mdi:fire",
         native_step=1,
         hybrid_only=True,
     ),

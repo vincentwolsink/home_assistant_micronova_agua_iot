@@ -168,7 +168,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     def hybrid_mode(self):
         return (
             MODE_WOOD
-            if self._hybrid and self._device.get_register_enabled("power_wood_set")
+            if self._hybrid and self._device.get_register_enabled("real_power_wood_get")
             else MODE_PELLETS
         )
 
