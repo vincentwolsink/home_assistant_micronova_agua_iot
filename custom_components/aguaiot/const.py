@@ -168,6 +168,18 @@ SWITCHES = (
         icon="mdi:power-standby",
         device_class=SwitchDeviceClass.SWITCH,
     ),
+    SwitchEntityDescription(
+        key="fun_auto_set",
+        name="Auto Mode",
+        icon="mdi:fan-auto",
+        device_class=SwitchDeviceClass.SWITCH,
+    ),
+    SwitchEntityDescription(
+        key="fun_pwf_set",
+        name="Powerful Mode",
+        icon="mdi:speedometer",
+        device_class=SwitchDeviceClass.SWITCH,
+    ),
 )
 
 NUMBERS = (
