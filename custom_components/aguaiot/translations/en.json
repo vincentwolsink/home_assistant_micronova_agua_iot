@@ -17,7 +17,8 @@
                     "brand_id": "Brand id (by default: 1)",
                     "api_login_application_version": "Application version",
                     "email": "Email address",
-                    "password": "Password"
+                    "password": "Password",
+                    "endpoint": "App name/brand"
                 },
                 "description": "Fill in Agua IOT parameters"
             }
