@@ -11,13 +11,9 @@
         "step": {
             "user": {
                 "data": {
-                    "api_url": "URL Agua IOT de la marque",
-                    "login_api_url": "URL de login (facultatif, précisez seulement si nécessaire)",
-                    "customer_code": "Code de la marque",
-                    "brand_id": "ID de la marque (par défaut: 1)",
-                    "api_login_application_version": "Version de l'application",
                     "email": "Adresse email",
-                    "password": "Mot de passe"
+                    "password": "Mot de passe",
+                    "endpoint": "App nom/marque"
                 },
                 "description": "Remplissez les paramètres Agua IOT"
             }

@@ -57,6 +57,7 @@ CONF_API_URL = "api_url"
 CONF_CUSTOMER_CODE = "customer_code"
 CONF_LOGIN_API_URL = "login_api_url"
 CONF_UUID = "uuid"
+CONF_ENDPOINT = "endpoint"
 
 DEVICE_VARIANTS = ["water", "air", "air2", "air_palm"]
 MODE_WOOD = "Wood"
@@ -71,6 +72,126 @@ PLATFORMS = [
 ]
 
 UPDATE_INTERVAL = 60
+
+ENDPOINTS = {
+    "Alfapalm": {
+        CONF_CUSTOMER_CODE: "862148",
+        CONF_API_URL: "https://alfaplam.agua-iot.com",
+    },
+    "Boreal Home": {
+        CONF_CUSTOMER_CODE: "173118",
+        CONF_API_URL: "https://boreal.agua-iot.com",
+    },
+    "Bronpi Home": {
+        CONF_CUSTOMER_CODE: "164873",
+        CONF_API_URL: "https://bronpi.agua-iot.com",
+    },
+    "Darwin Evolution": {
+        CONF_CUSTOMER_CODE: "475219",
+        CONF_API_URL: "https://cola.agua-iot.com",
+    },
+    "Easy Connect": {
+        CONF_CUSTOMER_CODE: "354924",
+        CONF_API_URL: "https://remote.mcz.it",
+    },
+    "Easy Connect Plus": {
+        CONF_CUSTOMER_CODE: "746318",
+        CONF_API_URL: "https://remote.mcz.it",
+    },
+    "Easy Connect Poêle": {
+        CONF_CUSTOMER_CODE: "354925",
+        CONF_API_URL: "https://remote.mcz.it",
+    },
+    "Elfire Wifi": {
+        CONF_CUSTOMER_CODE: "402762",
+        CONF_API_URL: "https://elfire.agua-iot.com",
+    },
+    "EvaCalòr - PuntoFuoco": {
+        CONF_CUSTOMER_CODE: "635987",
+        CONF_API_URL: "https://evastampaggi.agua-iot.com",
+    },
+    "Fontana Forni": {
+        CONF_CUSTOMER_CODE: "505912",
+        CONF_API_URL: "https://fontanaforni.agua-iot.com",
+    },
+    "Fonte Flamme contrôle 1": {
+        CONF_CUSTOMER_CODE: "848324",
+        CONF_API_URL: "https://fonteflame.agua-iot.com",
+    },
+    "Globe-fire": {
+        CONF_CUSTOMER_CODE: "634876",
+        CONF_API_URL: "https://globefire.agua-iot.com",
+    },
+    "GO HEAT": {
+        CONF_CUSTOMER_CODE: "859435",
+        CONF_API_URL: "https://amg.agua-iot.com",
+    },
+    "Jolly Mec Wi Fi": {
+        CONF_CUSTOMER_CODE: "732584",
+        CONF_API_URL: "https://jollymec.agua-iot.com",
+    },
+    "Karmek Wifi": {
+        CONF_CUSTOMER_CODE: "403873",
+        CONF_API_URL: "https://karmekone.agua-iot.com",
+    },
+    "Klover Home": {
+        CONF_CUSTOMER_CODE: "143789",
+        CONF_API_URL: "https://klover.agua-iot.com",
+    },
+    "LAMINOX Remote Control (2.0)": {
+        CONF_CUSTOMER_CODE: "352678",
+        CONF_API_URL: "https://laminox.agua-iot.com",
+    },
+    "Lorflam Home": {
+        CONF_CUSTOMER_CODE: "121567",
+        CONF_API_URL: "https://lorflam.agua-iot.com",
+    },
+    "Moretti design": {
+        CONF_CUSTOMER_CODE: "624813",
+        CONF_API_URL: "https://moretti.agua-iot.com",
+    },
+    "My Corisit": {
+        CONF_CUSTOMER_CODE: "101427",
+        CONF_API_URL: "https://mycorisit.agua-iot.com",
+    },
+    "MyPiazzetta": {
+        CONF_CUSTOMER_CODE: "458632",
+        CONF_API_URL: "https://piazzetta.agua-iot.com",
+        CONF_LOGIN_API_URL: "https://piazzetta-iot.app2cloud.it/api/bridge/endpoint/",
+    },
+    "Nina": {
+        CONF_CUSTOMER_CODE: "999999",
+        CONF_API_URL: "https://micronova.agua-iot.com",
+    },
+    "Nobis-Fi": {
+        CONF_CUSTOMER_CODE: "700700",
+        CONF_API_URL: "https://nobis.agua-iot.com",
+    },
+    "Nordic Fire 2.0": {
+        CONF_CUSTOMER_CODE: "132678",
+        CONF_API_URL: "https://nordicfire.agua-iot.com",
+    },
+    "Ravelli Wi-Fi": {
+        CONF_CUSTOMER_CODE: "953712",
+        CONF_API_URL: "https://aico.agua-iot.com",
+    },
+    "Stufe a pellet Italia": {
+        CONF_CUSTOMER_CODE: "015142",
+        CONF_API_URL: "https://stufepelletitalia.agua-iot.com",
+    },
+    "Thermoflux": {
+        CONF_CUSTOMER_CODE: "391278",
+        CONF_API_URL: "https://thermoflux.agua-iot.com",
+    },
+    "TS Smart": {
+        CONF_CUSTOMER_CODE: "046629",
+        CONF_API_URL: "https://timsistem.agua-iot.com",
+    },
+    "Wi-Phire": {
+        CONF_CUSTOMER_CODE: "521228",
+        CONF_API_URL: "https://lineavz.agua-iot.com",
+    },
+}
 
 BINARY_SENSORS = (
     AguaIOTBinarySensorEntityDescription(

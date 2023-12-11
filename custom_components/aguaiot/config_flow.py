@@ -19,7 +19,9 @@ from .const import (
     CONF_CUSTOMER_CODE,
     CONF_LOGIN_API_URL,
     CONF_UUID,
+    CONF_ENDPOINT,
     DOMAIN,
+    ENDPOINTS,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,7 +44,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def _entry_in_configuration_exists(self, user_input) -> bool:
         """Return True if config already exists in configuration."""
         email = user_input[CONF_EMAIL]
-        host_server = user_input[CONF_API_URL]
+        host_server = ENDPOINTS[user_input[CONF_ENDPOINT]][CONF_API_URL]
         if (email, host_server) in conf_entries(self.hass):
             return True
         return False
@@ -55,11 +57,12 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             email = user_input[CONF_EMAIL]
             password = user_input[CONF_PASSWORD]
 
-            api_url = user_input[CONF_API_URL]
-            customer_code = user_input[CONF_CUSTOMER_CODE]
+            endpoint = user_input[CONF_ENDPOINT]
+            api_url = ENDPOINTS[endpoint][CONF_API_URL]
+            customer_code = ENDPOINTS[endpoint][CONF_CUSTOMER_CODE]
             login_api_url = (
-                user_input.get(CONF_LOGIN_API_URL)
-                if user_input.get(CONF_LOGIN_API_URL) != ""
+                ENDPOINTS[endpoint][CONF_LOGIN_API_URL]
+                if CONF_LOGIN_API_URL in ENDPOINTS[endpoint]
                 else None
             )
 
@@ -89,7 +92,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             if "base" not in errors:
                 return self.async_create_entry(
-                    title=DOMAIN,
+                    title=endpoint,
                     data={
                         CONF_EMAIL: email,
                         CONF_PASSWORD: password,
@@ -102,23 +105,15 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         else:
             user_input = {}
 
-        data_schema = OrderedDict()
-        data_schema[
-            vol.Required(CONF_API_URL, default=user_input.get(CONF_API_URL))
-        ] = str
-        data_schema[
-            vol.Optional(
-                CONF_LOGIN_API_URL, default=user_input.get(CONF_LOGIN_API_URL, "")
-            )
-        ] = str
-        data_schema[
-            vol.Required(CONF_CUSTOMER_CODE, default=user_input.get(CONF_CUSTOMER_CODE))
-        ] = str
-        data_schema[vol.Required(CONF_EMAIL, default=user_input.get(CONF_EMAIL))] = str
-        data_schema[
-            vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD))
-        ] = str
-
+        data_schema = vol.Schema(
+            {
+                vol.Required(
+                    CONF_ENDPOINT, default=user_input.get(CONF_ENDPOINT)
+                ): vol.In(ENDPOINTS.keys()),
+                vol.Required(CONF_EMAIL, default=user_input.get(CONF_EMAIL)): str,
+                vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD)): str,
+            }
+        )
         return self.async_show_form(
-            step_id="user", data_schema=vol.Schema(data_schema), errors=errors
+            step_id="user", data_schema=data_schema, errors=errors
         )
