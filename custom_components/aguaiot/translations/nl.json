@@ -11,16 +11,11 @@
         "step": {
             "user": {
                 "data": {
-                    "api_url": "Agua IOT URL behorende bij het merk",
-                    "login_api_url": "Afzonderlijke loginAPI-URL (optioneel, specificeer alleen wanneer nodig)",
-                    "customer_code": "Klant code van het merk",
-                    "brand_id": "Merk id (standaard: 1)",
-                    "api_login_application_version": "Applicatie versie",
                     "email": "Email adres",
                     "password": "Wachtwoord",
                     "endpoint": "App naam/merk"
                 },
-                "description": "Vul Agua IOT parameters in"
+                "description": "Vul Agua IOT gegevens in"
             }
         }
     }

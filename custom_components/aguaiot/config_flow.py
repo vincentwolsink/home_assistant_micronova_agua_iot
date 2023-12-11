@@ -105,11 +105,15 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         else:
             user_input = {}
 
-        data_schema = vol.Schema({
-            vol.Required(CONF_ENDPOINT, default=user_input.get(CONF_ENDPOINT)): vol.In(ENDPOINTS.keys()),
-            vol.Required(CONF_EMAIL, default=user_input.get(CONF_EMAIL)): str,
-            vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD)): str
-        })
+        data_schema = vol.Schema(
+            {
+                vol.Required(
+                    CONF_ENDPOINT, default=user_input.get(CONF_ENDPOINT)
+                ): vol.In(ENDPOINTS.keys()),
+                vol.Required(CONF_EMAIL, default=user_input.get(CONF_EMAIL)): str,
+                vol.Required(CONF_PASSWORD, default=user_input.get(CONF_PASSWORD)): str,
+            }
+        )
         return self.async_show_form(
             step_id="user", data_schema=data_schema, errors=errors
         )
