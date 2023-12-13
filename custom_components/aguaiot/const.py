@@ -274,6 +274,22 @@ SENSORS = (
         force_enabled=True,
         hybrid_only=True,
     ),
+    AguaIOTSensorEntityDescription(
+        key="vent_front2_get",
+        name="Real Vent Front",
+        icon="mdi:fan",
+        native_unit_of_measurement=None,
+        state_class=None,
+        device_class=None,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="vent_rear2_get",
+        name="Real Vent Rear",
+        icon="mdi:fan",
+        native_unit_of_measurement=None,
+        state_class=None,
+        device_class=None,
+    ),
 )
 
 SWITCHES = (
