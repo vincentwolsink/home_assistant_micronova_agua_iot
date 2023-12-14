@@ -443,7 +443,11 @@ class Device(object):
         self.__information_dict = information_dict
 
     def __prepare_value_for_writing(self, item, value):
-        value = float(value)
+        formula = self.__register_map_dict[item]["formula_inverse"]
+        formula = formula.replace("#", str(value))
+        eval_formula = parser(formula)
+        value = int(eval_formula)
+
         set_min = self.__register_map_dict[item]["set_min"]
         set_max = self.__register_map_dict[item]["set_max"]
 
@@ -452,26 +456,36 @@ class Device(object):
                 "Value must be between {0} and {1}".format(set_min, set_max)
             )
 
-        formula = self.__register_map_dict[item]["formula_inverse"]
-        formula = formula.replace("#", str(value))
-        eval_formula = parser(formula)
-        return int(eval_formula)
+        if self.__register_map_dict[item]["is_hex"]:
+            value = int(f"0x{value}", 16)
 
-    async def __request_writing(self, item, values):
+        return value
+
+    async def __request_writing(self, items):
         url = self.__aguaiot.api_url + API_PATH_DEVICE_WRITING
 
-        items = [int(self.__register_map_dict[item]["offset"])]
-        masks = [int(self.__register_map_dict[item]["mask"])]
+        set_items = []
+        set_masks = []
+        set_bits = []
+        set_endians = []
+        set_values = []
+
+        for key in items:
+            set_items.append(int(self.__register_map_dict[key]["offset"]))
+            set_masks.append(int(self.__register_map_dict[key]["mask"]))
+            set_values.append(items[key])
+            set_bits.append(8)
+            set_endians.append("L")
 
         payload = {
             "id_device": self.id_device,
             "id_product": self.id_product,
             "Protocol": "RWMSmaster",
-            "BitData": [8],
-            "Endianess": ["L"],
-            "Items": items,
-            "Masks": masks,
-            "Values": values,
+            "BitData": set_bits,
+            "Endianess": set_endians,
+            "Items": set_items,
+            "Masks": set_masks,
+            "Values": set_values,
         }
 
         res = await self.__aguaiot.handle_webcall("POST", url, payload)
@@ -568,9 +582,20 @@ class Device(object):
             return self.get_register_value(enable_key) == 1
 
     async def set_register_value(self, key, value):
-        values = [self.__prepare_value_for_writing(key, value)]
+        value = self.__prepare_value_for_writing(key, value)
+        items = {key: value}
+
         try:
-            await self.__request_writing(key, values)
+            await self.__request_writing(items)
+        except AguaIOTError:
+            raise AguaIOTError(f"Error while trying to set: key={key} value={value}")
+
+    async def set_register_values(self, items):
+        for key in items:
+            items[key] = self.__prepare_value_for_writing(key, items[key])
+
+        try:
+            await self.__request_writing(items)
         except AguaIOTError:
             raise AguaIOTError(f"Error while trying to set: key={key} value={value}")
 

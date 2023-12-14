@@ -1,0 +1,4 @@
+sync_clock:
+  target:
+    entity:
+      domain: climate

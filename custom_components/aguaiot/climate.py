@@ -2,8 +2,10 @@
 import logging
 import re
 import copy
-
+from homeassistant.helpers import entity_platform, service
+from homeassistant.util import dt
 from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.core import ServiceCall
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -63,6 +65,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 )
 
     async_add_entities(entities, True)
+
+    platform = entity_platform.async_get_current_platform()
+    platform.async_register_entity_service(
+        "sync_clock",
+        {},
+        "sync_clock",
+    )
 
 
 class AguaIOTClimateDevice(CoordinatorEntity, ClimateEntity):
@@ -277,6 +286,21 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     def target_temperature_step(self):
         """Return the supported step of target temperature."""
         return self._device.get_register(self._temperature_set_key).get("step", 1)
+
+    async def sync_clock(call: ServiceCall):
+        dt_now = dt.now()
+        try:
+            await call._device.set_register_values(
+                {
+                    "clock_hour_set": dt_now.hour,
+                    "clock_minute_set": dt_now.minute,
+                    "calendar_day_set": dt_now.day,
+                    "calendar_month_set": dt_now.month,
+                    "calendar_year_set": dt_now.year,
+                }
+            )
+        except (ValueError, AguaIOTError) as err:
+            _LOGGER.error("Failed to set value, error: %s", err)
 
 
 class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
