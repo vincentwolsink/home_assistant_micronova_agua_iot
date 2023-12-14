@@ -18,5 +18,11 @@
                 "description": "Fill in Agua IOT parameters"
             }
         }
+    },
+    "services": {
+        "sync_clock": {
+          "name": "Synchronize Stove Clock",
+          "description": "Synchronize stove time and date with the current Home Assistant time and date."
+        }
     }
 }

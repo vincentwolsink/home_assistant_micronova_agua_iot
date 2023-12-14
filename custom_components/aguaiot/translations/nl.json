@@ -18,5 +18,11 @@
                 "description": "Vul Agua IOT gegevens in"
             }
         }
+    },
+    "services": {
+        "sync_clock": {
+          "name": "Synchroniseer Kachel Klok",
+          "description": "Synchroniseer kachel datum en tijd met de huidige Home Assistant datum en tijd."
+        }
     }
 }
