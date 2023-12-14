@@ -5,7 +5,6 @@ import copy
 from homeassistant.helpers import entity_platform, service
 from homeassistant.util import dt
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.core import ServiceCall
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -287,10 +286,10 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         """Return the supported step of target temperature."""
         return self._device.get_register(self._temperature_set_key).get("step", 1)
 
-    async def sync_clock(call: ServiceCall):
+    async def sync_clock(self):
         dt_now = dt.now()
         try:
-            await call._device.set_register_values(
+            await self._device.set_register_values(
                 {
                     "clock_hour_set": dt_now.hour,
                     "clock_minute_set": dt_now.minute,

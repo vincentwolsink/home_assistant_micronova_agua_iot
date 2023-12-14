@@ -597,7 +597,7 @@ class Device(object):
         try:
             await self.__request_writing(items)
         except AguaIOTError:
-            raise AguaIOTError(f"Error while trying to set: key={key} value={value}")
+            raise AguaIOTError(f"Error while trying to set: items={items}")
 
     async def set_register_value_description(self, key, value_description):
         try:
