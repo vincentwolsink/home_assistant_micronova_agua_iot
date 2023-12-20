@@ -443,18 +443,16 @@ class Device(object):
         self.__information_dict = information_dict
 
     def __prepare_value_for_writing(self, item, value):
+        set_min = self.__register_map_dict[item]["set_min"]
+        set_max = self.__register_map_dict[item]["set_max"]
+
+        if float(value) < set_min or float(value) > set_max:
+            raise ValueError(f"Value must be between {set_min} and {set_max}: {value}")
+
         formula = self.__register_map_dict[item]["formula_inverse"]
         formula = formula.replace("#", str(value))
         eval_formula = parser(formula)
         value = int(eval_formula)
-
-        set_min = self.__register_map_dict[item]["set_min"]
-        set_max = self.__register_map_dict[item]["set_max"]
-
-        if value < set_min or value > set_max:
-            raise ValueError(
-                "Value must be between {0} and {1}".format(set_min, set_max)
-            )
 
         if self.__register_map_dict[item]["is_hex"]:
             value = int(f"0x{value}", 16)
