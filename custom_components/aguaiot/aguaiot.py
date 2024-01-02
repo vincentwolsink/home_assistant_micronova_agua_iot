@@ -301,7 +301,7 @@ class aguaiot(object):
 
     async def handle_webcall(self, method, url, payload):
         if time.time() > self.token_expires:
-            self.do_refresh_token()
+            await self.do_refresh_token()
 
         extra_headers = {"local": "false", "Authorization": self.token}
 
