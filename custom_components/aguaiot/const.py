@@ -290,6 +290,14 @@ SENSORS = (
         state_class=None,
         device_class=None,
     ),
+    AguaIOTSensorEntityDescription(
+        key="type_combustible_get",
+        name="Fuel",
+        icon="mdi:gas-burner",
+        native_unit_of_measurement=None,
+        state_class=None,
+        device_class=None,
+    ),
 )
 
 SWITCHES = (
