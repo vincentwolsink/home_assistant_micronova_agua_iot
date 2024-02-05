@@ -417,7 +417,7 @@ class Device(object):
         url = self.__aguaiot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
 
         payload = {}
-        for retry_count in range(10):
+        for _ in range(10):
             await asyncio.sleep(1)
 
             res = await self.__aguaiot.handle_webcall("GET", url, payload)
