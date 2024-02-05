@@ -1,6 +1,7 @@
 """py_agua_iot provides controlling heating devices connected via
 the IOT Agua platform of Micronova
 """
+
 import asyncio
 import jwt
 import logging
@@ -327,6 +328,7 @@ class aguaiot(object):
                         follow_redirects=False,
                         timeout=DEFAULT_TIMEOUT_VALUE,
                     )
+            _LOGGER.debug(f"{response.status_code} - {response.text}")
         except httpx.TransportError:
             raise ConnectionError(f"Connection error to {url}: {e}")
 
@@ -416,15 +418,12 @@ class Device(object):
         url = self.__aguaiot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
 
         payload = {}
-
-        retry_count = 0
-        res = await self.__aguaiot.handle_webcall("GET", url, payload)
-        while (
-            res is False or res["jobAnswerStatus"] != "completed"
-        ) and retry_count < 10:
+        for _ in range(10):
             await asyncio.sleep(1)
+
             res = await self.__aguaiot.handle_webcall("GET", url, payload)
-            retry_count = retry_count + 1
+            if "jobAnswerStatus" in res and res["jobAnswerStatus"] == "completed":
+                break
 
         if res is False or res["jobAnswerStatus"] != "completed":
             raise AguaIOTError("Error while fetching device information")
