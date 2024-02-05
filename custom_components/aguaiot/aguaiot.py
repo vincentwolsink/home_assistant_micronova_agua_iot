@@ -1,6 +1,7 @@
 """py_agua_iot provides controlling heating devices connected via
 the IOT Agua platform of Micronova
 """
+
 import asyncio
 import jwt
 import logging
