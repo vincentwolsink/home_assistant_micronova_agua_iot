@@ -1,4 +1,5 @@
 """Agua IOT constants."""
+
 from homeassistant.const import (
     Platform,
     UnitOfTemperature,

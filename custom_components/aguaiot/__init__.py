@@ -1,4 +1,5 @@
 """Support for Micronova Agua IOT heating devices."""
+
 import logging
 from datetime import timedelta
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry

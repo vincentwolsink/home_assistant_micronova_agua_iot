@@ -1,4 +1,5 @@
 """Support for Agua IOT heating devices."""
+
 import logging
 import re
 import copy
