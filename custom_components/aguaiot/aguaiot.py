@@ -8,6 +8,7 @@ import logging
 import re
 import time
 import httpx
+from simpleeval import simple_eval
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,70 +27,6 @@ DEFAULT_TIMEOUT_VALUE = 30
 HEADER_ACCEPT = "application/json, text/javascript, */*; q=0.01"
 HEADER_CONTENT_TYPE = "application/json"
 HEADER = {"Accept": HEADER_ACCEPT, "Content-Type": HEADER_CONTENT_TYPE}
-
-
-def parser(string):
-    string = string.replace(" ", "")
-
-    def splitby(string, separators):
-        lis = []
-        current = ""
-        for ch in string:
-            if ch in separators:
-                lis.append(current)
-                lis.append(ch)
-                current = ""
-            else:
-                current += ch
-        lis.append(current)
-        return lis
-
-    lis = splitby(string, "+-")
-
-    def evaluate_mul_div(string):
-        lis = splitby(string, "x*/")
-        if len(lis) == 1:
-            return lis[0]
-
-        output = float(lis[0])
-        lis = lis[1:]
-
-        while len(lis) > 0:
-            operator = lis[0]
-            number = float(lis[1])
-            lis = lis[2:]
-
-            if operator == "x":
-                output *= number
-
-            elif operator == "*":
-                output *= number
-
-            elif operator == "/":
-                output /= number
-
-        return output
-
-    for i in range(len(lis)):
-        lis[i] = evaluate_mul_div(lis[i])
-
-    output = float(lis[0])
-    lis = lis[1:]
-
-    while len(lis) > 0:
-        operator = lis[0]
-        number = float(lis[1])
-        lis = lis[2:]
-
-        if operator == "+":
-            output += number
-        elif operator == "-":
-            output -= number
-
-    if not float(output).is_integer():
-        return float(output)
-    else:
-        return int(output)
 
 
 class aguaiot(object):
@@ -450,7 +387,7 @@ class Device(object):
 
         formula = self.__register_map_dict[item]["formula_inverse"]
         formula = formula.replace("#", str(value))
-        eval_formula = parser(formula)
+        eval_formula = simple_eval(formula)
         value = int(eval_formula)
 
         if self.__register_map_dict[item]["is_hex"]:
@@ -522,7 +459,7 @@ class Device(object):
                 self.__information_dict[register["offset"]] & register["mask"]
             )
             formula = register["formula"].replace("#", register["value_raw"])
-            register["value"] = parser(formula)
+            register["value"] = simple_eval(formula)
 
             return register
         except (KeyError, ValueError):
