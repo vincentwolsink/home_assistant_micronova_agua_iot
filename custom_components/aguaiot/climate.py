@@ -102,6 +102,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     def __init__(self, coordinator, device):
         """Initialize the thermostat."""
         CoordinatorEntity.__init__(self, coordinator)
+        self._enable_turn_on_off_backwards_compatibility = False
         self._device = device
         self._hybrid = "power_wood_set" in device.registers
 
@@ -139,7 +140,10 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     def supported_features(self):
         """Return the list of supported features."""
         features = (
-            ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
+            ClimateEntityFeature.TURN_ON
+            | ClimateEntityFeature.TURN_OFF
+            | ClimateEntityFeature.TARGET_TEMPERATURE
+            | ClimateEntityFeature.FAN_MODE
         )
         if self._hybrid:
             features = features | ClimateEntityFeature.PRESET_MODE
@@ -306,6 +310,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
 class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     def __init__(self, coordinator, device, description, parent):
         CoordinatorEntity.__init__(self, coordinator)
+        self._enable_turn_on_off_backwards_compatibility = False
         self._device = device
         self._parent = parent
         self.entity_description = description
