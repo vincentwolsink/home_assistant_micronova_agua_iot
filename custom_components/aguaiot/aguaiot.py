@@ -387,6 +387,7 @@ class Device(object):
 
         formula = self.__register_map_dict[item]["formula_inverse"]
         formula = formula.replace("#", str(value))
+        formula = formula.replace("Mod", "%")
         eval_formula = simple_eval(formula)
         value = int(eval_formula)
 
@@ -459,6 +460,7 @@ class Device(object):
                 self.__information_dict[register["offset"]] & register["mask"]
             )
             formula = register["formula"].replace("#", register["value_raw"])
+            formula = register["formula"].replace("Mod", "%")
             register["value"] = simple_eval(formula)
 
             return register
