@@ -460,7 +460,7 @@ class Device(object):
                 self.__information_dict[register["offset"]] & register["mask"]
             )
             formula = register["formula"].replace("#", register["value_raw"])
-            formula = register["formula"].replace("Mod", "%")
+            formula = formula.replace("Mod", "%")
             register["value"] = simple_eval(formula)
 
             return register
