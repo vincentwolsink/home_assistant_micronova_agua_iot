@@ -38,6 +38,9 @@ Supports the following vendors (mobile apps):
 * TS Smart
 * Wi-Phire
 
+Vendor apps **NOT** compatible (using a different platform):
+* Ravelli Smart Wi-Fi
+
 ## Installation
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=vincentwolsink&repository=home_assistant_micronova_agua_iot&category=integration)
