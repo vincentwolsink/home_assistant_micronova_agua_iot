@@ -41,6 +41,10 @@ Supports the following vendors (mobile apps):
 Vendor apps **NOT** compatible (using a different platform):
 * Ravelli Smart Wi-Fi
 
+## Screenshots
+<img width="671" alt="micronova_screenshot1" src="https://github.com/vincentwolsink/home_assistant_micronova_agua_iot/assets/1639734/4c646550-637d-4e20-bc64-a6977bfee3af">
+<img width="330" alt="micronova_screenshot3" src="https://github.com/vincentwolsink/home_assistant_micronova_agua_iot/assets/1639734/3a06b135-eaee-4ff2-94e4-c3da268fb7a9">
+
 ## Installation
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=vincentwolsink&repository=home_assistant_micronova_agua_iot&category=integration)
