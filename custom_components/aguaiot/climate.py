@@ -27,6 +27,8 @@ from .const import (
     CLIMATE_CANALIZATIONS,
     MODE_PELLETS,
     MODE_WOOD,
+    STATUS_OFF,
+    STATUS_IDLE,
 )
 from .aguaiot import AguaIOTError
 
@@ -152,11 +154,17 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     @property
     def hvac_action(self):
         """Return the current running hvac operation."""
-        if self._device.get_register_value("status_get") in [1, 2, 3, 4, 5, 13, 14]:
-            return HVACAction.HEATING
-        elif self._device.get_register_value("status_get") in [0, 6]:
+        if (
+            self._device.get_register_value_description("status_get").upper()
+            in STATUS_IDLE
+        ):
+            return HVACAction.IDLE
+        elif (
+            self._device.get_register_value_description("status_get").upper()
+            in STATUS_OFF
+        ):
             return HVACAction.OFF
-        return HVACAction.IDLE
+        return HVACAction.HEATING
 
     @property
     def hvac_modes(self):
@@ -166,7 +174,10 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     @property
     def hvac_mode(self):
         """Return hvac operation ie. heat, cool mode."""
-        if self._device.get_register_value("status_get") not in [0, 6]:
+        if (
+            self._device.get_register_value_description("status_get").upper()
+            not in STATUS_OFF
+        ):
             return HVACMode.HEAT
         return HVACMode.OFF
 
