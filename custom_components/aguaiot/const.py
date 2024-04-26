@@ -3,6 +3,8 @@
 from homeassistant.const import (
     Platform,
     UnitOfTemperature,
+    UnitOfPressure,
+    REVOLUTIONS_PER_MINUTE,
 )
 from homeassistant.components.climate.const import HVACAction
 from homeassistant.components.binary_sensor import (
@@ -311,6 +313,43 @@ SENSORS = (
         native_unit_of_measurement=None,
         state_class=None,
         device_class=None,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="pres_h2o_get",
+        name="Water Pressure",
+        native_unit_of_measurement=UnitOfPressure.BAR,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.PRESSURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="pascal_get",
+        name="Brazier Pressure",
+        native_unit_of_measurement=UnitOfPressure.PA,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.PRESSURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="giri_estrattore_get",
+        name="Extractor Fan",
+        icon="mdi:fan",
+        native_unit_of_measurement=REVOLUTIONS_PER_MINUTE,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=None,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="pomp_h2o_get",
+        name="Water Pump",
+        icon="mdi:pump",
+        native_unit_of_measurement=None,
+        state_class=None,
+        device_class=None,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="temp_h2o_mandata_get",
+        name="Water Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
     ),
 )
 
