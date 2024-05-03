@@ -66,7 +66,7 @@ DEVICE_VARIANTS = ["water", "air", "air2", "air_palm"]
 MODE_WOOD = "Wood"
 MODE_PELLETS = "Pellet"
 
-STATUS_OFF = ["OFF", "FINAL CLEANING", "STOP", "SHUT OFF"]
+STATUS_OFF = ["OFF", "FINAL CLEANING", "STOP", "SHUT OFF", "0", "6"]
 STATUS_IDLE = [
     "ECO STOP",
     "STANDBY",
@@ -77,6 +77,9 @@ STATUS_IDLE = [
     "ALARM MEMORY",
     "MEM.ALM",
     "MEM. ALARM",
+    "7",
+    "8",
+    "9",
 ]
 
 PLATFORMS = [

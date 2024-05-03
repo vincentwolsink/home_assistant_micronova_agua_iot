@@ -155,12 +155,12 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     def hvac_action(self):
         """Return the current running hvac operation."""
         if (
-            self._device.get_register_value_description("status_get").upper()
+            str(self._device.get_register_value_description("status_get")).upper()
             in STATUS_IDLE
         ):
             return HVACAction.IDLE
         elif (
-            self._device.get_register_value_description("status_get").upper()
+            str(self._device.get_register_value_description("status_get")).upper()
             in STATUS_OFF
         ):
             return HVACAction.OFF
@@ -175,7 +175,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
     def hvac_mode(self):
         """Return hvac operation ie. heat, cool mode."""
         if (
-            self._device.get_register_value_description("status_get").upper()
+            str(self._device.get_register_value_description("status_get")).upper()
             not in STATUS_OFF
         ):
             return HVACMode.HEAT
