@@ -38,8 +38,9 @@ Supports the following vendors (mobile apps):
 * TS Smart
 * Wi-Phire
 
-Vendor apps **NOT** compatible (using a different platform):
+Vendor apps **NOT** compatible (using a different platform or abstraction layer):
 * Ravelli Smart Wi-Fi
+* Total Control 2.0
 
 ## Screenshots
 <img width="671" alt="micronova_screenshot1" src="https://github.com/vincentwolsink/home_assistant_micronova_agua_iot/assets/1639734/4c646550-637d-4e20-bc64-a6977bfee3af">
