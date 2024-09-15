@@ -455,3 +455,13 @@ CLIMATE_CANALIZATIONS = (
         icon="mdi:fan",
     ),
 )
+
+TEMPERATURE_SENSORS = (
+    AguaIOTSensorEntityDescription(
+        key=r"temp_(?P<id>[\w\d]+)_get",
+        name="{id} Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+)
