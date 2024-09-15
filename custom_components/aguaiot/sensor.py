@@ -1,10 +1,12 @@
+import re
+import copy
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.entity import DeviceInfo
-from .const import SENSORS, DOMAIN
+from .const import SENSORS, DOMAIN, TEMPERATURE_SENSORS
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -24,6 +26,25 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 and (not sensor.hybrid_only or hybrid)
             ):
                 sensors.append(AguaIOTHeatingSensor(coordinator, device, sensor))
+
+        for temperature_sensor in TEMPERATURE_SENSORS:
+            for t_found in [
+                m
+                for i in device.registers
+                for m in [re.match(temperature_sensor.key, i.lower())]
+                if m and device.get_register_enabled(m.group(0))
+            ]:
+                t_copy = copy.deepcopy(temperature_sensor)
+                t_copy.key = t_found.group(0)
+                for key in ["name"]:
+                    if getattr(t_copy, key):
+                        setattr(
+                            t_copy,
+                            key,
+                            getattr(t_copy, key).format_map(t_found.groupdict()),
+                        )
+
+                sensors.append(AguaIOTHeatingSensor(coordinator, device, t_copy))
 
     async_add_entities(sensors, True)
 
