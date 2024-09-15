@@ -349,7 +349,7 @@ class Device(object):
 
         res = await self.__aguaiot.handle_webcall("POST", url, payload)
         if res is False:
-            raise AguaIOTError("Error while fetching device information")
+            raise AguaIOTError("Error while making device buffer read request.")
 
         id_request = res["idRequest"]
         url = self.__aguaiot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
@@ -363,7 +363,7 @@ class Device(object):
                 break
 
         if res is False or res["jobAnswerStatus"] != "completed":
-            raise AguaIOTError("Error while fetching device information")
+            raise AguaIOTError("Timeout on reply to device buffer read.")
 
         current_i = 0
         information_dict = dict()
@@ -374,7 +374,7 @@ class Device(object):
                 )
                 current_i = current_i + 1
         except KeyError:
-            raise AguaIOTError("Error while fetching device information")
+            raise AguaIOTError("Error in data received from device.")
 
         self.__information_dict = information_dict
 
