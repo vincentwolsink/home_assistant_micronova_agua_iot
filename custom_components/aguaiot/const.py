@@ -354,6 +354,42 @@ SENSORS = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
     ),
+    # Temperature sensors
+    AguaIOTSensorEntityDescription(
+        key=r"temp_air_get",
+        name="Air Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key=r"temp_air2_get",
+        name="Air Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key=r"temp_air_palm_get",
+        name="Remote Air Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key=r"temp_rear2_get",
+        name="Vent Rear Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key=r"temp_front2_get",
+        name="Vent Front Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
 )
 
 SWITCHES = (
@@ -453,15 +489,5 @@ CLIMATE_CANALIZATIONS = (
         key_temp_set="temp_{id}_set",
         key_temp_get="temp_{id}_get",
         icon="mdi:fan",
-    ),
-)
-
-TEMPERATURE_SENSORS = (
-    AguaIOTSensorEntityDescription(
-        key=r"temp_(?P<id>[\w\d]+)_get",
-        name="{id} Temperature",
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.TEMPERATURE,
     ),
 )
