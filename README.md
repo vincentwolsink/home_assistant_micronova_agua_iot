@@ -28,7 +28,8 @@ Supports the following vendors (mobile apps):
 * Lorflam Home
 * Moretti design
 * My Corisit
-* MyPiazzetta (MySuperior?)
+* MyPiazzetta
+* MySuperior
 * Nina
 * Nobis-Fi
 * Nordic Fire 2.0
