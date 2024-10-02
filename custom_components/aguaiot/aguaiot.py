@@ -21,7 +21,6 @@ API_PATH_DEVICE_REGISTERS_MAP = "/deviceGetRegistersMap"
 API_PATH_DEVICE_BUFFER_READING = "/deviceGetBufferReading"
 API_PATH_DEVICE_JOB_STATUS = "/deviceJobStatus/"
 API_PATH_DEVICE_WRITING = "/deviceRequestWriting"
-API_LOGIN_APPLICATION_VERSION = "1.9.5"
 DEFAULT_TIMEOUT_VALUE = 30
 
 HEADER_ACCEPT = "application/json, text/javascript, */*; q=0.01"
@@ -38,17 +37,19 @@ class aguaiot(object):
         password,
         unique_id,
         login_api_url=None,
-        brand_id=1,
-        api_login_application_version=API_LOGIN_APPLICATION_VERSION,
+        brand_id=None,
+        brand=None,
+        application_version="1.9.7",
     ):
         self.api_url = api_url.rstrip("/")
-        self.customer_code = str(customer_code)
+        self.customer_code = customer_code
         self.email = email
         self.password = password
         self.unique_id = unique_id
-        self.brand_id = str(brand_id)
+        self.brand_id = brand_id
+        self.brand = brand
         self.login_api_url = login_api_url
-        self.api_login_application_version = api_login_application_version
+        self.application_version = application_version
         self.token = None
         self.token_expires = None
         self.refresh_token = None
@@ -63,13 +64,17 @@ class aguaiot(object):
     def _headers(self):
         """Correctly set headers for requests to Agua IOT."""
 
-        return {
+        headers = {
             "Accept": HEADER_ACCEPT,
             "Content-Type": HEADER_CONTENT_TYPE,
             "Origin": "file://",
-            "id_brand": self.brand_id,
+            "id_brand": self.brand_id if self.brand_id is not None else "1",
             "customer_code": self.customer_code,
         }
+        if self.brand is not None:
+            headers["brand"] = self.brand
+
+        return headers
 
     async def register_app_id(self):
         """Register app id with Agua IOT"""
@@ -87,6 +92,9 @@ class aguaiot(object):
         }
 
         try:
+            _LOGGER.debug(
+                "POST Register app - HEADERS: %s DATA: %s", self._headers(), payload
+            )
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     url,
@@ -94,6 +102,11 @@ class aguaiot(object):
                     headers=self._headers(),
                     follow_redirects=False,
                     timeout=DEFAULT_TIMEOUT_VALUE,
+                )
+                _LOGGER.debug(
+                    "RESPONSE Register app - CODE: %s DATA: %s",
+                    response.status_code,
+                    response.text,
                 )
         except httpx.TransportError as e:
             raise ConnectionError(f"Connection error to {url}: {e}")
@@ -121,7 +134,7 @@ class aguaiot(object):
 
         if self.login_api_url is not None:
             extra_login_headers = {
-                "applicationversion": self.api_login_application_version,
+                "applicationversion": self.application_version,
                 "url": API_PATH_LOGIN.lstrip("/"),
                 "userid": "null",
                 "aguaid": "null",
@@ -130,6 +143,7 @@ class aguaiot(object):
             url = self.login_api_url
 
         try:
+            _LOGGER.debug("POST Login - HEADERS: %s DATA: ***", headers)
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     url,
@@ -137,6 +151,11 @@ class aguaiot(object):
                     headers=headers,
                     follow_redirects=False,
                     timeout=DEFAULT_TIMEOUT_VALUE,
+                )
+                _LOGGER.debug(
+                    "RESPONSE Login - CODE: %s DATA: %s",
+                    response.status_code,
+                    response.text,
                 )
         except httpx.TransportError:
             raise ConnectionError(f"Connection error to {url}: {e}")
@@ -168,6 +187,9 @@ class aguaiot(object):
         payload = {"refresh_token": self.refresh_token}
 
         try:
+            _LOGGER.debug(
+                "POST Refresh token - HEADERS: %s DATA: %s", self._headers(), payload
+            )
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     url,
@@ -175,6 +197,11 @@ class aguaiot(object):
                     headers=self._headers(),
                     follow_redirects=False,
                     timeout=DEFAULT_TIMEOUT_VALUE,
+                )
+                _LOGGER.debug(
+                    "RESPONSE Refresh token - CODE: %s DATA: %s",
+                    response.status_code,
+                    response.text,
                 )
         except httpx.TransportError:
             raise ConnectionError(f"Connection error to {url}: {e}")
@@ -208,7 +235,6 @@ class aguaiot(object):
             url = self.api_url + API_PATH_DEVICE_INFO
 
             payload = {"id_device": dev["id_device"], "id_product": dev["id_product"]}
-
             res2 = await self.handle_webcall("POST", url, payload)
             if res2 is False:
                 raise AguaIOTError("Error while fetching device info")
@@ -247,6 +273,7 @@ class aguaiot(object):
         headers.update(extra_headers)
 
         try:
+            _LOGGER.debug("%s %s - HEADERS: %s DATA: %s", method, url, headers, payload)
             if method == "POST":
                 async with httpx.AsyncClient() as client:
                     response = await client.post(
@@ -265,7 +292,12 @@ class aguaiot(object):
                         follow_redirects=False,
                         timeout=DEFAULT_TIMEOUT_VALUE,
                     )
-            _LOGGER.debug(f"{response.status_code} - {response.text}")
+            _LOGGER.debug(
+                "RESPONSE %s - CODE: %s DATA: %s",
+                url,
+                response.status_code,
+                response.text,
+            )
         except httpx.TransportError:
             raise ConnectionError(f"Connection error to {url}: {e}")
 

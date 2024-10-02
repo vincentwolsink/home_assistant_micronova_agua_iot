@@ -61,6 +61,8 @@ CONF_CUSTOMER_CODE = "customer_code"
 CONF_LOGIN_API_URL = "login_api_url"
 CONF_UUID = "uuid"
 CONF_ENDPOINT = "endpoint"
+CONF_BRAND_ID = "brand_id"
+CONF_BRAND = "brand"
 
 DEVICE_VARIANTS = ["water", "air", "air2", "air_palm"]
 MODE_WOOD = "Wood"
@@ -177,6 +179,13 @@ ENDPOINTS = {
         CONF_CUSTOMER_CODE: "458632",
         CONF_API_URL: "https://piazzetta.agua-iot.com",
         CONF_LOGIN_API_URL: "https://piazzetta-iot.app2cloud.it/api/bridge/endpoint/",
+    },
+    "MySuperior": {
+        CONF_CUSTOMER_CODE: "458632",
+        CONF_API_URL: "https://piazzetta.agua-iot.com",
+        CONF_LOGIN_API_URL: "https://piazzetta-iot.app2cloud.it/api/bridge/endpoint/",
+        CONF_BRAND_ID: "2",
+        CONF_BRAND: "superior",
     },
     "Nina": {
         CONF_CUSTOMER_CODE: "999999",

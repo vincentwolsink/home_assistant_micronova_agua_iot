@@ -21,6 +21,8 @@ from .const import (
     CONF_LOGIN_API_URL,
     CONF_UUID,
     CONF_ENDPOINT,
+    CONF_BRAND_ID,
+    CONF_BRAND,
     DOMAIN,
     ENDPOINTS,
 )
@@ -61,11 +63,9 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             endpoint = user_input[CONF_ENDPOINT]
             api_url = ENDPOINTS[endpoint][CONF_API_URL]
             customer_code = ENDPOINTS[endpoint][CONF_CUSTOMER_CODE]
-            login_api_url = (
-                ENDPOINTS[endpoint][CONF_LOGIN_API_URL]
-                if CONF_LOGIN_API_URL in ENDPOINTS[endpoint]
-                else None
-            )
+            login_api_url = ENDPOINTS[endpoint].get(CONF_LOGIN_API_URL)
+            brand_id = ENDPOINTS[endpoint].get(CONF_BRAND_ID)
+            brand = ENDPOINTS[endpoint].get(CONF_BRAND)
 
             if self._entry_in_configuration_exists(user_input):
                 return self.async_abort(reason="device_already_configured")
@@ -73,12 +73,14 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             try:
                 gen_uuid = str(uuid.uuid1())
                 agua = aguaiot(
-                    api_url,
-                    customer_code,
-                    email,
-                    password,
-                    gen_uuid,
-                    login_api_url,
+                    api_url=api_url,
+                    customer_code=customer_code,
+                    email=email,
+                    password=password,
+                    unique_id=gen_uuid,
+                    login_api_url=login_api_url,
+                    brand_id=brand_id,
+                    brand=brand,
                 )
                 await agua.connect()
             except UnauthorizedError as e:
@@ -101,6 +103,8 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         CONF_API_URL: api_url,
                         CONF_CUSTOMER_CODE: customer_code,
                         CONF_LOGIN_API_URL: login_api_url,
+                        CONF_BRAND_ID: brand_id,
+                        CONF_BRAND: brand,
                     },
                 )
         else:

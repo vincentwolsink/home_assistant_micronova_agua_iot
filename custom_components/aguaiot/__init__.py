@@ -24,6 +24,8 @@ from .const import (
     CONF_CUSTOMER_CODE,
     CONF_LOGIN_API_URL,
     CONF_UUID,
+    CONF_BRAND_ID,
+    CONF_BRAND,
     DOMAIN,
     PLATFORMS,
     UPDATE_INTERVAL,
@@ -52,19 +54,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     email = entry.data[CONF_EMAIL]
     password = entry.data[CONF_PASSWORD]
     gen_uuid = entry.data[CONF_UUID]
-    login_api_url = (
-        entry.data.get(CONF_LOGIN_API_URL)
-        if entry.data.get(CONF_LOGIN_API_URL) != ""
-        else None
-    )
+    login_api_url = entry.data.get(CONF_LOGIN_API_URL)
+    brand_id = entry.data.get(CONF_BRAND_ID)
+    brand = entry.data.get(CONF_BRAND)
 
     agua = aguaiot(
-        api_url,
-        customer_code,
-        email,
-        password,
-        gen_uuid,
-        login_api_url,
+        api_url=api_url,
+        customer_code=customer_code,
+        email=email,
+        password=password,
+        unique_id=gen_uuid,
+        login_api_url=login_api_url,
+        brand_id=brand_id,
+        brand=brand,
     )
 
     try:
