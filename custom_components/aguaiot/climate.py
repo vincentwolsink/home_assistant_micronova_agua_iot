@@ -23,7 +23,8 @@ from homeassistant.const import (
 )
 from .const import (
     DOMAIN,
-    DEVICE_VARIANTS,
+    AIR_VARIANTS,
+    WATER_VARIANTS,
     CLIMATE_CANALIZATIONS,
     MODE_PELLETS,
     MODE_WOOD,
@@ -42,8 +43,11 @@ async def async_setup_entry(hass, entry, async_add_entities):
     agua = hass.data[DOMAIN][entry.entry_id]["agua"]
     entities = []
     for device in agua.devices:
-        stove = AguaIOTHeatingDevice(coordinator, device)
+        stove = AguaIOTAirDevice(coordinator, device)
         entities.append(stove)
+
+        if any(f"temp_{variant}_set" in device.registers for variant in WATER_VARIANTS):
+            entities.append(AguaIOTWaterDevice(coordinator, device, stove))
 
         for canalization in CLIMATE_CANALIZATIONS:
             for c_found in [
@@ -98,7 +102,7 @@ class AguaIOTClimateDevice(CoordinatorEntity, ClimateEntity):
         return PRECISION_HALVES
 
 
-class AguaIOTHeatingDevice(AguaIOTClimateDevice):
+class AguaIOTAirDevice(AguaIOTClimateDevice):
     """Representation of an Agua IOT heating device."""
 
     def __init__(self, coordinator, device):
@@ -109,7 +113,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
         self._hybrid = "power_wood_set" in device.registers
 
         self._temperature_get_key = None
-        for variant in DEVICE_VARIANTS:
+        for variant in AIR_VARIANTS:
             if (
                 f"temp_{variant}_get" in self._device.registers
                 and self._device.get_register_enabled(f"temp_{variant}_get")
@@ -119,7 +123,7 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
                 break
 
         self._temperature_set_key = None
-        for variant in DEVICE_VARIANTS:
+        for variant in AIR_VARIANTS:
             if (
                 f"temp_{variant}_set" in self._device.registers
                 and self._device.get_register_enabled(f"temp_{variant}_set")
@@ -316,6 +320,137 @@ class AguaIOTHeatingDevice(AguaIOTClimateDevice):
             )
         except (ValueError, AguaIOTError) as err:
             _LOGGER.error("Failed to set value, error: %s", err)
+
+
+class AguaIOTWaterDevice(AguaIOTClimateDevice):
+    """Representation of an Agua IOT heating device."""
+
+    def __init__(self, coordinator, device, parent):
+        """Initialize the thermostat."""
+        CoordinatorEntity.__init__(self, coordinator)
+        self._enable_turn_on_off_backwards_compatibility = False
+        self._device = device
+        self._parent = parent
+
+        self._temperature_get_key = None
+        for variant in WATER_VARIANTS:
+            if (
+                f"temp_{variant}_get" in self._device.registers
+                and self._device.get_register_enabled(f"temp_{variant}_get")
+                and self._device.get_register_value(f"temp_{variant}_get")
+            ):
+                self._temperature_get_key = f"temp_{variant}_get"
+                break
+
+        self._temperature_set_key = None
+        for variant in WATER_VARIANTS:
+            if (
+                f"temp_{variant}_set" in self._device.registers
+                and self._device.get_register_enabled(f"temp_{variant}_set")
+                and self._device.get_register_value(f"temp_{variant}_set")
+            ):
+                self._temperature_set_key = f"temp_{variant}_set"
+                break
+
+    @property
+    def unique_id(self):
+        return f"{self._device.id_device}_water"
+
+    @property
+    def name(self):
+        return f"{self._device.name} Water"
+
+    @property
+    def icon(self):
+        return "mdi:water"
+
+    @property
+    def supported_features(self):
+        """Return the list of supported features."""
+        features = (
+            ClimateEntityFeature.TURN_ON
+            | ClimateEntityFeature.TURN_OFF
+            | ClimateEntityFeature.TARGET_TEMPERATURE
+        )
+        return features
+
+    @property
+    def hvac_action(self):
+        return self._parent.hvac_action
+
+    @property
+    def hvac_modes(self):
+        return self._parent.hvac_modes
+
+    @property
+    def hvac_mode(self):
+        return self._parent.hvac_mode
+
+    async def async_set_hvac_mode(self, hvac_mode):
+        """Set new target hvac mode."""
+        if hvac_mode == HVACMode.OFF:
+            await self.async_turn_off()
+        elif hvac_mode == HVACMode.HEAT:
+            await self.async_turn_on()
+
+    async def async_turn_off(self):
+        """Turn device off."""
+        try:
+            await self._device.set_register_value_description(
+                "status_managed_get", "OFF"
+            )
+            await self.coordinator.async_request_refresh()
+        except AguaIOTError as err:
+            _LOGGER.error("Failed to turn off device, error: %s", err)
+
+    async def async_turn_on(self):
+        """Turn device on."""
+        try:
+            await self._device.set_register_value_description(
+                "status_managed_get", "ON"
+            )
+            await self.coordinator.async_request_refresh()
+        except AguaIOTError as err:
+            _LOGGER.error("Failed to turn on device, error: %s", err)
+
+    @property
+    def min_temp(self):
+        """Return the minimum temperature to set."""
+        return self._device.get_register_value_min(self._temperature_set_key)
+
+    @property
+    def max_temp(self):
+        """Return the maximum temperature to set."""
+        return self._device.get_register_value_max(self._temperature_set_key)
+
+    @property
+    def current_temperature(self):
+        """Return the current temperature."""
+        return self._device.get_register_value(self._temperature_get_key)
+
+    @property
+    def target_temperature(self):
+        """Return the temperature we try to reach."""
+        return self._device.get_register_value(self._temperature_set_key)
+
+    async def async_set_temperature(self, **kwargs):
+        """Set new target temperature."""
+        temperature = kwargs.get(ATTR_TEMPERATURE)
+        if temperature is None:
+            return
+
+        try:
+            await self._device.set_register_value(
+                self._temperature_set_key, temperature
+            )
+            await self.coordinator.async_request_refresh()
+        except (ValueError, AguaIOTError) as err:
+            _LOGGER.error("Failed to set temperature, error: %s", err)
+
+    @property
+    def target_temperature_step(self):
+        """Return the supported step of target temperature."""
+        return self._device.get_register(self._temperature_set_key).get("step", 1)
 
 
 class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
