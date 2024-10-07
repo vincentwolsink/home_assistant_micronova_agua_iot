@@ -64,7 +64,9 @@ CONF_ENDPOINT = "endpoint"
 CONF_BRAND_ID = "brand_id"
 CONF_BRAND = "brand"
 
-DEVICE_VARIANTS = ["water", "air", "air2", "air_palm"]
+AIR_VARIANTS = ["air", "air2", "air_palm"]
+WATER_VARIANTS = ["water", "h2o", "h2o_mandata"]
+
 MODE_WOOD = "Wood"
 MODE_PELLETS = "Pellet"
 
@@ -253,20 +255,6 @@ BINARY_SENSORS = (
 
 SENSORS = (
     AguaIOTSensorEntityDescription(
-        key="temp_gas_flue_get",
-        name="Smoke Temperature",
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.TEMPERATURE,
-    ),
-    AguaIOTSensorEntityDescription(
-        key="temp_probe_k_get",
-        name="Flame Temperature",
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.TEMPERATURE,
-    ),
-    AguaIOTSensorEntityDescription(
         key="status_get",
         name="Status",
         icon="mdi:fire",
@@ -356,6 +344,63 @@ SENSORS = (
         state_class=None,
         device_class=None,
     ),
+    # Temperature sensors
+    AguaIOTSensorEntityDescription(
+        key="temp_gas_flue_get",
+        name="Smoke Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="temp_probe_k_get",
+        name="Flame Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="temp_air_get",
+        name="Air Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="temp_air2_get",
+        name="Air Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="temp_air_palm_get",
+        name="Remote Air Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="temp_rear2_get",
+        name="Vent Rear Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="temp_front2_get",
+        name="Vent Front Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="temp_water_get",
+        name="Water Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
     AguaIOTSensorEntityDescription(
         key="temp_h2o_mandata_get",
         name="Water Temperature",
@@ -363,38 +408,9 @@ SENSORS = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
     ),
-    # Temperature sensors
     AguaIOTSensorEntityDescription(
-        key=r"temp_air_get",
-        name="Air Temperature",
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.TEMPERATURE,
-    ),
-    AguaIOTSensorEntityDescription(
-        key=r"temp_air2_get",
-        name="Air Temperature",
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.TEMPERATURE,
-    ),
-    AguaIOTSensorEntityDescription(
-        key=r"temp_air_palm_get",
-        name="Remote Air Temperature",
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.TEMPERATURE,
-    ),
-    AguaIOTSensorEntityDescription(
-        key=r"temp_rear2_get",
-        name="Vent Rear Temperature",
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.TEMPERATURE,
-    ),
-    AguaIOTSensorEntityDescription(
-        key=r"temp_front2_get",
-        name="Vent Front Temperature",
+        key="temp_h2o_get",
+        name="Water Temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
