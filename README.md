@@ -8,6 +8,7 @@ Home Assistant integration for controlling heating devices connected via the Agu
 
 Supports the following vendors (mobile apps):
 * Alfaplam
+* APP-O BIOEN
 * Boreal Home
 * Bronpi Home
 * Darwin Evolution
