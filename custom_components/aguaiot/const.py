@@ -101,6 +101,10 @@ ENDPOINTS = {
         CONF_CUSTOMER_CODE: "862148",
         CONF_API_URL: "https://alfaplam.agua-iot.com",
     },
+    "APP-O BIOEN": {
+        CONF_CUSTOMER_CODE: "289982",
+        CONF_API_URL: "https://unical.agua-iot.com",
+    },
     "Boreal Home": {
         CONF_CUSTOMER_CODE: "173118",
         CONF_API_URL: "https://boreal.agua-iot.com",
