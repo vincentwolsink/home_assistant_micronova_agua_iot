@@ -4,7 +4,7 @@
 [![Maintainer][maintainer-shield]][maintainer]
 [![HACS Custom][hacs-shield]][hacs-url]
 
-Home Assistant integration for controlling heating devices connected via the Agua IOT platform of Micronova.
+Home Assistant integration for controlling heating devices (pellet stoves) connected via the Agua IOT platform of Micronova.
 
 Supports the following vendors (mobile apps):
 * Alfaplam
