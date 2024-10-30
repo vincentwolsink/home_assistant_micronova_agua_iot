@@ -410,11 +410,11 @@ class Device(object):
 
         self.__information_dict = information_dict
 
-    def __prepare_value_for_writing(self, item, value):
+    def __prepare_value_for_writing(self, item, value, limit_value_raw=False):
         set_min = self.__register_map_dict[item]["set_min"]
         set_max = self.__register_map_dict[item]["set_max"]
 
-        if float(value) < set_min or float(value) > set_max:
+        if not limit_value_raw and (float(value) < set_min or float(value) > set_max):
             raise ValueError(f"Value must be between {set_min} and {set_max}: {value}")
 
         formula = self.__register_map_dict[item]["formula_inverse"]
@@ -422,6 +422,11 @@ class Device(object):
         formula = formula.replace("Mod", "%")
         eval_formula = simple_eval(formula)
         value = int(eval_formula)
+
+        if limit_value_raw and (float(value) < set_min or float(value) > set_max):
+            raise ValueError(
+                f"Raw value must be between {set_min} and {set_max}: {value}"
+            )
 
         if self.__register_map_dict[item]["is_hex"]:
             value = int(f"0x{value}", 16)
@@ -549,8 +554,10 @@ class Device(object):
         else:
             return self.get_register_value(enable_key) == 1
 
-    async def set_register_value(self, key, value):
-        value = self.__prepare_value_for_writing(key, value)
+    async def set_register_value(self, key, value, limit_value_raw=False):
+        value = self.__prepare_value_for_writing(
+            key, value, limit_value_raw=limit_value_raw
+        )
         items = {key: value}
 
         try:
@@ -558,9 +565,11 @@ class Device(object):
         except AguaIOTError:
             raise AguaIOTError(f"Error while trying to set: key={key} value={value}")
 
-    async def set_register_values(self, items):
+    async def set_register_values(self, items, limit_value_raw=False):
         for key in items:
-            items[key] = self.__prepare_value_for_writing(key, items[key])
+            items[key] = self.__prepare_value_for_writing(
+                key, items[key], limit_value_raw=limit_value_raw
+            )
 
         try:
             await self.__request_writing(items)

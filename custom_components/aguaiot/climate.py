@@ -318,7 +318,8 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
                     "calendar_day_set": dt_now.day,
                     "calendar_month_set": dt_now.month,
                     "calendar_year_set": dt_now.year,
-                }
+                },
+                limit_value_raw=True,
             )
         except (ValueError, AguaIOTError) as err:
             _LOGGER.error("Failed to set value, error: %s", err)
