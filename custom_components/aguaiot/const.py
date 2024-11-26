@@ -264,7 +264,7 @@ SENSORS = (
         icon="mdi:fire",
         native_unit_of_measurement=None,
         state_class=None,
-        device_class=None,
+        device_class=SensorDeviceClass.ENUM,
     ),
     AguaIOTSensorEntityDescription(
         key="alarms_get",
@@ -272,7 +272,7 @@ SENSORS = (
         icon="mdi:alert-outline",
         native_unit_of_measurement=None,
         state_class=None,
-        device_class=None,
+        device_class=SensorDeviceClass.ENUM,
         force_enabled=True,
     ),
     AguaIOTSensorEntityDescription(
@@ -281,8 +281,8 @@ SENSORS = (
         icon="mdi:gauge",
         native_unit_of_measurement=None,
         state_class=None,
-        device_class=None,
         force_enabled=True,
+        device_class=SensorDeviceClass.ENUM,
     ),
     AguaIOTSensorEntityDescription(
         key="real_power_wood_get",
@@ -290,8 +290,8 @@ SENSORS = (
         icon="mdi:gauge",
         native_unit_of_measurement=None,
         state_class=None,
-        device_class=None,
         force_enabled=True,
+        device_class=SensorDeviceClass.ENUM,
         hybrid_only=True,
     ),
     AguaIOTSensorEntityDescription(
@@ -300,7 +300,7 @@ SENSORS = (
         icon="mdi:fan",
         native_unit_of_measurement=None,
         state_class=None,
-        device_class=None,
+        device_class=SensorDeviceClass.ENUM,
     ),
     AguaIOTSensorEntityDescription(
         key="vent_rear2_get",
@@ -308,7 +308,7 @@ SENSORS = (
         icon="mdi:fan",
         native_unit_of_measurement=None,
         state_class=None,
-        device_class=None,
+        device_class=SensorDeviceClass.ENUM,
     ),
     AguaIOTSensorEntityDescription(
         key="type_combustible_get",
@@ -316,7 +316,7 @@ SENSORS = (
         icon="mdi:gas-burner",
         native_unit_of_measurement=None,
         state_class=None,
-        device_class=None,
+        device_class=SensorDeviceClass.ENUM,
     ),
     AguaIOTSensorEntityDescription(
         key="pres_h2o_get",

@@ -4,7 +4,7 @@ from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.helpers.entity import DeviceInfo
 from .const import SENSORS, DOMAIN
 
@@ -69,5 +69,25 @@ class AguaIOTHeatingSensor(CoordinatorEntity, SensorEntity):
             return {
                 "raw_value": self._device.get_register_value(
                     self.entity_description.key
-                )
+                ),
             }
+
+    @property
+    def options(self):
+        if self.entity_description.device_class == SensorDeviceClass.ENUM:
+            options = sorted(
+                list(
+                    set(
+                        self._device.get_register_value_options(
+                            self.entity_description.key
+                        ).values()
+                    )
+                )
+            )
+            cur_value = self._device.get_register_value_description(
+                self.entity_description.key
+            )
+            if cur_value not in options:
+                options.append(cur_value)
+
+            return options
