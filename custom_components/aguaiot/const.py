@@ -41,12 +41,15 @@ class AguaIOTBinarySensorEntityDescription(BinarySensorEntityDescription):
 class AguaIOTSensorEntityDescription(SensorEntityDescription):
     force_enabled: bool = False
     hybrid_only: bool = False
+    hybrid_exclude: bool = False
+    raw_value: bool = False
 
 
 @dataclass
 class AguaIOTNumberEntityDescription(NumberEntityDescription):
     force_enabled: bool = False
     hybrid_only: bool = False
+    hybrid_exclude: bool = False
 
 
 @dataclass
@@ -281,19 +284,30 @@ SENSORS = (
         name="Real Power",
         icon="mdi:gauge",
         native_unit_of_measurement=None,
-        state_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
         force_enabled=True,
-        device_class=SensorDeviceClass.ENUM,
+        raw_value=True,
+        hybrid_exclude=True,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="real_power_get",
+        name="Real Pellet Power",
+        icon="mdi:gauge",
+        native_unit_of_measurement=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        force_enabled=True,
+        raw_value=True,
+        hybrid_only=True,
     ),
     AguaIOTSensorEntityDescription(
         key="real_power_wood_get",
         name="Real Wood Power",
         icon="mdi:gauge",
         native_unit_of_measurement=None,
-        state_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
         force_enabled=True,
-        device_class=SensorDeviceClass.ENUM,
         hybrid_only=True,
+        raw_value=True,
     ),
     AguaIOTSensorEntityDescription(
         key="vent_front2_get",
@@ -466,10 +480,19 @@ NUMBERS = (
     ),
     AguaIOTNumberEntityDescription(
         key="power_set",
+        name="Power",
+        icon="mdi:fire",
+        native_step=1,
+        force_enabled=True,
+        hybrid_exclude=True,
+    ),
+    AguaIOTNumberEntityDescription(
+        key="power_set",
         name="Pellet Power",
         icon="mdi:fire",
         native_step=1,
         force_enabled=True,
+        hybrid_only=True,
     ),
     AguaIOTNumberEntityDescription(
         key="power_wood_set",
