@@ -54,21 +54,27 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 m
                 for i in device.registers
                 for m in [re.match(canalization.key, i.lower())]
-                if m and device.get_register_enabled(m.group(0))
+                if m
             ]:
-                c_copy = copy.deepcopy(canalization)
-                c_copy.key = c_found.group(0)
-                for key in ["name", "key_temp_set", "key_temp_get"]:
-                    if getattr(c_copy, key):
-                        setattr(
-                            c_copy,
-                            key,
-                            getattr(c_copy, key).format_map(c_found.groupdict()),
-                        )
+                if (
+                    canalization.key_enable
+                    and device.get_register_enabled(
+                        canalization.key_enable.format(id=c_found.group(1))
+                    )
+                ) or device.get_register_enabled(c_found.group(0)):
+                    c_copy = copy.deepcopy(canalization)
+                    c_copy.key = c_found.group(0)
+                    for key in ["name", "key_temp_set", "key_temp_get"]:
+                        if getattr(c_copy, key):
+                            setattr(
+                                c_copy,
+                                key,
+                                getattr(c_copy, key).format_map(c_found.groupdict()),
+                            )
 
-                entities.append(
-                    AguaIOTCanalizationDevice(coordinator, device, c_copy, stove)
-                )
+                    entities.append(
+                        AguaIOTCanalizationDevice(coordinator, device, c_copy, stove)
+                    )
 
     async_add_entities(entities, True)
 
