@@ -57,14 +57,31 @@ async def async_setup_entry(hass, entry, async_add_entities):
                 if m
             ]:
                 if (
-                    canalization.key_enable
-                    and device.get_register_enabled(
-                        canalization.key_enable.format(id=c_found.group(1))
+                    (
+                        canalization.key_enable
+                        and device.get_register_enabled(
+                            canalization.key_enable.format(id=c_found.group(1))
+                        )
                     )
-                ) or device.get_register_enabled(c_found.group(0)):
+                    or (
+                        canalization.key2_enable
+                        and device.get_register_enabled(
+                            canalization.key2_enable.format(id=c_found.group(1))
+                        )
+                    )
+                    or (
+                        not canalization.key_enable
+                        and device.get_register_enabled(c_found.group(0))
+                    )
+                ):
                     c_copy = copy.deepcopy(canalization)
                     c_copy.key = c_found.group(0)
-                    for key in ["name", "key_temp_set", "key_temp_get"]:
+                    for key in [
+                        "name",
+                        "key_temp_set",
+                        "key_temp_get",
+                        "key_temp2_get",
+                    ]:
                         if getattr(c_copy, key):
                             setattr(
                                 c_copy,
@@ -571,6 +588,13 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
         """Return the current temperature."""
         if self.entity_description.key_temp_get in self._device.registers:
             return self._device.get_register_value(self.entity_description.key_temp_get)
+        elif (
+            self.entity_description.key_temp2_get
+            and self.entity_description.key_temp2_get in self._device.registers
+        ):
+            return self._device.get_register_value(
+                self.entity_description.key_temp2_get
+            )
 
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
