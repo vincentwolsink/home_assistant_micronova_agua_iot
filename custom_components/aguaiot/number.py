@@ -22,7 +22,11 @@ async def async_setup_entry(hass, entry, async_add_entities):
             if (
                 number.key in device.registers
                 and (number.force_enabled or device.get_register_enabled(number.key))
-                and (not number.hybrid_only or hybrid)
+                and (
+                    (number.hybrid_only and hybrid)
+                    or (number.hybrid_exclude and not hybrid)
+                    or (not number.hybrid_only and not number.hybrid_exclude)
+                )
             ):
                 numbers.append(AguaIOTHeatingNumber(coordinator, device, number))
 
