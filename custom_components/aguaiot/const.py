@@ -469,7 +469,7 @@ NUMBERS = (
         name="Pellet Power",
         icon="mdi:fire",
         native_step=1,
-        hybrid_only=True,
+        force_enabled=True,
     ),
     AguaIOTNumberEntityDescription(
         key="power_wood_set",
