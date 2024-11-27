@@ -56,7 +56,9 @@ class AguaIOTNumberEntityDescription(NumberEntityDescription):
 class AguaIOTCanalizationEntityDescription(ClimateEntityDescription):
     key_temp_set: str | None = None
     key_temp_get: str | None = None
+    key_temp2_get: str | None = None
     key_enable: str | None = None
+    key2_enable: str | None = None
 
 
 DOMAIN = "aguaiot"
@@ -523,26 +525,12 @@ CLIMATE_CANALIZATIONS = (
     ),
     AguaIOTCanalizationEntityDescription(
         name="Vent {id}",
-        key=r"vent_(?P<id>front)_set",
-        key_temp_set="temp_{id}_set",
-        key_temp_get="temp_{id}_get",
-        icon="mdi:fan",
-    ),
-    # Weird nobis habit of having temp_rear_set and temp_rear2_get
-    AguaIOTCanalizationEntityDescription(
-        name="Vent {id}",
-        key=r"vent_(?P<id>(front|rear))_set",
-        key_enable="vent_{id}_enable",
-        key_temp_set="temp_{id}_set",
-        key_temp_get="temp_{id}2_get",
-        icon="mdi:fan",
-    ),
-    AguaIOTCanalizationEntityDescription(
-        name="Vent {id}",
         key=r"vent_(?P<id>(front|rear))_set",
         key_enable="vent_{id}2_enable",
+        key2_enable="vent_{id}2_enable",
         key_temp_set="temp_{id}_set",
-        key_temp_get="temp_{id}2_get",
+        key_temp_get="temp_{id}_get",
+        key_temp2_get="temp_{id}2_get",
         icon="mdi:fan",
     ),
     AguaIOTCanalizationEntityDescription(
