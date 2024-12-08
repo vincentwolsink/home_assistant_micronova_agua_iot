@@ -586,11 +586,15 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        if self.entity_description.key_temp_get in self._device.registers:
+        if (
+            self.entity_description.key_temp_get in self._device.registers
+            and self._device.get_register_enabled(self.entity_description.key_temp_get)
+        ):
             return self._device.get_register_value(self.entity_description.key_temp_get)
         elif (
             self.entity_description.key_temp2_get
             and self.entity_description.key_temp2_get in self._device.registers
+            and self._device.get_register_enabled(self.entity_description.key_temp2_get)
         ):
             return self._device.get_register_value(
                 self.entity_description.key_temp2_get
