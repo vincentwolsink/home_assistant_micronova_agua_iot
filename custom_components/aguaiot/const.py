@@ -514,6 +514,11 @@ CLIMATE_CANALIZATIONS = (
     AguaIOTCanalizationEntityDescription(
         name="Canalization {id}",
         key=r"canalization_(?P<id>[a-zA-Z0-9]+)_set",
+        key_enable="canalization_{id}_enable",
+        key2_enable="canalization_2{id}_enable",
+        key_temp_set="canalization_{id}_temp_air_set",
+        key_temp_get="canalization_{id}_temp_air_get",
+        key_temp2_get="canalization_2{id}_temp_air_get",
         icon="mdi:fan",
     ),
     AguaIOTCanalizationEntityDescription(
