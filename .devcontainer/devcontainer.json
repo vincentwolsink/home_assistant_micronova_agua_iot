@@ -4,7 +4,9 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "ms-python.python"
+                "ms-python.python",
+                "mikoz.black-py",
+                "github.vscode-github-actions"
             ]
         }
     }
