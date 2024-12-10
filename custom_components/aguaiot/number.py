@@ -1,3 +1,4 @@
+import logging
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -7,6 +8,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from .const import NUMBERS, DOMAIN
 from .aguaiot import AguaIOTError
 
+_LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator: DataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
