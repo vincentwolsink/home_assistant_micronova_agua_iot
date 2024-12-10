@@ -157,7 +157,7 @@ class aguaiot(object):
                     response.status_code,
                     response.text,
                 )
-        except httpx.TransportError:
+        except httpx.TransportError as e:
             raise ConnectionError(f"Connection error to {url}: {e}")
 
         if response.status_code != 200:
@@ -203,7 +203,7 @@ class aguaiot(object):
                     response.status_code,
                     response.text,
                 )
-        except httpx.TransportError:
+        except httpx.TransportError as e:
             raise ConnectionError(f"Connection error to {url}: {e}")
 
         if response.status_code != 201:
@@ -298,7 +298,7 @@ class aguaiot(object):
                 response.status_code,
                 response.text,
             )
-        except httpx.TransportError:
+        except httpx.TransportError as e:
             raise ConnectionError(f"Connection error to {url}: {e}")
 
         if response.status_code == 401:
