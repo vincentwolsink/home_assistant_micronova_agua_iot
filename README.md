@@ -37,6 +37,7 @@ Supports the following vendors (mobile apps):
 * Ravelli Wi-Fi
 * Stufe a pellet Italia
 * Thermoflux
+* Total Control (Extraflame)
 * TS Smart
 * Wi-Phire
 
