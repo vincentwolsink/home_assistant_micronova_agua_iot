@@ -224,7 +224,7 @@ ENDPOINTS = {
         CONF_API_URL: "https://thermoflux.agua-iot.com",
     },
     "Total Control (Extraflame)": {
-        CONF_CUSTOMER_CODE: "195763",
+        CONF_CUSTOMER_CODE: "195764",
         CONF_API_URL: "https://extraflame.agua-iot.com/",
     },
     "TS Smart": {
