@@ -82,7 +82,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     login_api_url=login_api_url,
                     brand_id=brand_id,
                     brand=brand,
-                    async_client=get_async_client(hass),
+                    async_client=get_async_client(self.hass),
                 )
                 await agua.connect()
             except UnauthorizedError as e:
