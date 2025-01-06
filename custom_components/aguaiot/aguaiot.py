@@ -40,6 +40,7 @@ class aguaiot(object):
         brand_id=None,
         brand=None,
         application_version="1.9.7",
+        async_client=None,
     ):
         self.api_url = api_url.rstrip("/")
         self.customer_code = customer_code
@@ -54,6 +55,10 @@ class aguaiot(object):
         self.token_expires = None
         self.refresh_token = None
         self.devices = list()
+        self.async_client = async_client
+
+        if not self.async_client:
+            self.async_client = httpx.AsyncClient()
 
     async def connect(self):
         await self.register_app_id()
@@ -95,7 +100,7 @@ class aguaiot(object):
             _LOGGER.debug(
                 "POST Register app - HEADERS: %s DATA: %s", self._headers(), payload
             )
-            async with httpx.AsyncClient() as client:
+            async with self.async_client as client:
                 response = await client.post(
                     url,
                     json=payload,
@@ -144,7 +149,7 @@ class aguaiot(object):
 
         try:
             _LOGGER.debug("POST Login - HEADERS: %s DATA: ***", headers)
-            async with httpx.AsyncClient() as client:
+            async with self.async_client as client:
                 response = await client.post(
                     url,
                     json=payload,
@@ -190,7 +195,7 @@ class aguaiot(object):
             _LOGGER.debug(
                 "POST Refresh token - HEADERS: %s DATA: %s", self._headers(), payload
             )
-            async with httpx.AsyncClient() as client:
+            async with self.async_client as client:
                 response = await client.post(
                     url,
                     json=payload,
@@ -275,7 +280,7 @@ class aguaiot(object):
         try:
             _LOGGER.debug("%s %s - HEADERS: %s DATA: %s", method, url, headers, payload)
             if method == "POST":
-                async with httpx.AsyncClient() as client:
+                async with self.async_client as client:
                     response = await client.post(
                         url,
                         json=payload,
@@ -284,7 +289,7 @@ class aguaiot(object):
                         timeout=DEFAULT_TIMEOUT_VALUE,
                     )
             else:
-                async with httpx.AsyncClient() as client:
+                async with self.async_client as client:
                     response = await client.get(
                         url,
                         params=payload,

@@ -14,6 +14,7 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
+from homeassistant.helpers.httpx_client import get_async_client
 
 from .const import (
     CONF_API_URL,
@@ -81,6 +82,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     login_api_url=login_api_url,
                     brand_id=brand_id,
                     brand=brand,
+                    async_client=get_async_client(hass),
                 )
                 await agua.connect()
             except UnauthorizedError as e:
