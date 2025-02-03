@@ -62,6 +62,14 @@ Or folow these steps:
 
 Some parts of the code are based on [py-agua-iot](https://github.com/fredericvl/py-agua-iot)
 
+## Related
+
+For local stove control, without need for the Micronova cloud platform, take a look at one of these projects (custom hardware required). 
+* https://esphome.io/components/micronova.html
+* https://github.com/eni23/micronova-controller
+* https://github.com/fabrizioromanelli/Pellet-Stove-Control
+* https://github.com/philibertc/micronova_controller
+
 [releases-shield]: https://img.shields.io/github/v/release/vincentwolsink/home_assistant_micronova_agua_iot.svg?style=for-the-badge
 [releases]: https://github.com/vincentwolsink/home_assistant_micronova_agua_iot/releases
 [maintainer-shield]: https://img.shields.io/badge/maintainer-vincentwolsink-blue.svg?style=for-the-badge
