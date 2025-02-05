@@ -82,6 +82,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
                         "key_temp_set",
                         "key_temp_get",
                         "key_temp2_get",
+                        "key_vent_set",
                     ]:
                         if getattr(c_copy, key):
                             setattr(
@@ -493,6 +494,13 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
         self._device = device
         self._parent = parent
         self.entity_description = description
+        self._fan_register = self.entity_description.key
+
+        if (
+            self.entity_description.key_vent_set
+            and self.entity_description.key_vent_set in self._device.registers
+        ):
+            self._fan_register = self.entity_description.key_vent_set
 
     @property
     def unique_id(self):
@@ -506,33 +514,37 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     def supported_features(self):
         features = ClimateEntityFeature.FAN_MODE
         if (
-            self.entity_description.key_temp_set in self._device.registers
+            self.entity_description.key_temp_set
+            and self.entity_description.key_temp_set in self._device.registers
             and self._device.get_register_enabled(self.entity_description.key_temp_set)
         ):
             features |= ClimateEntityFeature.TARGET_TEMPERATURE
+        if (
+            self.entity_description.key_vent_set
+            and self.entity_description.key_vent_set in self._device.registers
+        ):
+            features |= ClimateEntityFeature.PRESET_MODE
 
         return features
 
     @property
     def fan_mode(self):
         """Return fan mode."""
-        return str(
-            self._device.get_register_value_description(self.entity_description.key)
-        )
+        return str(self._device.get_register_value_description(self._fan_register))
 
     @property
     def fan_modes(self):
         """Return the list of available fan modes."""
         fan_modes = []
         for x in range(
-            self._device.get_register_value_min(self.entity_description.key),
-            (self._device.get_register_value_max(self.entity_description.key) + 1),
+            self._device.get_register_value_min(self._fan_register),
+            (self._device.get_register_value_max(self._fan_register) + 1),
         ):
             fan_modes.append(
                 str(
-                    self._device.get_register_value_options(
-                        self.entity_description.key
-                    ).get(x, x)
+                    self._device.get_register_value_options(self._fan_register).get(
+                        x, x
+                    )
                 )
             )
         return fan_modes
@@ -546,6 +558,28 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
             _LOGGER.error("Failed to set fan mode, error: %s", err)
+
+    @property
+    def preset_modes(self):
+        return list(
+            self._device.get_register_value_options(
+                self.entity_description.key
+            ).values()
+        )
+
+    @property
+    def preset_mode(self):
+        return self._device.get_register_value_description(self.entity_description.key)
+
+    async def async_set_preset_mode(self, preset_mode):
+        """Set new target preset mode."""
+        try:
+            await self._device.set_register_value_description(
+                self.entity_description.key, preset_mode
+            )
+            await self.coordinator.async_request_refresh()
+        except AguaIOTError as err:
+            _LOGGER.error("Failed to set preset mode, error: %s", err)
 
     @property
     def hvac_action(self):
