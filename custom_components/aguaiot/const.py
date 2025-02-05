@@ -57,6 +57,7 @@ class AguaIOTCanalizationEntityDescription(ClimateEntityDescription):
     key_temp_set: str | None = None
     key_temp_get: str | None = None
     key_temp2_get: str | None = None
+    key_vent_set: str | None = None
     key_enable: str | None = None
     key2_enable: str | None = None
 
@@ -530,13 +531,7 @@ CLIMATE_CANALIZATIONS = (
         key_temp_set="canalization_{id}_temp_air_set",
         key_temp_get="canalization_{id}_temp_air_get",
         key_temp2_get="canalization_2{id}_temp_air_get",
-        icon="mdi:fan",
-    ),
-    AguaIOTCanalizationEntityDescription(
-        name="Canalization {id}",
-        key=r"canalization_(?P<id>\d+)_vent_set",
-        key_temp_set="canalization_{id}_temp_air_set",
-        key_temp_get="canalization_{id}_temp_air_get",
+        key_vent_set="canalization_{id}_vent_set",
         icon="mdi:fan",
     ),
     AguaIOTCanalizationEntityDescription(
