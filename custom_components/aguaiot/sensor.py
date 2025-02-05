@@ -1,5 +1,6 @@
 import re
 import copy
+import numbers
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -67,9 +68,14 @@ class AguaIOTHeatingSensor(CoordinatorEntity, SensorEntity):
         if self.entity_description.raw_value:
             return self._device.get_register_value(self.entity_description.key)
         else:
-            return self._device.get_register_value_description(
+            value = self._device.get_register_value_description(
                 self.entity_description.key
             )
+            # Do not return a description if the sensor expects a number
+            if not self.entity_description.native_unit_of_measurement or isinstance(
+                value, numbers.Number
+            ):
+                return value
 
     @property
     def extra_state_attributes(self):

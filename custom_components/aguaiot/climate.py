@@ -3,6 +3,7 @@
 import logging
 import re
 import copy
+import numbers
 from homeassistant.helpers import entity_platform, service
 from homeassistant.util import dt
 from homeassistant.helpers.entity import DeviceInfo
@@ -305,12 +306,15 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        return self._device.get_register_value(self._temperature_get_key)
+        value = self._device.get_register_value_description(self._temperature_get_key)
+        if isinstance(value, numbers.Number):
+            return value
 
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        return self._device.get_register_value(self._temperature_set_key)
+        if self.current_temperature:
+            return self._device.get_register_value(self._temperature_set_key)
 
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
@@ -452,12 +456,15 @@ class AguaIOTWaterDevice(AguaIOTClimateDevice):
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        return self._device.get_register_value(self._temperature_get_key)
+        value = self._device.get_register_value_description(self._temperature_get_key)
+        if isinstance(value, numbers.Number):
+            return value
 
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        return self._device.get_register_value(self._temperature_set_key)
+        if self.current_temperature:
+            return self._device.get_register_value(self._temperature_set_key)
 
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
@@ -581,7 +588,10 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     def target_temperature(self):
         """Return the temperature we try to reach."""
         if self.entity_description.key_temp_set in self._device.registers:
-            return self._device.get_register_value(self.entity_description.key_temp_set)
+            if self.current_temperature:
+                return self._device.get_register_value(
+                    self.entity_description.key_temp_set
+                )
 
     @property
     def current_temperature(self):
@@ -590,15 +600,21 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
             self.entity_description.key_temp_get in self._device.registers
             and self._device.get_register_enabled(self.entity_description.key_temp_get)
         ):
-            return self._device.get_register_value(self.entity_description.key_temp_get)
+            value = self._device.get_register_value_description(
+                self.entity_description.key_temp_get
+            )
+            if isinstance(value, numbers.Number):
+                return value
         elif (
             self.entity_description.key_temp2_get
             and self.entity_description.key_temp2_get in self._device.registers
             and self._device.get_register_enabled(self.entity_description.key_temp2_get)
         ):
-            return self._device.get_register_value(
+            value = self._device.get_register_value_description(
                 self.entity_description.key_temp2_get
             )
+            if isinstance(value, numbers.Number):
+                return value
 
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
