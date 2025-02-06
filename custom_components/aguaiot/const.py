@@ -27,6 +27,7 @@ from homeassistant.components.number import (
 from homeassistant.components.climate import (
     ClimateEntityDescription,
 )
+from homeassistant.components.select import SelectEntityDescription
 from dataclasses import dataclass
 
 
@@ -99,6 +100,7 @@ PLATFORMS = [
     Platform.SENSOR,
     Platform.SWITCH,
     Platform.NUMBER,
+    Platform.SELECT,
 ]
 
 UPDATE_INTERVAL = 60
@@ -549,6 +551,19 @@ CLIMATE_CANALIZATIONS = (
         key=r"vent_(?!(front|rear))(?P<id>\w+)_set",
         key_temp_set="temp_{id}_set",
         key_temp_get="temp_{id}_get",
+        icon="mdi:fan",
+    ),
+)
+
+SELECTS = (
+    SelectEntityDescription(
+        key="fan_mode_set",
+        name="Fan Mode",
+        icon="mdi:fan",
+    ),
+    SelectEntityDescription(
+        key="fan2_mode_set",
+        name="Fan Mode",
         icon="mdi:fan",
     ),
 )
