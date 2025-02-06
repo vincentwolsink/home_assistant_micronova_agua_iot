@@ -553,7 +553,7 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
         """Set new target fan mode."""
         try:
             await self._device.set_register_value_description(
-                self.entity_description.key, fan_mode
+                self._fan_register, fan_mode
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
