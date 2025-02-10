@@ -13,6 +13,7 @@ from .aguaiot import (
 import voluptuous as vol
 
 from homeassistant import config_entries
+from homeassistant.core import callback
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.helpers.httpx_client import get_async_client
 
@@ -124,3 +125,33 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=data_schema, errors=errors
         )
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry):
+        return AguaIOTOptionsFlowHandler()
+
+
+class AguaIOTOptionsFlowHandler(config_entries.OptionsFlow):
+
+    async def async_step_init(self, _user_input=None):
+        """Manage the options."""
+        return await self.async_step_user()
+
+    async def async_step_user(self, user_input=None):
+        """Handle a flow initialized by the user."""
+
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        schema = {
+            vol.Optional(
+                "air_temp_fix",
+                default=self.config_entry.options.get("air_temp_fix", False),
+            ): bool,
+            vol.Optional(
+                "reading_error_fix",
+                default=self.config_entry.options.get("reading_error_fix", False),
+            ): bool,
+        }
+        return self.async_show_form(step_id="user", data_schema=vol.Schema(schema))

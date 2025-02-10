@@ -41,6 +41,8 @@ class aguaiot(object):
         brand=None,
         application_version="1.9.7",
         async_client=None,
+        air_temp_fix=False,
+        reading_error_fix=False,
     ):
         self.api_url = api_url.rstrip("/")
         self.customer_code = customer_code
@@ -56,6 +58,10 @@ class aguaiot(object):
         self.refresh_token = None
         self.devices = list()
         self.async_client = async_client
+
+        # Vendor specific fixes
+        self.air_temp_fix = air_temp_fix
+        self.reading_error_fix = reading_error_fix
 
         if not self.async_client:
             self.async_client = httpx.AsyncClient()
@@ -501,6 +507,7 @@ class Device(object):
             register["value_raw"] = str(
                 self.__information_dict[register["offset"]] & register["mask"]
             )
+
             formula = register["formula"].replace("#", register["value_raw"])
             formula = formula.replace("Mod", "%")
             register["value"] = simple_eval(formula)
@@ -510,7 +517,31 @@ class Device(object):
             return {}
 
     def get_register_value(self, key):
-        return self.get_register(key).get("value")
+        value = self.get_register(key).get("value")
+
+        # Fix for reading errors from wifi module
+        if (
+            self.__aguaiot.reading_error_fix
+            and int(self.get_register(key).get("value_raw", 0)) == 32768
+        ):
+            _LOGGER.debug(
+                f"Applied reading_error_fix. Dropped value {value} for register {key}"
+            )
+            return
+
+        # Fix for stoves abusing air temp register
+        if (
+            self.__aguaiot.air_temp_fix
+            and key.endswith("air_get")
+            and value
+            and int(value) > 100
+        ):
+            _LOGGER.debug(
+                f"Applied air_temp_fix. Dropped value {value} for register {key}"
+            )
+            return
+
+        return value
 
     def get_register_value_min(self, key):
         return self.get_register(key).get("set_min")

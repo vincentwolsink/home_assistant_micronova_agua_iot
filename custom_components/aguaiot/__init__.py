@@ -58,6 +58,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     login_api_url = entry.data.get(CONF_LOGIN_API_URL)
     brand_id = entry.data.get(CONF_BRAND_ID)
     brand = entry.data.get(CONF_BRAND)
+    air_temp_fix = entry.options.get("air_temp_fix", False)
+    reading_error_fix = entry.options.get("reading_error_fix", False)
 
     agua = aguaiot(
         api_url=api_url,
@@ -69,6 +71,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         brand_id=brand_id,
         brand=brand,
         async_client=get_async_client(hass),
+        air_temp_fix=air_temp_fix,
+        reading_error_fix=reading_error_fix,
     )
 
     try:
