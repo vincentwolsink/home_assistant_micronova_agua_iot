@@ -24,5 +24,16 @@
           "name": "Synchronize Stove Clock",
           "description": "Synchronize stove time and date with the current Home Assistant time and date."
         }
+    },
+    "options": {
+        "step": {
+            "user": {
+                "title": "Micronova Agua IOT options",
+                "data": {
+                    "air_temp_fix": "[Jolly Mec] Ignore incorrect air temperature when using external themostat.",
+                    "reading_error_fix": "[Bronpi] Filter incorrect readings (when stove is without power)."
+                }
+            }
+        }
     }
 }

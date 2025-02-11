@@ -24,5 +24,16 @@
           "name": "Synchroniseer Kachel Klok",
           "description": "Synchroniseer kachel datum en tijd met de huidige Home Assistant datum en tijd."
         }
+    },
+    "options": {
+        "step": {
+            "user": {
+                "title": "Micronova Agua IOT opties",
+                "data": {
+                    "air_temp_fix": "[Jolly Mec] Negeer foutieve air temperature bij gebruik van een externe thermostaat.",
+                    "reading_error_fix": "[Bronpi] Filter foutieve waardes (wanneer kachel geen stroom heeft)."
+                }
+            }
+        }
     }
 }

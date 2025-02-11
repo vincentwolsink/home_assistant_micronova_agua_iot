@@ -307,9 +307,12 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        value = self._device.get_register_value_description(self._temperature_get_key)
-        if isinstance(value, numbers.Number):
-            return value
+        if self._temperature_get_key:
+            value = self._device.get_register_value_description(
+                self._temperature_get_key
+            )
+            if isinstance(value, numbers.Number):
+                return value
 
     @property
     def target_temperature(self):
@@ -457,9 +460,12 @@ class AguaIOTWaterDevice(AguaIOTClimateDevice):
     @property
     def current_temperature(self):
         """Return the current temperature."""
-        value = self._device.get_register_value_description(self._temperature_get_key)
-        if isinstance(value, numbers.Number):
-            return value
+        if self._temperature_get_key:
+            value = self._device.get_register_value_description(
+                self._temperature_get_key
+            )
+            if isinstance(value, numbers.Number):
+                return value
 
     @property
     def target_temperature(self):
