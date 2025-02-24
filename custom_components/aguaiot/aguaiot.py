@@ -591,6 +591,9 @@ class Device(object):
             return self.get_register_value(enable_key) == 1
 
     async def set_register_value(self, key, value, limit_value_raw=False):
+        if value is None:
+            raise AguaIOTError(f"Error while trying to set '{key}' to None")
+
         value = self.__prepare_value_for_writing(
             key, value, limit_value_raw=limit_value_raw
         )
@@ -612,7 +615,9 @@ class Device(object):
         except AguaIOTError:
             raise AguaIOTError(f"Error while trying to set: items={items}")
 
-    async def set_register_value_description(self, key, value_description):
+    async def set_register_value_description(
+        self, key, value_description, value_fallback=None
+    ):
         try:
             options = self.get_register_value_options(key)
             value = list(options.keys())[
@@ -620,6 +625,10 @@ class Device(object):
             ]
         except (AttributeError, ValueError):
             value = value_description
+        try:
+            value = float(value)
+        except TypeError:
+            value = value_fallback
 
         await self.set_register_value(key, value)
 
