@@ -627,7 +627,7 @@ class Device(object):
             value = value_description
         try:
             value = float(value)
-        except TypeError:
+        except ValueError:
             value = value_fallback
 
         await self.set_register_value(key, value)
