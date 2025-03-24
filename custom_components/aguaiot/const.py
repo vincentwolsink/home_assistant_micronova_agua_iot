@@ -138,6 +138,10 @@ ENDPOINTS = {
         CONF_CUSTOMER_CODE: "354925",
         CONF_API_URL: "https://remote.mcz.it",
     },
+    "Elcofire Pellet Home": {
+        CONF_CUSTOMER_CODE: "132679",
+        CONF_API_URL: "https://elcofire.agua-iot.com",
+    },
     "Elfire Wifi": {
         CONF_CUSTOMER_CODE: "402762",
         CONF_API_URL: "https://elfire.agua-iot.com",
