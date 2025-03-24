@@ -15,6 +15,7 @@ Supports the following vendors (mobile apps):
 * Easy Connect
 * Easy Connect Plus
 * Easy Connect Poêle
+* Elcofire Pellet Home
 * Elfire Wifi
 * EOSS WIFI
 * EvaCalòr - PuntoFuoco
