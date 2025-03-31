@@ -72,7 +72,7 @@ CONF_ENDPOINT = "endpoint"
 CONF_BRAND_ID = "brand_id"
 CONF_BRAND = "brand"
 
-AIR_VARIANTS = ["air", "air2", "air_palm"]
+AIR_VARIANTS = ["air", "air2", "air3", "air_palm"]
 WATER_VARIANTS = ["water", "h2o", "h2o_mandata"]
 
 MODE_WOOD = "Wood"
@@ -400,6 +400,13 @@ SENSORS = (
     ),
     AguaIOTSensorEntityDescription(
         key="temp_air2_get",
+        name="Air Temperature",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="temp_air3_get",
         name="Air Temperature",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
