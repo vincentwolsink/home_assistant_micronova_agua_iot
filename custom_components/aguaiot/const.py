@@ -220,7 +220,7 @@ ENDPOINTS = {
     },
     "Ravelli Wi-Fi": {
         CONF_CUSTOMER_CODE: "953712",
-        CONF_API_URL: "https://aico.agua-iot.com",
+        CONF_API_URL: "https://ravelli.agua-iot.com",
     },
     "Stufe a pellet Italia": {
         CONF_CUSTOMER_CODE: "015142",
