@@ -9,5 +9,5 @@
   "iot_class": "cloud_polling",  
   "issue_tracker": "https://github.com/vincentwolsink/home_assistant_micronova_agua_iot/issues",
   "requirements": ["httpx", "simpleeval"],
-  "version": "0.7.1"
+  "version": "0.7.2"
 }
