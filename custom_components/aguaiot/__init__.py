@@ -27,6 +27,8 @@ from .const import (
     CONF_UUID,
     CONF_BRAND_ID,
     CONF_BRAND,
+    CONF_LANGUAGE,
+    DEFAULT_LANGUAGE,
     DOMAIN,
     PLATFORMS,
     UPDATE_INTERVAL,
@@ -60,6 +62,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     brand = entry.data.get(CONF_BRAND)
     air_temp_fix = entry.options.get("air_temp_fix", False)
     reading_error_fix = entry.options.get("reading_error_fix", False)
+    language = entry.options.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
 
     agua = aguaiot(
         api_url=api_url,
@@ -73,6 +76,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         async_client=get_async_client(hass),
         air_temp_fix=air_temp_fix,
         reading_error_fix=reading_error_fix,
+        language=language,
     )
 
     try:
