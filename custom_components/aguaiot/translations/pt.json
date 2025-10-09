@@ -18,5 +18,23 @@
                 "description": "Preencher com os parametros de Agua IOT"
             }
         }
+    },
+    "services": {
+        "sync_clock": {
+          "name": "Sincronizar Relógio do Forno",
+          "description": "Sincroniza a hora e a data do forno com a hora e a data atuais do Home Assistant."
+        }
+    },
+    "options": {
+        "step": {
+            "user": {
+                "title": "Opções Micronova Agua IOT",
+                "data": {
+                    "air_temp_fix": "[Jolly Mec] Ignorar temperatura do ar incorreta ao usar termostato externo.",
+                    "reading_error_fix": "[Bronpi] Filtrar leituras incorretas (quando o forno está sem energia).",
+                    "language": "Idioma para descrições"
+                }
+            }
+        }
     }
 }
