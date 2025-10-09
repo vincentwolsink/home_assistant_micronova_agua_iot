@@ -18,5 +18,23 @@
                 "description": "Remplissez les paramètres Agua IOT"
             }
         }
+    },
+    "services": {
+        "sync_clock": {
+          "name": "Synchroniser l'horloge du poêle",
+          "description": "Synchronise l'heure et la date du poêle avec l'heure et la date actuelles de Home Assistant."
+        }
+    },
+    "options": {
+        "step": {
+            "user": {
+                "title": "Options Micronova Agua IOT",
+                "data": {
+                    "air_temp_fix": "[Jolly Mec] Ignorer la température de l'air incorrecte lors de l'utilisation d'un thermostat externe.",
+                    "reading_error_fix": "[Bronpi] Filtrer les lectures incorrectes (lorsque le poêle est sans alimentation).",
+                    "language": "Langue pour les descriptions"
+                }
+            }
+        }
     }
 }
