@@ -25,6 +25,9 @@ from .const import (
     CONF_ENDPOINT,
     CONF_BRAND_ID,
     CONF_BRAND,
+    CONF_LANGUAGE,
+    DEFAULT_LANGUAGE,
+    LANGUAGES,
     DOMAIN,
     ENDPOINTS,
 )
@@ -84,6 +87,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     brand_id=brand_id,
                     brand=brand,
                     async_client=get_async_client(self.hass),
+                    language=user_input.get(CONF_LANGUAGE, DEFAULT_LANGUAGE),
                 )
                 await agua.connect()
             except UnauthorizedError as e:
@@ -108,6 +112,7 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         CONF_LOGIN_API_URL: login_api_url,
                         CONF_BRAND_ID: brand_id,
                         CONF_BRAND: brand,
+                        CONF_LANGUAGE: user_input.get(CONF_LANGUAGE, DEFAULT_LANGUAGE),
                     },
                 )
         else:
@@ -153,5 +158,9 @@ class AguaIOTOptionsFlowHandler(config_entries.OptionsFlow):
                 "reading_error_fix",
                 default=self.config_entry.options.get("reading_error_fix", False),
             ): bool,
+            vol.Optional(
+                CONF_LANGUAGE,
+                default=self.config_entry.options.get(CONF_LANGUAGE, DEFAULT_LANGUAGE),
+            ): vol.In(LANGUAGES),
         }
         return self.async_show_form(step_id="user", data_schema=vol.Schema(schema))
