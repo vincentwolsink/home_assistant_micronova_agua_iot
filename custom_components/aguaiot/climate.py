@@ -4,7 +4,7 @@ import logging
 import re
 import copy
 import numbers
-from homeassistant.helpers import entity_platform, service
+from homeassistant.helpers import entity_platform
 from homeassistant.util import dt
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import (

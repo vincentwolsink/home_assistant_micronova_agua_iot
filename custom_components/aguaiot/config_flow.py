@@ -1,6 +1,5 @@
 """Config flow for Agua IOT."""
 
-from collections import OrderedDict
 import logging
 import uuid
 

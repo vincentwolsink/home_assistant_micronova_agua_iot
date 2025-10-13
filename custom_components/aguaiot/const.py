@@ -6,7 +6,6 @@ from homeassistant.const import (
     UnitOfPressure,
     REVOLUTIONS_PER_MINUTE,
 )
-from homeassistant.components.climate.const import HVACAction
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntityDescription,

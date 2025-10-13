@@ -5,7 +5,6 @@ the IOT Agua platform of Micronova
 import asyncio
 import jwt
 import logging
-import re
 import time
 import httpx
 from simpleeval import simple_eval
