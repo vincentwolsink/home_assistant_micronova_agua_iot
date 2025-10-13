@@ -1,5 +1,3 @@
-import re
-import copy
 import numbers
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
