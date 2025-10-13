@@ -564,6 +564,11 @@ CLIMATE_CANALIZATIONS = (
         key_temp_get="temp_{id}_get",
         icon="mdi:fan",
     ),
+    AguaIOTCanalizationEntityDescription(
+        name="Multifire",
+        key="vent_front_sweetair_set",
+        icon="mdi:fan",
+    ),
 )
 
 SELECTS = (
