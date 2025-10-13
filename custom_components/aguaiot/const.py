@@ -73,14 +73,6 @@ CONF_BRAND_ID = "brand_id"
 CONF_BRAND = "brand"
 CONF_LANGUAGE = "language"
 
-DEFAULT_LANGUAGE = "ENG"
-LANGUAGE_DEU = "DEU"
-LANGUAGE_ENG = "ENG"
-LANGUAGE_FRE = "FRE"
-LANGUAGE_PRT = "PRT"
-
-LANGUAGES = [LANGUAGE_DEU, LANGUAGE_ENG, LANGUAGE_FRE, LANGUAGE_PRT]
-
 AIR_VARIANTS = ["air", "air2", "air3", "air_palm"]
 WATER_VARIANTS = ["water", "h2o", "h2o_mandata"]
 

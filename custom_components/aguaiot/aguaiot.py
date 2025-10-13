@@ -557,8 +557,8 @@ class Device(object):
             self.get_register(key).get("value"),
         )
 
-    def get_register_value_description(self, key):
-        options = self.get_register_value_options(key)
+    def get_register_value_description(self, key, language=None):
+        options = self.get_register_value_options(key, language)
         if options:
             return options.get(
                 self.get_register_value(key), self.get_register_value(key)
@@ -566,14 +566,23 @@ class Device(object):
         else:
             return self.get_register_value(key)
 
-    def get_register_value_options(self, key):
+    def get_register_value_options(self, key, language=None):
         if "enc_val" in self.get_register(key):
+            lang = language if language else self.__aguaiot.language
+            if lang not in self.get_register_value_options_languages(key):
+                lang = "ENG"
+
             return {
                 item["value"]: item["description"]
                 for item in self.get_register(key).get("enc_val")
-                if item["lang"] == self.__aguaiot.language
+                if item["lang"] == lang
             }
         return {}
+
+    def get_register_value_options_languages(self, key):
+        if "enc_val" in self.get_register(key):
+            return {item["lang"] for item in self.get_register(key).get("enc_val")}
+        return set()
 
     def get_register_enabled(self, key):
         enable_key = key.rsplit("_", 1)[0] + "_enable"
@@ -618,10 +627,10 @@ class Device(object):
             raise AguaIOTError(f"Error while trying to set: items={items}")
 
     async def set_register_value_description(
-        self, key, value_description, value_fallback=None
+        self, key, value_description, value_fallback=None, language=None
     ):
         try:
-            options = self.get_register_value_options(key)
+            options = self.get_register_value_options(key, language)
             value = list(options.keys())[
                 list(options.values()).index(value_description)
             ]
