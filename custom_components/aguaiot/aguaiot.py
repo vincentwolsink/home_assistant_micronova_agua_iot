@@ -43,6 +43,7 @@ class aguaiot(object):
         async_client=None,
         air_temp_fix=False,
         reading_error_fix=False,
+        language="ENG",
     ):
         self.api_url = api_url.rstrip("/")
         self.customer_code = customer_code
@@ -62,6 +63,7 @@ class aguaiot(object):
         # Vendor specific fixes
         self.air_temp_fix = air_temp_fix
         self.reading_error_fix = reading_error_fix
+        self.language = language
 
         if not self.async_client:
             self.async_client = httpx.AsyncClient()
@@ -569,7 +571,7 @@ class Device(object):
             return {
                 item["value"]: item["description"]
                 for item in self.get_register(key).get("enc_val")
-                if item["lang"] == "ENG"
+                if item["lang"] == self.__aguaiot.language
             }
         return {}
 
