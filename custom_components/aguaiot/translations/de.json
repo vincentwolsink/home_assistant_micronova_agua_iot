@@ -13,9 +13,27 @@
                 "data": {
                     "email": "Emailadresse",
                     "password": "Passwort",
-                    "endpoint": "App name/marke"
+                    "endpoint": "App-Name/Marke"
                 },
                 "description": "Geben Sie die Agua IOT Parameter ein"
+            }
+        }
+    },
+    "services": {
+        "sync_clock": {
+          "name": "Ofenuhr synchronisieren",
+          "description": "Synchronisiert Uhrzeit und Datum des Ofens mit der aktuellen Uhrzeit und dem Datum von Home Assistant."
+        }
+    },
+    "options": {
+        "step": {
+            "user": {
+                "title": "Micronova Agua IOT Optionen",
+                "data": {
+                    "air_temp_fix": "[Jolly Mec] Inkorrekte Lufttemperatur bei Verwendung eines externen Thermostats ignorieren.",
+                    "reading_error_fix": "[Bronpi] Inkorrekte Messwerte filtern (wenn der Ofen ohne Strom ist).",
+                    "language": "Sprache für Beschreibungen"
+                }
             }
         }
     }

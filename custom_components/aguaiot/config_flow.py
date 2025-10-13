@@ -12,9 +12,14 @@ from .aguaiot import (
 )
 import voluptuous as vol
 
-from homeassistant import config_entries
-from homeassistant.core import callback
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    OptionsFlowWithReload,
+    CONN_CLASS_CLOUD_POLL,
+)
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
+from homeassistant.core import callback
 from homeassistant.helpers.httpx_client import get_async_client
 
 from .const import (
@@ -25,6 +30,7 @@ from .const import (
     CONF_ENDPOINT,
     CONF_BRAND_ID,
     CONF_BRAND,
+    CONF_LANGUAGE,
     DOMAIN,
     ENDPOINTS,
 )
@@ -40,11 +46,11 @@ def conf_entries(hass):
     )
 
 
-class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class AguaIOTConfigFlow(ConfigFlow, domain=DOMAIN):
     """Agua IOT Config Flow handler."""
 
     VERSION = 1
-    CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
+    CONNECTION_CLASS = CONN_CLASS_CLOUD_POLL
 
     def _entry_in_configuration_exists(self, user_input) -> bool:
         """Return True if config already exists in configuration."""
@@ -128,11 +134,11 @@ class AguaIOTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry: config_entries.ConfigEntry):
+    def async_get_options_flow(config_entry: ConfigEntry):
         return AguaIOTOptionsFlowHandler()
 
 
-class AguaIOTOptionsFlowHandler(config_entries.OptionsFlow):
+class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
 
     async def async_step_init(self, _user_input=None):
         """Manage the options."""
@@ -144,6 +150,52 @@ class AguaIOTOptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
+        """Set up AguaIOT entry."""
+        entry = self.config_entry
+
+        api_url = entry.data.get(CONF_API_URL)
+        customer_code = entry.data.get(CONF_CUSTOMER_CODE)
+        email = entry.data.get(CONF_EMAIL)
+        password = entry.data.get(CONF_PASSWORD)
+        gen_uuid = entry.data.get(CONF_UUID)
+        login_api_url = entry.data.get(CONF_LOGIN_API_URL)
+        brand_id = entry.data.get(CONF_BRAND_ID)
+        brand = entry.data.get(CONF_BRAND)
+
+        agua = aguaiot(
+            api_url=api_url,
+            customer_code=customer_code,
+            email=email,
+            password=password,
+            unique_id=gen_uuid,
+            login_api_url=login_api_url,
+            brand_id=brand_id,
+            brand=brand,
+            async_client=get_async_client(self.hass),
+        )
+
+        try:
+            await agua.connect()
+        except UnauthorizedError as e:
+            _LOGGER.error("Agua IOT Unauthorized: %s", e)
+            return False
+        except ConnectionError as e:
+            _LOGGER.error("Connection error to Agua IOT: %s", e)
+            return False
+        except AguaIOTError as e:
+            _LOGGER.error("Unknown Agua IOT error: %s", e)
+            return False
+
+        languages = ["ENG"]
+        if agua.devices:
+            languages = sorted(
+                list(
+                    agua.devices[0].get_register_value_options_languages(
+                        "status_managed_get"
+                    )
+                )
+            )
+
         schema = {
             vol.Optional(
                 "air_temp_fix",
@@ -153,5 +205,9 @@ class AguaIOTOptionsFlowHandler(config_entries.OptionsFlow):
                 "reading_error_fix",
                 default=self.config_entry.options.get("reading_error_fix", False),
             ): bool,
+            vol.Optional(
+                CONF_LANGUAGE,
+                default=self.config_entry.options.get(CONF_LANGUAGE, "ENG"),
+            ): vol.In(languages),
         }
         return self.async_show_form(step_id="user", data_schema=vol.Schema(schema))

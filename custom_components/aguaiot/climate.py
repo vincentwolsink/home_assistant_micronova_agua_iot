@@ -185,14 +185,20 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
         """Return the current running hvac operation."""
         if self._device.get_register_value("status_get") is not None:
             if (
-                str(self._device.get_register_value_description("status_get")).upper()
+                str(
+                    self._device.get_register_value_description(
+                        key="status_get", language="ENG"
+                    )
+                ).upper()
                 in STATUS_IDLE
             ):
                 return HVACAction.IDLE
             elif (
                 self._device.get_register_value("status_get") == 0
                 or str(
-                    self._device.get_register_value_description("status_get")
+                    self._device.get_register_value_description(
+                        key="status_get", language="ENG"
+                    )
                 ).upper()
                 in STATUS_OFF
             ):
@@ -211,7 +217,9 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
             if (
                 self._device.get_register_value("status_get") == 0
                 or str(
-                    self._device.get_register_value_description("status_get")
+                    self._device.get_register_value_description(
+                        key="status_get", language="ENG"
+                    )
                 ).upper()
                 in STATUS_OFF
             ):
@@ -273,7 +281,10 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
         """Turn device off."""
         try:
             await self._device.set_register_value_description(
-                "status_managed_get", "OFF", 170
+                key="status_managed_get",
+                value_description="OFF",
+                value_fallback=170,
+                language="ENG",
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
@@ -283,7 +294,10 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
         """Turn device on."""
         try:
             await self._device.set_register_value_description(
-                "status_managed_get", "ON", 85
+                key="status_managed_get",
+                value_description="ON",
+                value_fallback=85,
+                language="ENG",
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
@@ -437,7 +451,10 @@ class AguaIOTWaterDevice(AguaIOTClimateDevice):
         """Turn device off."""
         try:
             await self._device.set_register_value_description(
-                "status_managed_get", "OFF", 170
+                key="status_managed_get",
+                value_description="OFF",
+                value_fallback=170,
+                language="ENG",
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:
@@ -447,7 +464,10 @@ class AguaIOTWaterDevice(AguaIOTClimateDevice):
         """Turn device on."""
         try:
             await self._device.set_register_value_description(
-                "status_managed_get", "ON", 85
+                key="status_managed_get",
+                value_description="ON",
+                value_fallback=85,
+                language="ENG",
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:

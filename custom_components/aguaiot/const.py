@@ -71,6 +71,7 @@ CONF_UUID = "uuid"
 CONF_ENDPOINT = "endpoint"
 CONF_BRAND_ID = "brand_id"
 CONF_BRAND = "brand"
+CONF_LANGUAGE = "language"
 
 AIR_VARIANTS = ["air", "air2", "air3", "air_palm"]
 WATER_VARIANTS = ["water", "h2o", "h2o_mandata"]
