@@ -432,7 +432,10 @@ class Device(object):
         formula = self.__register_map_dict[item]["formula_inverse"]
         formula = formula.replace("#", str(value))
         formula = formula.replace("Mod", "%")
-        eval_formula = simple_eval(formula)
+        eval_formula = simple_eval(
+            formula,
+            functions={"IF": lambda a, b, c: b if a else c, "int": lambda a: int(a)},
+        )
         value = int(eval_formula)
 
         if limit_value_raw and (float(value) < set_min or float(value) > set_max):
@@ -511,7 +514,13 @@ class Device(object):
 
             formula = register["formula"].replace("#", register["value_raw"])
             formula = formula.replace("Mod", "%")
-            register["value"] = simple_eval(formula)
+            register["value"] = simple_eval(
+                formula,
+                functions={
+                    "IF": lambda a, b, c: b if a else c,
+                    "int": lambda a: int(a),
+                },
+            )
 
             return register
         except (KeyError, ValueError):
