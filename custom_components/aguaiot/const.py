@@ -461,6 +461,13 @@ SENSORS = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TEMPERATURE,
     ),
+    AguaIOTSensorEntityDescription(
+        key="pellet_level_get",
+        name="Pellet Level",
+        native_unit_of_measurement="%",
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:percent",
+    ),
 )
 
 SWITCHES = (
