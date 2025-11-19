@@ -555,6 +555,11 @@ CLIMATE_CANALIZATIONS = (
         icon="mdi:fan",
     ),
     AguaIOTCanalizationEntityDescription(
+        name="Canalization Single",
+        key=r"canalization_single_vent_set",
+        icon="mdi:fan",
+    ),
+    AguaIOTCanalizationEntityDescription(
         name="Vent {id}",
         key=r"vent_(?P<id>(front|rear))_set",
         key_enable="vent_{id}2_enable",
