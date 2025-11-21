@@ -1,7 +1,6 @@
 import logging
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
-    DataUpdateCoordinator,
 )
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.helpers.entity import DeviceInfo
@@ -11,11 +10,9 @@ from .aguaiot import AguaIOTError
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator: DataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
-        "coordinator"
-    ]
-    agua = hass.data[DOMAIN][entry.entry_id]["agua"]
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    coordinator = config_entry.runtime_data
+    agua = coordinator.agua
 
     switches = []
     for device in agua.devices:
@@ -29,9 +26,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class AguaIOTHeatingSwitch(CoordinatorEntity, SwitchEntity):
+    """Switch entity"""
+
+    _attr_has_entity_name = True
+
     def __init__(self, coordinator, device, description):
         """Initialize the thermostat."""
-        CoordinatorEntity.__init__(self, coordinator)
+        super().__init__(coordinator)
         self._device = device
         self.entity_description = description
 

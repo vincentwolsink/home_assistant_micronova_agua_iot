@@ -9,7 +9,6 @@ from homeassistant.util import dt
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
-    DataUpdateCoordinator,
 )
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
@@ -37,11 +36,10 @@ from .aguaiot import AguaIOTError
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator: DataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
-        "coordinator"
-    ]
-    agua = hass.data[DOMAIN][entry.entry_id]["agua"]
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    coordinator = config_entry.runtime_data
+    agua = coordinator.agua
+
     entities = []
     for device in agua.devices:
         stove = AguaIOTAirDevice(coordinator, device)
@@ -130,9 +128,12 @@ class AguaIOTClimateDevice(CoordinatorEntity, ClimateEntity):
 class AguaIOTAirDevice(AguaIOTClimateDevice):
     """Representation of an Agua IOT heating device."""
 
+    _attr_has_entity_name = True
+    _attr_name = None
+
     def __init__(self, coordinator, device):
         """Initialize the thermostat."""
-        CoordinatorEntity.__init__(self, coordinator)
+        super().__init__(coordinator)
         self._enable_turn_on_off_backwards_compatibility = False
         self._device = device
         self._hybrid = "power_wood_set" in device.registers
@@ -161,11 +162,6 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
     def unique_id(self):
         """Return a unique ID."""
         return self._device.id_device
-
-    @property
-    def name(self):
-        """Return the name of the device, if any."""
-        return self._device.name
 
     @property
     def supported_features(self):
@@ -379,9 +375,13 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
 class AguaIOTWaterDevice(AguaIOTClimateDevice):
     """Representation of an Agua IOT heating device."""
 
+    _attr_has_entity_name = True
+    _attr_name = "Water"
+    _attr_icon = "mdi:water"
+
     def __init__(self, coordinator, device, parent):
         """Initialize the thermostat."""
-        CoordinatorEntity.__init__(self, coordinator)
+        super().__init__(coordinator)
         self._enable_turn_on_off_backwards_compatibility = False
         self._device = device
         self._parent = parent
@@ -409,14 +409,6 @@ class AguaIOTWaterDevice(AguaIOTClimateDevice):
     @property
     def unique_id(self):
         return f"{self._device.id_device}_water"
-
-    @property
-    def name(self):
-        return f"{self._device.name} Water"
-
-    @property
-    def icon(self):
-        return "mdi:water"
 
     @property
     def supported_features(self):
@@ -520,8 +512,12 @@ class AguaIOTWaterDevice(AguaIOTClimateDevice):
 
 
 class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
+    """Canalization device"""
+
+    _attr_has_entity_name = True
+
     def __init__(self, coordinator, device, description, parent):
-        CoordinatorEntity.__init__(self, coordinator)
+        super().__init__(coordinator)
         self._enable_turn_on_off_backwards_compatibility = False
         self._device = device
         self._parent = parent
@@ -540,7 +536,7 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
 
     @property
     def name(self):
-        return f"{self._device.name} {self.entity_description.name}"
+        return self.entity_description.name
 
     @property
     def supported_features(self):
