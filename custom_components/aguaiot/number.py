@@ -1,7 +1,6 @@
 import logging
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
-    DataUpdateCoordinator,
 )
 from homeassistant.components.number import NumberEntity
 from homeassistant.helpers.entity import DeviceInfo
@@ -11,11 +10,9 @@ from .aguaiot import AguaIOTError
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator: DataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
-        "coordinator"
-    ]
-    agua = hass.data[DOMAIN][entry.entry_id]["agua"]
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    coordinator = config_entry.runtime_data
+    agua = coordinator.agua
 
     numbers = []
     for device in agua.devices:
@@ -37,9 +34,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class AguaIOTHeatingNumber(CoordinatorEntity, NumberEntity):
+    """Number entity"""
+
+    _attr_has_entity_name = True
+
     def __init__(self, coordinator, device, description):
         """Initialize the thermostat."""
-        CoordinatorEntity.__init__(self, coordinator)
+        super().__init__(coordinator)
         self._device = device
         self.entity_description = description
 
@@ -51,7 +52,7 @@ class AguaIOTHeatingNumber(CoordinatorEntity, NumberEntity):
     @property
     def name(self):
         """Return the name of the device, if any."""
-        return f"{self._device.name} {self.entity_description.name}"
+        return self.entity_description.name
 
     @property
     def device_info(self):
