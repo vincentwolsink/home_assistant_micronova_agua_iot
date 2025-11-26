@@ -4,9 +4,9 @@ import logging
 import uuid
 
 from .aguaiot import (
-    ConnectionError,
+    AguaIOTConnectionError,
     AguaIOTError,
-    UnauthorizedError,
+    AguaIOTUnauthorized,
     aguaiot,
 )
 import voluptuous as vol
@@ -30,6 +30,10 @@ from .const import (
     CONF_BRAND_ID,
     CONF_BRAND,
     CONF_LANGUAGE,
+    CONF_AIR_TEMP_FIX,
+    CONF_READING_ERROR_FIX,
+    CONF_HTTP_TIMEOUT,
+    CONF_BUFFER_READ_TIMEOUT,
     DOMAIN,
     ENDPOINTS,
 )
@@ -91,14 +95,14 @@ class AguaIOTConfigFlow(ConfigFlow, domain=DOMAIN):
                     async_client=get_async_client(self.hass),
                 )
                 await agua.connect()
-            except UnauthorizedError as e:
+            except AguaIOTUnauthorized as e:
                 _LOGGER.error("Agua IOT Unauthorized: %s", e)
                 errors["base"] = "unauthorized"
-            except ConnectionError as e:
-                _LOGGER.error("Connection error to Agua IOT: %s", e)
+            except AguaIOTConnectionError as e:
+                _LOGGER.error("Agua IOT Connection error: %s", e)
                 errors["base"] = "connection_error"
             except AguaIOTError as e:
-                _LOGGER.error("Unknown Agua IOT error: %s", e)
+                _LOGGER.error("Agua IOT error: %s", e)
                 errors["base"] = "unknown_error"
 
             if "base" not in errors:
@@ -175,14 +179,15 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
 
         try:
             await agua.connect()
-        except UnauthorizedError as e:
+            await agua.update()
+        except AguaIOTUnauthorized as e:
             _LOGGER.error("Agua IOT Unauthorized: %s", e)
             return False
-        except ConnectionError as e:
-            _LOGGER.error("Connection error to Agua IOT: %s", e)
+        except AguaIOTConnectionError as e:
+            _LOGGER.error("Agua IOT Connection error: %s", e)
             return False
         except AguaIOTError as e:
-            _LOGGER.error("Unknown Agua IOT error: %s", e)
+            _LOGGER.error("Agua IOT error: %s", e)
             return False
 
         languages = ["ENG"]
@@ -197,13 +202,21 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
 
         schema = {
             vol.Optional(
-                "air_temp_fix",
-                default=self.config_entry.options.get("air_temp_fix", False),
+                CONF_AIR_TEMP_FIX,
+                default=self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
             ): bool,
             vol.Optional(
-                "reading_error_fix",
-                default=self.config_entry.options.get("reading_error_fix", False),
+                CONF_READING_ERROR_FIX,
+                default=self.config_entry.options.get(CONF_READING_ERROR_FIX, False),
             ): bool,
+            vol.Optional(
+                CONF_HTTP_TIMEOUT,
+                default=self.config_entry.options.get(CONF_HTTP_TIMEOUT, 30),
+            ): vol.All(vol.Coerce(int), vol.Range(max=60)),
+            vol.Optional(
+                CONF_BUFFER_READ_TIMEOUT,
+                default=self.config_entry.options.get(CONF_BUFFER_READ_TIMEOUT, 30),
+            ): vol.All(vol.Coerce(int), vol.Range(max=60)),
             vol.Optional(
                 CONF_LANGUAGE,
                 default=self.config_entry.options.get(CONF_LANGUAGE, "ENG"),
