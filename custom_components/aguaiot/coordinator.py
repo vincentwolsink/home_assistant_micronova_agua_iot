@@ -12,9 +12,10 @@ from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.helpers.httpx_client import get_async_client
 
 from .aguaiot import (
-    ConnectionError,
+    AguaIOTConnectionError,
     AguaIOTError,
-    UnauthorizedError,
+    AguaIOTUnauthorized,
+    AguaIOTTimeout,
     aguaiot,
 )
 
@@ -26,6 +27,10 @@ from .const import (
     CONF_BRAND_ID,
     CONF_BRAND,
     CONF_LANGUAGE,
+    CONF_AIR_TEMP_FIX,
+    CONF_READING_ERROR_FIX,
+    CONF_HTTP_TIMEOUT,
+    CONF_BUFFER_READ_TIMEOUT,
     DOMAIN,
     UPDATE_INTERVAL,
 )
@@ -59,9 +64,11 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         login_api_url = config_entry.data.get(CONF_LOGIN_API_URL)
         brand_id = config_entry.data.get(CONF_BRAND_ID)
         brand = config_entry.data.get(CONF_BRAND)
-        air_temp_fix = config_entry.options.get("air_temp_fix", False)
-        reading_error_fix = config_entry.options.get("reading_error_fix", False)
+        air_temp_fix = config_entry.options.get(CONF_AIR_TEMP_FIX, False)
+        reading_error_fix = config_entry.options.get(CONF_READING_ERROR_FIX, False)
         language = config_entry.options.get(CONF_LANGUAGE)
+        http_timeout = config_entry.options.get(CONF_HTTP_TIMEOUT)
+        buffer_read_timeout = config_entry.options.get(CONF_BUFFER_READ_TIMEOUT)
 
         self.agua = aguaiot(
             api_url=api_url,
@@ -76,32 +83,33 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
             air_temp_fix=air_temp_fix,
             reading_error_fix=reading_error_fix,
             language=language,
+            http_timeout=http_timeout,
+            buffer_read_timeout=buffer_read_timeout,
         )
 
     async def _async_setup(self) -> None:
         """Connect to the AguaIOT platform"""
         try:
             await self.agua.connect()
-        except UnauthorizedError as e:
-            _LOGGER.error("Agua IOT Unauthorized: %s", e)
-            raise UpdateFailed("Agua IOT Unauthorized: %s", e) from e
-        except ConnectionError as e:
-            _LOGGER.error("Connection error to Agua IOT: %s", e)
-            raise UpdateFailed("Connection error to Agua IOT: %s", e) from e
+            await self.agua.update()
+        except AguaIOTUnauthorized as e:
+            raise UpdateFailed(f"Agua IOT Unauthorized: {e}") from e
+        except AguaIOTConnectionError as e:
+            raise UpdateFailed(f"Agua IOT Connection error: {e}") from e
+        except AguaIOTTimeout as e:
+            raise UpdateFailed(f"Agua IOT Timeout: {e}") from e
         except AguaIOTError as e:
-            _LOGGER.error("Unknown Agua IOT error: %s", e)
-            raise UpdateFailed("Unknown Agua IOT error: %s", e) from e
+            raise UpdateFailed(f"Agua IOT error: {e}") from e
 
     async def _async_update_data(self) -> None:
         """Get the latest data."""
         try:
             await self.agua.update()
-        except UnauthorizedError as e:
-            _LOGGER.error("Agua IOT Unauthorized: %s", e)
-            raise UpdateFailed("Agua IOT Unauthorized: %s", e) from e
-        except ConnectionError as e:
-            _LOGGER.error("Connection error to Agua IOT: %s", e)
-            raise UpdateFailed("Connection error to Agua IOT: %s", e) from e
+        except AguaIOTUnauthorized as e:
+            raise UpdateFailed(f"Agua IOT Unauthorized: {e}") from e
+        except AguaIOTConnectionError as e:
+            raise UpdateFailed(f"Agua IOT Connection error: {e}") from e
+        except AguaIOTTimeout as e:
+            raise UpdateFailed(f"Agua IOT Timeout: {e}") from e
         except AguaIOTError as e:
-            _LOGGER.error("Unknown Agua IOT error: %s", e)
-            raise UpdateFailed("Unknown Agua IOT error: %s", e) from e
+            raise UpdateFailed(f"Agua IOT error: {e}") from e

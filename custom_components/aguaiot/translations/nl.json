@@ -32,7 +32,9 @@
                 "data": {
                     "air_temp_fix": "[Jolly Mec] Negeer foutieve air temperature bij gebruik van een externe thermostaat.",
                     "reading_error_fix": "[Bronpi] Filter foutieve waardes (wanneer kachel geen stroom heeft).",
-                    "language": "Taal voor beschrijvingen"
+                    "http_timeout": "Timeout voor API verzoeken (seconden).",
+                    "buffer_read_timeout": "Timeout voor kachel buffer uitlezen (seconden).",
+                    "language": "Taal voor beschrijvingen."
                 }
             }
         }

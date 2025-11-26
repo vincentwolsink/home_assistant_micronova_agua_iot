@@ -36,7 +36,9 @@
         "data": {
           "air_temp_fix": "[Jolly Mec] Ignore incorrect air temperature when using external themostat.",
           "reading_error_fix": "[Bronpi] Filter incorrect readings (when stove is without power).",
-          "language": "Language for descriptions"
+          "http_timeout": "Timeout for API calls (seconds).",
+          "buffer_read_timeout": "Timeout for stove buffer reading (seconds).",
+          "language": "Language for descriptions."
         }
       }
     }
