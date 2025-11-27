@@ -499,6 +499,12 @@ SWITCHES = (
         icon="mdi:speedometer",
         device_class=SwitchDeviceClass.SWITCH,
     ),
+    SwitchEntityDescription(
+        key="eco_stop_set",
+        name="ECO Stop",
+        icon="mdi:leaf-off",
+        device_class=SwitchDeviceClass.SWITCH,
+    ),
 )
 
 NUMBERS = (
@@ -538,6 +544,15 @@ NUMBERS = (
         icon="mdi:fire",
         native_step=1,
         hybrid_only=True,
+    ),
+    AguaIOTNumberEntityDescription(
+        key="eco_temp_stop",
+        name="ECO Stop Time",
+        native_step=1,
+        native_unit_of_measurement="min",
+        native_min_value=0,
+        native_max_value=30,
+        force_enabled=True,
     ),
 )
 
