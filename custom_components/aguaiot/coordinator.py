@@ -91,7 +91,6 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         """Connect to the AguaIOT platform"""
         try:
             await self.agua.connect()
-            await self.agua.update()
         except AguaIOTUnauthorized as e:
             raise UpdateFailed(f"Agua IOT Unauthorized: {e}") from e
         except AguaIOTConnectionError as e:

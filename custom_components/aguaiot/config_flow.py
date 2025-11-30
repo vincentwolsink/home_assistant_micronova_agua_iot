@@ -142,7 +142,6 @@ class AguaIOTConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
-
     async def async_step_init(self, _user_input=None):
         """Manage the options."""
         return await self.async_step_user()
