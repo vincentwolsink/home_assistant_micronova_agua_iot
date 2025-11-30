@@ -399,18 +399,27 @@ class Device(object):
 
         async def buffer_read_loop(id_request):
             url = self.__aguaiot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
-
             sleep_secs = 1
-            while True:
-                res_get = await self.__aguaiot.handle_webcall("GET", url, {})
-                if (
-                    "jobAnswerStatus" in res_get
-                    and res_get["jobAnswerStatus"] == "completed"
-                ):
-                    return res_get
+            attempts = 1
 
-                await asyncio.sleep(sleep_secs)
-                sleep_secs += 1
+            try:
+                while True:
+                    await asyncio.sleep(sleep_secs)
+
+                    _LOGGER.debug("BUFFER READ (%s) ATTEMPT %s", id_request, attempts)
+                    res_get = await self.__aguaiot.handle_webcall("GET", url, {})
+                    _LOGGER.debug(
+                        "BUFFER READ (%s) STATUS: %s",
+                        id_request,
+                        res_get.get("jobAnswerStatus"),
+                    )
+                    if res_get.get("jobAnswerStatus", "") != "waiting":
+                        return res_get
+
+                    sleep_secs += 1
+                    attempts += 1
+            except asyncio.CancelledError:
+                raise
 
         try:
             res = await asyncio.wait_for(
@@ -422,8 +431,12 @@ class Device(object):
                 f"Timeout on waiting device buffer read to complete within {self.__aguaiot.buffer_read_timeout} seconds."
             )
 
-        if res is False:
+        if not res:
             raise AguaIOTError("Error while reading device buffer response.")
+        elif res.get("jobAnswerStatus", "") == "terminated":
+            raise AguaIOTError(
+                "Error while reading device buffer response: Cloud terminated request."
+            )
 
         current_i = 0
         information_dict = dict()
