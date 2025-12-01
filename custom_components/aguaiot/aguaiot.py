@@ -535,8 +535,9 @@ class Device(object):
         return list(self.__register_map_dict.keys())
 
     def get_register(self, key):
+        register = self.__register_map_dict.get(key, {})
+
         try:
-            register = self.__register_map_dict[key]
             register["value_raw"] = str(
                 self.__information_dict[register["offset"]] & register["mask"]
             )
@@ -550,10 +551,10 @@ class Device(object):
                     "int": lambda a: int(a),
                 },
             )
-
-            return register
         except (KeyError, ValueError):
-            return {}
+            pass
+
+        return register
 
     def get_register_value(self, key):
         value = self.get_register(key).get("value")
