@@ -15,7 +15,7 @@ from .aguaiot import (
     AguaIOTConnectionError,
     AguaIOTError,
     AguaIOTUnauthorized,
-    AguaIOTTimeout,
+    AguaIOTUpdateError,
     aguaiot,
 )
 
@@ -93,12 +93,12 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         """Connect to the AguaIOT platform"""
         try:
             await self.agua.connect()
+        except AguaIOTUpdateError as e:
+            _LOGGER.warning("Agua IOT Update error: %s", e)
         except AguaIOTUnauthorized as e:
             raise UpdateFailed(f"Agua IOT Unauthorized: {e}") from e
         except AguaIOTConnectionError as e:
             raise UpdateFailed(f"Agua IOT Connection error: {e}") from e
-        except AguaIOTTimeout as e:
-            raise UpdateFailed(f"Agua IOT Timeout: {e}") from e
         except AguaIOTError as e:
             raise UpdateFailed(f"Agua IOT error: {e}") from e
 
@@ -106,11 +106,11 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         """Get the latest data."""
         try:
             await self.agua.update()
+        except AguaIOTUpdateError as e:
+            _LOGGER.warning("Agua IOT Update error: %s", e)
         except AguaIOTUnauthorized as e:
             raise UpdateFailed(f"Agua IOT Unauthorized: {e}") from e
         except AguaIOTConnectionError as e:
             raise UpdateFailed(f"Agua IOT Connection error: {e}") from e
-        except AguaIOTTimeout as e:
-            raise UpdateFailed(f"Agua IOT Timeout: {e}") from e
         except AguaIOTError as e:
             raise UpdateFailed(f"Agua IOT error: {e}") from e
