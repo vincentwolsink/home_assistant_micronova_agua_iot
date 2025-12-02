@@ -223,7 +223,7 @@ class aguaiot(object):
 
         if response.status_code != 201:
             _LOGGER.warning("Refresh auth token failed, forcing new login...")
-            self.login()
+            await self.login()
             return
 
         res = response.json()
@@ -413,7 +413,7 @@ class Device(object):
                         id_request,
                         res_get.get("jobAnswerStatus"),
                     )
-                    if res_get.get("jobAnswerStatus", "") != "waiting":
+                    if res_get.get("jobAnswerStatus") != "waiting":
                         return res_get
 
                     sleep_secs += 1
@@ -427,29 +427,31 @@ class Device(object):
                 self.__aguaiot.buffer_read_timeout,
             )
         except asyncio.TimeoutError:
-            raise AguaIOTTimeout(
+            raise AguaIOTUpdateError(
                 f"Timeout on waiting device buffer read to complete within {self.__aguaiot.buffer_read_timeout} seconds."
             )
 
         if not res:
-            raise AguaIOTError("Error while reading device buffer response.")
-        elif res.get("jobAnswerStatus", "") == "terminated":
-            raise AguaIOTError(
-                "Error while reading device buffer response: Cloud terminated request."
+            raise AguaIOTUpdateError("Error while reading device buffer response.")
+
+        if res.get("jobAnswerStatus") == "completed":
+            current_i = 0
+            information_dict = dict()
+            try:
+                for item in res["jobAnswerData"]["Items"]:
+                    information_dict.update(
+                        {item: res["jobAnswerData"]["Values"][current_i]}
+                    )
+                    current_i = current_i + 1
+            except KeyError:
+                raise AguaIOTUpdateError("Error in data received from device.")
+
+            self.__information_dict = information_dict
+        else:
+            raise AguaIOTUpdateError(
+                "Received unexpected 'jobAnswerStatus' while reading buffers: %s",
+                res.get("jobAnswerStatus"),
             )
-
-        current_i = 0
-        information_dict = dict()
-        try:
-            for item in res["jobAnswerData"]["Items"]:
-                information_dict.update(
-                    {item: res["jobAnswerData"]["Values"][current_i]}
-                )
-                current_i = current_i + 1
-        except KeyError:
-            raise AguaIOTError("Error in data received from device.")
-
-        self.__information_dict = information_dict
 
     def __prepare_value_for_writing(self, item, value, limit_value_raw=False):
         set_min = self.__register_map_dict[item]["set_min"]
@@ -703,8 +705,8 @@ class AguaIOTConnectionError(AguaIOTError):
         super().__init__(message)
 
 
-class AguaIOTTimeout(AguaIOTError):
-    """Connection error"""
+class AguaIOTUpdateError(AguaIOTError):
+    """Update error"""
 
     def __init__(self, message):
         super().__init__(message)
