@@ -449,8 +449,7 @@ class Device(object):
             self.__information_dict = information_dict
         else:
             raise AguaIOTUpdateError(
-                "Received unexpected 'jobAnswerStatus' while reading buffers: %s",
-                res.get("jobAnswerStatus"),
+                f"Received unexpected 'jobAnswerStatus' while reading buffers: {res.get('jobAnswerStatus')}"
             )
 
     def __prepare_value_for_writing(self, item, value, limit_value_raw=False):
