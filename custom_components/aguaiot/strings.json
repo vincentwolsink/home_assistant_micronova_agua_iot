@@ -38,7 +38,8 @@
           "reading_error_fix": "[Bronpi] Filter incorrect readings (when stove is without power).",
           "http_timeout": "Timeout for API calls (seconds).",
           "buffer_read_timeout": "Timeout for stove buffer reading (seconds).",
-          "language": "Language for descriptions."
+          "language": "Language for descriptions.",
+          "update_interval": "Time between updates (seconds)."
         }
       }
     }

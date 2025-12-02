@@ -32,6 +32,7 @@ from .const import (
     CONF_LANGUAGE,
     CONF_AIR_TEMP_FIX,
     CONF_READING_ERROR_FIX,
+    CONF_UPDATE_INTERVAL,
     CONF_HTTP_TIMEOUT,
     CONF_BUFFER_READ_TIMEOUT,
     DOMAIN,
@@ -178,7 +179,6 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
 
         try:
             await agua.connect()
-            await agua.update()
         except AguaIOTUnauthorized as e:
             _LOGGER.error("Agua IOT Unauthorized: %s", e)
             return False
@@ -208,6 +208,10 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                 CONF_READING_ERROR_FIX,
                 default=self.config_entry.options.get(CONF_READING_ERROR_FIX, False),
             ): bool,
+            vol.Optional(
+                CONF_UPDATE_INTERVAL,
+                default=self.config_entry.options.get(CONF_UPDATE_INTERVAL, 60),
+            ): vol.All(vol.Coerce(int), vol.Range(min=10)),
             vol.Optional(
                 CONF_HTTP_TIMEOUT,
                 default=self.config_entry.options.get(CONF_HTTP_TIMEOUT, 30),

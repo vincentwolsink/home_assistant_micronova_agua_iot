@@ -73,6 +73,7 @@ CONF_BRAND = "brand"
 CONF_LANGUAGE = "language"
 CONF_AIR_TEMP_FIX = "air_temp_fix"
 CONF_READING_ERROR_FIX = "reading_error_fix"
+CONF_UPDATE_INTERVAL = "update_interval"
 CONF_HTTP_TIMEOUT = "http_timeout"
 CONF_BUFFER_READ_TIMEOUT = "buffer_read_timeout"
 
@@ -106,8 +107,6 @@ PLATFORMS = [
     Platform.NUMBER,
     Platform.SELECT,
 ]
-
-UPDATE_INTERVAL = 60
 
 ENDPOINTS = {
     "Alfapalm": {
