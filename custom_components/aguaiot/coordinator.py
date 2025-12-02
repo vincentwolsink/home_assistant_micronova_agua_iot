@@ -94,7 +94,7 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         try:
             await self.agua.connect()
         except AguaIOTUpdateError as e:
-            _LOGGER.warning("Agua IOT Update error: %s", e)
+            _LOGGER.error("Agua IOT Update error: %s", e)
         except AguaIOTUnauthorized as e:
             raise UpdateFailed(f"Agua IOT Unauthorized: {e}") from e
         except AguaIOTConnectionError as e:
@@ -107,7 +107,7 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         try:
             await self.agua.update()
         except AguaIOTUpdateError as e:
-            _LOGGER.warning("Agua IOT Update error: %s", e)
+            _LOGGER.error("Agua IOT Update error: %s", e)
         except AguaIOTUnauthorized as e:
             raise UpdateFailed(f"Agua IOT Unauthorized: {e}") from e
         except AguaIOTConnectionError as e:
