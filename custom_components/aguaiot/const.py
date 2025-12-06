@@ -241,6 +241,12 @@ ENDPOINTS = {
         CONF_CUSTOMER_CODE: "046629",
         CONF_API_URL: "https://timsistem.agua-iot.com",
     },
+    "TurboFonte": {
+        CONF_CUSTOMER_CODE: "354924",
+        CONF_API_URL: "https://remote.mcz.it",
+        CONF_BRAND_ID: "2",
+        CONF_BRAND: "turbofonte",
+    },
     "Wi-Phire": {
         CONF_CUSTOMER_CODE: "521228",
         CONF_API_URL: "https://lineavz.agua-iot.com",
