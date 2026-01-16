@@ -477,6 +477,22 @@ SENSORS = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:percent",
     ),
+    AguaIOTSensorEntityDescription(
+        key="p_quality_p12_get",
+        name="Pellet Quality",
+        icon="mdi:quality-high",
+        native_unit_of_measurement=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=None,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="c_quality_p12_get",
+        name="Combustion Quality",
+        icon="mdi:fire-circle",
+        native_unit_of_measurement=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=None,
+    ),
 )
 
 SWITCHES = (
@@ -558,6 +574,18 @@ NUMBERS = (
         native_min_value=0,
         native_max_value=30,
         force_enabled=True,
+    ),
+    AguaIOTNumberEntityDescription(
+        key="p_quality_p12_set",
+        name="Pellet Quality",
+        icon="mdi:quality-high",
+        native_step=1,
+    ),
+    AguaIOTNumberEntityDescription(
+        key="c_quality_p12_set",
+        name="Combustion Quality",
+        icon="mdi:fire-circle",
+        native_step=1,
     ),
 )
 
