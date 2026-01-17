@@ -4,6 +4,7 @@ from homeassistant.const import (
     Platform,
     UnitOfTemperature,
     UnitOfPressure,
+    UnitOfTime,
     REVOLUTIONS_PER_MINUTE,
 )
 from homeassistant.components.binary_sensor import (
@@ -492,6 +493,22 @@ SENSORS = (
         native_unit_of_measurement=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=None,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="ore_lavoro_tot_get",
+        name="Total Hours",
+        icon="mdi:clock-outline",
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        device_class=SensorDeviceClass.DURATION,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="ore_lavoro_par_get",
+        name="Partial Hours",
+        icon="mdi:clock-outline",
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        device_class=SensorDeviceClass.DURATION,
     ),
 )
 
