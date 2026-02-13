@@ -609,7 +609,7 @@ NUMBERS = (
 CLIMATE_CANALIZATIONS = (
     AguaIOTCanalizationEntityDescription(
         name="Multifire {id}",
-        key=r"multifire_(?P<id>\d+)_set",
+        key=r"multifire_(?P<id>\d+)(_\d+)?_set",
         icon="mdi:fan",
     ),
     AguaIOTCanalizationEntityDescription(
@@ -646,8 +646,13 @@ CLIMATE_CANALIZATIONS = (
         icon="mdi:fan",
     ),
     AguaIOTCanalizationEntityDescription(
-        name="Multifire",
+        name="Sweet Air",
         key="vent_front_sweetair_set",
+        icon="mdi:fan",
+    ),
+    AguaIOTCanalizationEntityDescription(
+        name="Sweet Air {id}",
+        key=r"sweetair_(?P<id>\d+)(_\d+)?_set",
         icon="mdi:fan",
     ),
 )
