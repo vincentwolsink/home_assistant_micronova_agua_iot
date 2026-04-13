@@ -93,7 +93,9 @@ After that bootstrap data is cached in Home Assistant, reads and writes can run 
 2. Make sure Home Assistant can reach the stove over Bluetooth, either directly or through a Bluetooth proxy close to the stove.
 3. Open the integration options.
 4. Change `Connection mode` to `Bluetooth local`.
-5. Leave the default BLE service / characteristic UUIDs unless you know your module uses different ones.
+5. Submit the form and let Home Assistant auto-detect and validate the nearby Micronova BLE module.
+
+The options flow performs a real BLE validation before it accepts the local mode, so a successful save means the module was detected and the local transport was able to talk to it.
 
 ### Current scope and limitations
 
