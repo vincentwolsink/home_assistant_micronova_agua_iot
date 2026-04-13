@@ -166,7 +166,9 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
             "brand": entry.data.get(CONF_BRAND),
             "async_client": get_async_client(self.hass),
             "air_temp_fix": self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
-            "reading_error_fix": self.config_entry.options.get(CONF_READING_ERROR_FIX, False),
+            "reading_error_fix": self.config_entry.options.get(
+                CONF_READING_ERROR_FIX, False
+            ),
             "language": self.config_entry.options.get(CONF_LANGUAGE, "ENG"),
             "http_timeout": self.config_entry.options.get(CONF_HTTP_TIMEOUT, 30),
             "buffer_read_timeout": self.config_entry.options.get(
@@ -272,7 +274,9 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
         if user_input is not None:
             connection_mode = user_input.get(
                 CONF_CONNECTION_MODE,
-                self.config_entry.options.get(CONF_CONNECTION_MODE, CONNECTION_MODE_CLOUD),
+                self.config_entry.options.get(
+                    CONF_CONNECTION_MODE, CONNECTION_MODE_CLOUD
+                ),
             )
             try:
                 agua = self._build_client(connection_mode)

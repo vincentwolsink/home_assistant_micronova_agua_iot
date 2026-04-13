@@ -15,7 +15,13 @@ from bleak_retry_connector import BleakClientWithServiceCache, establish_connect
 from homeassistant.components import bluetooth
 from homeassistant.core import HomeAssistant
 
-from .aguaiot import AguaIOTConnectionError, AguaIOTError, AguaIOTUpdateError, Device, aguaiot
+from .aguaiot import (
+    AguaIOTConnectionError,
+    AguaIOTError,
+    AguaIOTUpdateError,
+    Device,
+    aguaiot,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -145,7 +151,9 @@ class LocalBleAguaIOT:
     async def validate_local_connection(self) -> dict[str, Any]:
         """Detect and validate the local BLE module for the first configured stove."""
         if not self.devices:
-            raise AguaIOTError("No Micronova devices are available for local Bluetooth.")
+            raise AguaIOTError(
+                "No Micronova devices are available for local Bluetooth."
+            )
 
         device = self.devices[0]
         async with self._device_session(device) as session:
@@ -161,7 +169,8 @@ class LocalBleAguaIOT:
                 "device_name": device.name,
                 "module_address": session.connected_address
                 or self._device_ble_address(device),
-                "module_name": session.connected_name or self._expected_local_name(device),
+                "module_name": session.connected_name
+                or self._expected_local_name(device),
                 "buffer_ids": buffer_ids,
             }
             _LOGGER.info(
@@ -301,9 +310,7 @@ class LocalBleAguaIOT:
                 # Prime the local session the same way the vendor app does:
                 # it reads buffers before sending writes.
                 await session.get_buffer_reading(buffer_ids[0])
-            response = await session.exchange(
-                self._make_enveloped_command(payload)
-            )
+            response = await session.exchange(self._make_enveloped_command(payload))
             payload = response.get("pl", {})
             if payload.get("NackErrCode") is not None:
                 raise AguaIOTError(
@@ -447,9 +454,8 @@ class LocalBleAguaIOT:
                     )
                     return service_info.device
 
-                if (
-                    fallback_prefix_device is None
-                    and service_name.startswith(DEFAULT_NAME_PREFIX)
+                if fallback_prefix_device is None and service_name.startswith(
+                    DEFAULT_NAME_PREFIX
                 ):
                     fallback_prefix_device = service_info.device
 
@@ -539,7 +545,9 @@ class _BleMicronovaSession:
         if isinstance(self._resolved_target, str):
             return self._resolved_target.upper()
 
-        if self._resolved_target is not None and getattr(self._resolved_target, "address", None):
+        if self._resolved_target is not None and getattr(
+            self._resolved_target, "address", None
+        ):
             return str(self._resolved_target.address).upper()
 
         return None
@@ -596,7 +604,9 @@ class _BleMicronovaSession:
 
     async def identity(self) -> dict[str, Any]:
         """Authenticate the BLE session."""
-        response = await self.exchange(self._transport._make_identity_command(self._device))
+        response = await self.exchange(
+            self._transport._make_identity_command(self._device)
+        )
         payload = response.get("pl", {})
         if payload.get("NackErrCode") is not None:
             raise AguaIOTError(
@@ -657,13 +667,17 @@ class _BleMicronovaSession:
         assert self._client is not None
         assert self._characteristic_uuid is not None
 
-        body = json.dumps(obj, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-        header = b"JSON" + struct.pack("<H", len(body)) + b"\xF9\x01"
+        body = json.dumps(obj, separators=(",", ":"), ensure_ascii=False).encode(
+            "utf-8"
+        )
+        header = b"JSON" + struct.pack("<H", len(body)) + b"\xf9\x01"
 
         self._response_ready.clear()
         self._notif_len = None
 
-        await self._client.write_gatt_char(self._characteristic_uuid, header, response=True)
+        await self._client.write_gatt_char(
+            self._characteristic_uuid, header, response=True
+        )
 
         mtu = getattr(self._client, "mtu_size", 23) or 23
         chunk_size = max(20, mtu - 3)

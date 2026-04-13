@@ -223,7 +223,11 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
         status_value = self._device.get_register_value("status_get")
         if status_value is not None:
             description = self._status_description_upper()
-            if self._is_alarm_like_status() or status_value == 0 or description in STATUS_OFF:
+            if (
+                self._is_alarm_like_status()
+                or status_value == 0
+                or description in STATUS_OFF
+            ):
                 return HVACMode.OFF
             return HVACMode.HEAT
 
