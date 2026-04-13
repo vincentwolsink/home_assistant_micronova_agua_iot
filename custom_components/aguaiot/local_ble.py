@@ -142,6 +142,37 @@ class LocalBleAguaIOT:
         for dev in self.devices:
             await dev.update()
 
+    async def validate_local_connection(self) -> dict[str, Any]:
+        """Detect and validate the local BLE module for the first configured stove."""
+        if not self.devices:
+            raise AguaIOTError("No Micronova devices are available for local Bluetooth.")
+
+        device = self.devices[0]
+        async with self._device_session(device) as session:
+            await session.identity()
+            buffer_ids = await session.get_buffer_ids()
+            if not buffer_ids:
+                raise AguaIOTUpdateError(
+                    f"Bluetooth validation succeeded but no buffer IDs were returned for '{device.name}'."
+                )
+
+            await session.get_buffer_reading(buffer_ids[0])
+            result = {
+                "device_name": device.name,
+                "module_address": session.connected_address
+                or self._device_ble_address(device),
+                "module_name": session.connected_name or self._expected_local_name(device),
+                "buffer_ids": buffer_ids,
+            }
+            _LOGGER.info(
+                "Validated Micronova BLE module for '%s' via %s (%s), buffer_ids=%s",
+                device.name,
+                result["module_address"],
+                result["module_name"],
+                buffer_ids,
+            )
+            return result
+
     async def _bootstrap_from_cloud(self) -> None:
         """Fetch device metadata and register mappings once via the cloud API."""
         cloud = aguaiot(
@@ -456,10 +487,12 @@ class _BleMicronovaSession:
         self._characteristic_uuid: str | None = None
         self._response_ready = asyncio.Event()
         self._notif_len: int | None = None
+        self._resolved_target: Any = None
 
     async def __aenter__(self) -> "_BleMicronovaSession":
         await self._transport._command_lock.acquire()
         ble_device = await self._transport._async_get_ble_device(self._device)
+        self._resolved_target = ble_device
 
         try:
             self._client = await establish_connection(
@@ -496,6 +529,32 @@ class _BleMicronovaSession:
                     await self._client.disconnect()
             finally:
                 self._transport._command_lock.release()
+
+    @property
+    def connected_address(self) -> str | None:
+        """Return the resolved BLE address for the session."""
+        if self._client and getattr(self._client, "address", None):
+            return str(self._client.address).upper()
+
+        if isinstance(self._resolved_target, str):
+            return self._resolved_target.upper()
+
+        if self._resolved_target is not None and getattr(self._resolved_target, "address", None):
+            return str(self._resolved_target.address).upper()
+
+        return None
+
+    @property
+    def connected_name(self) -> str | None:
+        """Return the resolved BLE local name for the session."""
+        if self._resolved_target is None:
+            return None
+
+        if isinstance(self._resolved_target, str):
+            return None
+
+        name = getattr(self._resolved_target, "name", None)
+        return str(name) if name else None
 
     def _resolve_characteristic_uuid(self) -> str:
         """Pick the characteristic used as the JSON tunnel."""
