@@ -9,6 +9,7 @@ from .aguaiot import (
     AguaIOTUnauthorized,
     aguaiot,
 )
+from .local_ble import DEFAULT_CHAR_UUID, DEFAULT_SERVICE_UUID, LocalBleAguaIOT
 import voluptuous as vol
 
 from homeassistant.config_entries import (
@@ -23,6 +24,10 @@ from homeassistant.helpers.httpx_client import get_async_client
 
 from .const import (
     CONF_API_URL,
+    CONF_BLE_BOOTSTRAP_DEVICES,
+    CONF_BLE_CHAR_UUID,
+    CONF_BLE_SERVICE_UUID,
+    CONF_CONNECTION_MODE,
     CONF_CUSTOMER_CODE,
     CONF_LOGIN_API_URL,
     CONF_UUID,
@@ -35,6 +40,8 @@ from .const import (
     CONF_UPDATE_INTERVAL,
     CONF_HTTP_TIMEOUT,
     CONF_BUFFER_READ_TIMEOUT,
+    CONNECTION_MODE_BLUETOOTH,
+    CONNECTION_MODE_CLOUD,
     DOMAIN,
     ENDPOINTS,
 )
@@ -164,18 +171,39 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
         login_api_url = entry.data.get(CONF_LOGIN_API_URL)
         brand_id = entry.data.get(CONF_BRAND_ID)
         brand = entry.data.get(CONF_BRAND)
-
-        agua = aguaiot(
-            api_url=api_url,
-            customer_code=customer_code,
-            email=email,
-            password=password,
-            unique_id=gen_uuid,
-            login_api_url=login_api_url,
-            brand_id=brand_id,
-            brand=brand,
-            async_client=get_async_client(self.hass),
+        connection_mode = self.config_entry.options.get(
+            CONF_CONNECTION_MODE, CONNECTION_MODE_CLOUD
         )
+        cached_devices = entry.data.get(CONF_BLE_BOOTSTRAP_DEVICES)
+        ble_service_uuid = self.config_entry.options.get(
+            CONF_BLE_SERVICE_UUID, DEFAULT_SERVICE_UUID
+        )
+        ble_char_uuid = self.config_entry.options.get(
+            CONF_BLE_CHAR_UUID, DEFAULT_CHAR_UUID
+        )
+
+        agua_kwargs = {
+            "api_url": api_url,
+            "customer_code": customer_code,
+            "email": email,
+            "password": password,
+            "unique_id": gen_uuid,
+            "login_api_url": login_api_url,
+            "brand_id": brand_id,
+            "brand": brand,
+            "async_client": get_async_client(self.hass),
+        }
+
+        if connection_mode == CONNECTION_MODE_BLUETOOTH:
+            agua = LocalBleAguaIOT(
+                hass=self.hass,
+                cached_devices=cached_devices,
+                service_uuid=ble_service_uuid,
+                char_uuid=ble_char_uuid,
+                **agua_kwargs,
+            )
+        else:
+            agua = aguaiot(**agua_kwargs)
 
         try:
             await agua.connect()
@@ -220,6 +248,29 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                 CONF_BUFFER_READ_TIMEOUT,
                 default=self.config_entry.options.get(CONF_BUFFER_READ_TIMEOUT, 30),
             ): vol.All(vol.Coerce(int), vol.Range(max=60)),
+            vol.Optional(
+                CONF_CONNECTION_MODE,
+                default=self.config_entry.options.get(
+                CONF_CONNECTION_MODE, CONNECTION_MODE_CLOUD
+                ),
+            ): vol.In(
+                {
+                    CONNECTION_MODE_CLOUD: "Cloud (Micronova API)",
+                    CONNECTION_MODE_BLUETOOTH: "Bluetooth local (experimental)",
+                }
+            ),
+            vol.Optional(
+                CONF_BLE_SERVICE_UUID,
+                default=self.config_entry.options.get(
+                    CONF_BLE_SERVICE_UUID, DEFAULT_SERVICE_UUID
+                ),
+            ): str,
+            vol.Optional(
+                CONF_BLE_CHAR_UUID,
+                default=self.config_entry.options.get(
+                    CONF_BLE_CHAR_UUID, DEFAULT_CHAR_UUID
+                ),
+            ): str,
             vol.Optional(
                 CONF_LANGUAGE,
                 default=self.config_entry.options.get(CONF_LANGUAGE, "ENG"),

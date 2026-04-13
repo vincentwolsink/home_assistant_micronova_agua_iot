@@ -18,9 +18,14 @@ from .aguaiot import (
     AguaIOTUpdateError,
     aguaiot,
 )
+from .local_ble import DEFAULT_CHAR_UUID, DEFAULT_SERVICE_UUID, LocalBleAguaIOT
 
 from .const import (
     CONF_API_URL,
+    CONF_BLE_BOOTSTRAP_DEVICES,
+    CONF_BLE_CHAR_UUID,
+    CONF_BLE_SERVICE_UUID,
+    CONF_CONNECTION_MODE,
     CONF_CUSTOMER_CODE,
     CONF_LOGIN_API_URL,
     CONF_UUID,
@@ -32,6 +37,8 @@ from .const import (
     CONF_UPDATE_INTERVAL,
     CONF_HTTP_TIMEOUT,
     CONF_BUFFER_READ_TIMEOUT,
+    CONNECTION_MODE_BLUETOOTH,
+    CONNECTION_MODE_CLOUD,
     DOMAIN,
 )
 
@@ -69,30 +76,49 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         air_temp_fix = config_entry.options.get(CONF_AIR_TEMP_FIX, False)
         reading_error_fix = config_entry.options.get(CONF_READING_ERROR_FIX, False)
         language = config_entry.options.get(CONF_LANGUAGE)
-        http_timeout = config_entry.options.get(CONF_HTTP_TIMEOUT)
-        buffer_read_timeout = config_entry.options.get(CONF_BUFFER_READ_TIMEOUT)
-
-        self.agua = aguaiot(
-            api_url=api_url,
-            customer_code=customer_code,
-            email=email,
-            password=password,
-            unique_id=gen_uuid,
-            login_api_url=login_api_url,
-            brand_id=brand_id,
-            brand=brand,
-            async_client=get_async_client(hass),
-            air_temp_fix=air_temp_fix,
-            reading_error_fix=reading_error_fix,
-            language=language,
-            http_timeout=http_timeout,
-            buffer_read_timeout=buffer_read_timeout,
+        http_timeout = config_entry.options.get(CONF_HTTP_TIMEOUT, 30)
+        buffer_read_timeout = config_entry.options.get(CONF_BUFFER_READ_TIMEOUT, 30)
+        connection_mode = config_entry.options.get(
+            CONF_CONNECTION_MODE, CONNECTION_MODE_CLOUD
         )
+
+        client_kwargs = {
+            "api_url": api_url,
+            "customer_code": customer_code,
+            "email": email,
+            "password": password,
+            "unique_id": gen_uuid,
+            "login_api_url": login_api_url,
+            "brand_id": brand_id,
+            "brand": brand,
+            "async_client": get_async_client(hass),
+            "air_temp_fix": air_temp_fix,
+            "reading_error_fix": reading_error_fix,
+            "language": language,
+            "http_timeout": http_timeout,
+            "buffer_read_timeout": buffer_read_timeout,
+        }
+
+        if connection_mode == CONNECTION_MODE_BLUETOOTH:
+            self.agua = LocalBleAguaIOT(
+                hass=hass,
+                cached_devices=config_entry.data.get(CONF_BLE_BOOTSTRAP_DEVICES),
+                service_uuid=config_entry.options.get(
+                    CONF_BLE_SERVICE_UUID, DEFAULT_SERVICE_UUID
+                ),
+                char_uuid=config_entry.options.get(
+                    CONF_BLE_CHAR_UUID, DEFAULT_CHAR_UUID
+                ),
+                **client_kwargs,
+            )
+        else:
+            self.agua = aguaiot(**client_kwargs)
 
     async def _async_setup(self) -> None:
         """Connect to the AguaIOT platform"""
         try:
             await self.agua.connect()
+            await self._async_persist_ble_bootstrap_if_needed()
         except AguaIOTUpdateError as e:
             _LOGGER.error("Agua IOT Update error: %s", e)
         except AguaIOTUnauthorized as e:
@@ -106,6 +132,7 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         """Get the latest data."""
         try:
             await self.agua.update()
+            await self._async_persist_ble_bootstrap_if_needed()
         except AguaIOTUpdateError as e:
             _LOGGER.error("Agua IOT Update error: %s", e)
         except AguaIOTUnauthorized as e:
@@ -114,3 +141,18 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
             raise UpdateFailed(f"Agua IOT Connection error: {e}") from e
         except AguaIOTError as e:
             raise UpdateFailed(f"Agua IOT error: {e}") from e
+
+    async def _async_persist_ble_bootstrap_if_needed(self) -> None:
+        """Persist BLE bootstrap data when it is freshly learned from the cloud."""
+        if not isinstance(self.agua, LocalBleAguaIOT) or not self.agua.cache_dirty:
+            return
+
+        updated_data = {
+            **self.config_entry.data,
+            CONF_BLE_BOOTSTRAP_DEVICES: self.agua.export_bootstrap_cache(),
+        }
+        self.hass.config_entries.async_update_entry(
+            self.config_entry,
+            data=updated_data,
+        )
+        self.agua.mark_cache_persisted()

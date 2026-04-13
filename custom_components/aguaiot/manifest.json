@@ -3,7 +3,7 @@
   "name": "Micronova Agua IOT",
   "codeowners": ["@vincentwolsink"],
   "config_flow": true,
-  "dependencies": [],
+  "dependencies": ["bluetooth"],
   "documentation": "https://github.com/vincentwolsink/home_assistant_micronova_agua_iot/",
   "integration_type": "hub",
   "iot_class": "cloud_polling",  

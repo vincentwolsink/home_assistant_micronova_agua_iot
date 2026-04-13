@@ -32,7 +32,13 @@
                 "data": {
                     "air_temp_fix": "[Jolly Mec] Ignorer la température de l'air incorrecte lors de l'utilisation d'un thermostat externe.",
                     "reading_error_fix": "[Bronpi] Filtrer les lectures incorrectes (lorsque le poêle est sans alimentation).",
-                    "language": "Langue pour les descriptions"
+                    "http_timeout": "Délai d'attente des appels API (secondes).",
+                    "buffer_read_timeout": "Délai d'attente des lectures du poêle (secondes).",
+                    "connection_mode": "Mode de connexion.",
+                    "ble_service_uuid": "UUID du service Bluetooth.",
+                    "ble_char_uuid": "UUID de la caractéristique Bluetooth.",
+                    "language": "Langue pour les descriptions",
+                    "update_interval": "Temps entre les mises à jour (secondes)."
                 }
             }
         }

@@ -3,6 +3,7 @@ the IOT Agua platform of Micronova
 """
 
 import asyncio
+import copy
 import jwt
 import logging
 import time
@@ -265,6 +266,7 @@ class aguaiot(object):
                     dev["name_product"],
                     res2["device_info"][0]["id_registers_map"],
                     self,
+                    device_info=res2["device_info"][0],
                 )
             )
 
@@ -328,77 +330,45 @@ class aguaiot(object):
 
         return response.json()
 
-
-class Device(object):
-    """Agua IOT heating device representation"""
-
-    def __init__(
-        self,
-        id,
-        id_device,
-        id_product,
-        product_serial,
-        name,
-        is_online,
-        name_product,
-        id_registers_map,
-        aguaiot,
-    ):
-        self.id = id
-        self.id_device = id_device
-        self.id_product = id_product
-        self.product_serial = product_serial
-        self.name = name
-        self.is_online = is_online
-        self.name_product = name_product
-        self.id_registers_map = id_registers_map
-        self.__aguaiot = aguaiot
-        self.__register_map_dict = dict()
-        self.__information_dict = dict()
-
-    async def update_mapping(self):
-        await self.__update_device_registers_mapping()
-
-    async def update(self):
-        await self.__update_device_information()
-
-    async def __update_device_registers_mapping(self):
-        url = self.__aguaiot.api_url + API_PATH_DEVICE_REGISTERS_MAP
+    async def _fetch_device_registers_mapping(self, device):
+        """Fetch registers map for a device."""
+        url = self.api_url + API_PATH_DEVICE_REGISTERS_MAP
         registers = dict()
 
         payload = {
-            "id_device": self.id_device,
-            "id_product": self.id_product,
+            "id_device": device.id_device,
+            "id_product": device.id_product,
             "last_update": "2018-06-03T08:59:54.043",
         }
 
-        res = await self.__aguaiot.handle_webcall("POST", url, payload)
+        res = await self.handle_webcall("POST", url, payload)
         if res is False:
             raise AguaIOTError("Error while fetching registers map")
 
         for registers_map in res["device_registers_map"]["registers_map"]:
-            if registers_map["id"] == self.id_registers_map:
+            if registers_map["id"] == device.id_registers_map:
                 registers = {
                     reg["reg_key"].lower(): reg for reg in registers_map["registers"]
                 }
 
-        self.__register_map_dict = registers
+        return registers
 
-    async def __update_device_information(self):
-        url = self.__aguaiot.api_url + API_PATH_DEVICE_BUFFER_READING
+    async def _fetch_device_information(self, device):
+        """Fetch current register values for a device."""
+        url = self.api_url + API_PATH_DEVICE_BUFFER_READING
 
         payload = {
-            "id_device": self.id_device,
-            "id_product": self.id_product,
+            "id_device": device.id_device,
+            "id_product": device.id_product,
             "BufferId": 1,
         }
 
-        res_req = await self.__aguaiot.handle_webcall("POST", url, payload)
+        res_req = await self.handle_webcall("POST", url, payload)
         if res_req is False:
             raise AguaIOTError("Error while making device buffer read request.")
 
         async def buffer_read_loop(id_request):
-            url = self.__aguaiot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
+            url = self.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
             sleep_secs = 1
             attempts = 1
 
@@ -407,7 +377,7 @@ class Device(object):
                     await asyncio.sleep(sleep_secs)
 
                     _LOGGER.debug("BUFFER READ (%s) ATTEMPT %s", id_request, attempts)
-                    res_get = await self.__aguaiot.handle_webcall("GET", url, {})
+                    res_get = await self.handle_webcall("GET", url, {})
                     _LOGGER.debug(
                         "BUFFER READ (%s) STATUS: %s",
                         id_request,
@@ -424,11 +394,11 @@ class Device(object):
         try:
             res = await asyncio.wait_for(
                 buffer_read_loop(res_req["idRequest"]),
-                self.__aguaiot.buffer_read_timeout,
+                self.buffer_read_timeout,
             )
         except asyncio.TimeoutError:
             raise AguaIOTUpdateError(
-                f"Timeout on waiting device buffer read to complete within {self.__aguaiot.buffer_read_timeout} seconds."
+                f"Timeout on waiting device buffer read to complete within {self.buffer_read_timeout} seconds."
             )
 
         if not res:
@@ -446,11 +416,104 @@ class Device(object):
             except KeyError:
                 raise AguaIOTUpdateError("Error in data received from device.")
 
-            self.__information_dict = information_dict
-        else:
-            raise AguaIOTUpdateError(
-                f"Received unexpected 'jobAnswerStatus' while reading buffers: {res.get('jobAnswerStatus')}"
-            )
+            return information_dict
+
+        raise AguaIOTUpdateError(
+            f"Received unexpected 'jobAnswerStatus' while reading buffers: {res.get('jobAnswerStatus')}"
+        )
+
+    async def _request_writing(self, device, items):
+        """Write raw register values for a device."""
+        url = self.api_url + API_PATH_DEVICE_WRITING
+
+        set_items = []
+        set_masks = []
+        set_bits = []
+        set_endians = []
+        set_values = []
+
+        for key in items:
+            set_items.append(int(device.get_register(key)["offset"]))
+            set_masks.append(int(device.get_register(key)["mask"]))
+            set_values.append(items[key])
+            set_bits.append(8)
+            set_endians.append("L")
+
+        payload = {
+            "id_device": device.id_device,
+            "id_product": device.id_product,
+            "Protocol": "RWMSmaster",
+            "BitData": set_bits,
+            "Endianess": set_endians,
+            "Items": set_items,
+            "Masks": set_masks,
+            "Values": set_values,
+        }
+
+        res = await self.handle_webcall("POST", url, payload)
+        if res is False:
+            raise AguaIOTError("Error while request device writing")
+
+        id_request = res["idRequest"]
+
+        url = self.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
+
+        payload = {}
+
+        retry_count = 0
+        res = await self.handle_webcall("GET", url, payload)
+        while (
+            res is False or res["jobAnswerStatus"] != "completed"
+        ) and retry_count < 10:
+            await asyncio.sleep(1)
+            res = await self.handle_webcall("GET", url, payload)
+            retry_count = retry_count + 1
+
+        if (
+            res is False
+            or res["jobAnswerStatus"] != "completed"
+            or "Cmd" not in res["jobAnswerData"]
+        ):
+            raise AguaIOTError("Error while request device writing")
+
+
+class Device(object):
+    """Agua IOT heating device representation"""
+
+    def __init__(
+        self,
+        id,
+        id_device,
+        id_product,
+        product_serial,
+        name,
+        is_online,
+        name_product,
+        id_registers_map,
+        aguaiot,
+        device_info=None,
+        register_map=None,
+    ):
+        self.id = id
+        self.id_device = id_device
+        self.id_product = id_product
+        self.product_serial = product_serial
+        self.name = name
+        self.is_online = is_online
+        self.name_product = name_product
+        self.id_registers_map = id_registers_map
+        self.__aguaiot = aguaiot
+        self.__device_info = device_info or dict()
+        self.__register_map_dict = register_map or dict()
+        self.__information_dict = dict()
+
+    async def update_mapping(self):
+        self.__register_map_dict = await self.__aguaiot._fetch_device_registers_mapping(
+            self
+        )
+
+    async def update(self):
+        self.__information_dict = await self.__aguaiot._fetch_device_information(self)
 
     def __prepare_value_for_writing(self, item, value, limit_value_raw=False):
         set_min = self.__register_map_dict[item]["set_min"]
@@ -479,61 +542,40 @@ class Device(object):
         return value
 
     async def __request_writing(self, items):
-        url = self.__aguaiot.api_url + API_PATH_DEVICE_WRITING
-
-        set_items = []
-        set_masks = []
-        set_bits = []
-        set_endians = []
-        set_values = []
-
-        for key in items:
-            set_items.append(int(self.__register_map_dict[key]["offset"]))
-            set_masks.append(int(self.__register_map_dict[key]["mask"]))
-            set_values.append(items[key])
-            set_bits.append(8)
-            set_endians.append("L")
-
-        payload = {
-            "id_device": self.id_device,
-            "id_product": self.id_product,
-            "Protocol": "RWMSmaster",
-            "BitData": set_bits,
-            "Endianess": set_endians,
-            "Items": set_items,
-            "Masks": set_masks,
-            "Values": set_values,
-        }
-
-        res = await self.__aguaiot.handle_webcall("POST", url, payload)
-        if res is False:
-            raise AguaIOTError("Error while request device writing")
-
-        id_request = res["idRequest"]
-
-        url = self.__aguaiot.api_url + API_PATH_DEVICE_JOB_STATUS + id_request
-
-        payload = {}
-
-        retry_count = 0
-        res = await self.__aguaiot.handle_webcall("GET", url, payload)
-        while (
-            res is False or res["jobAnswerStatus"] != "completed"
-        ) and retry_count < 10:
-            await asyncio.sleep(1)
-            res = await self.__aguaiot.handle_webcall("GET", url, payload)
-            retry_count = retry_count + 1
-
-        if (
-            res is False
-            or res["jobAnswerStatus"] != "completed"
-            or "Cmd" not in res["jobAnswerData"]
-        ):
-            raise AguaIOTError("Error while request device writing")
+        await self.__aguaiot._request_writing(self, items)
 
     @property
     def registers(self):
         return list(self.__register_map_dict.keys())
+
+    @property
+    def device_info_data(self):
+        return self.__device_info
+
+    @property
+    def ble_mac(self):
+        return self.__device_info.get("mac")
+
+    @property
+    def ble_security_code(self):
+        return self.__device_info.get("security_code")
+
+    def export_register_map(self):
+        return copy.deepcopy(self.__register_map_dict)
+
+    def export_cache(self):
+        return {
+            "id": self.id,
+            "id_device": self.id_device,
+            "id_product": self.id_product,
+            "product_serial": self.product_serial,
+            "name": self.name,
+            "is_online": self.is_online,
+            "name_product": self.name_product,
+            "id_registers_map": self.id_registers_map,
+            "device_info": copy.deepcopy(self.__device_info),
+            "register_map": self.export_register_map(),
+        }
 
     def get_register(self, key):
         register = self.__register_map_dict.get(key, {})
@@ -651,8 +693,10 @@ class Device(object):
 
         try:
             await self.__request_writing(items)
-        except AguaIOTError:
-            raise AguaIOTError(f"Error while trying to set: key={key} value={value}")
+        except AguaIOTError as err:
+            raise AguaIOTError(
+                f"Error while trying to set: key={key} value={value} ({err})"
+            ) from err
 
     async def set_register_values(self, items, limit_value_raw=False):
         for key in items:
@@ -662,8 +706,8 @@ class Device(object):
 
         try:
             await self.__request_writing(items)
-        except AguaIOTError:
-            raise AguaIOTError(f"Error while trying to set: items={items}")
+        except AguaIOTError as err:
+            raise AguaIOTError(f"Error while trying to set: items={items} ({err})") from err
 
     async def set_register_value_description(
         self, key, value_description, value_fallback=None, language=None

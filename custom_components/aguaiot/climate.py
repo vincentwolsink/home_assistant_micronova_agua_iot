@@ -158,6 +158,28 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
                 self._temperature_set_key = f"temp_{variant}_set"
                 break
 
+    def _status_description_upper(self):
+        """Return the current status description in a normalized uppercase form."""
+        status_value = self._device.get_register_value("status_get")
+        if status_value is None:
+            return None
+
+        description = self._device.get_register_value_description(
+            key="status_get", language="ENG"
+        )
+        if description is None:
+            return None
+
+        return str(description).strip().upper()
+
+    def _is_alarm_like_status(self):
+        """Return True for Micronova alarm/manual-alarm style states."""
+        description = self._status_description_upper()
+        if description is None:
+            return False
+
+        return "ALARM" in description or "ALLARM" in description
+
     @property
     def unique_id(self):
         """Return a unique ID."""
@@ -179,25 +201,14 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
     @property
     def hvac_action(self):
         """Return the current running hvac operation."""
-        if self._device.get_register_value("status_get") is not None:
-            if (
-                str(
-                    self._device.get_register_value_description(
-                        key="status_get", language="ENG"
-                    )
-                ).upper()
-                in STATUS_IDLE
-            ):
+        status_value = self._device.get_register_value("status_get")
+        if status_value is not None:
+            description = self._status_description_upper()
+            if self._is_alarm_like_status():
+                return HVACAction.OFF
+            if description in STATUS_IDLE:
                 return HVACAction.IDLE
-            elif (
-                self._device.get_register_value("status_get") == 0
-                or str(
-                    self._device.get_register_value_description(
-                        key="status_get", language="ENG"
-                    )
-                ).upper()
-                in STATUS_OFF
-            ):
+            elif status_value == 0 or description in STATUS_OFF:
                 return HVACAction.OFF
             return HVACAction.HEATING
 
@@ -209,16 +220,10 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
     @property
     def hvac_mode(self):
         """Return hvac operation ie. heat, cool mode."""
-        if self._device.get_register_value("status_get") is not None:
-            if (
-                self._device.get_register_value("status_get") == 0
-                or str(
-                    self._device.get_register_value_description(
-                        key="status_get", language="ENG"
-                    )
-                ).upper()
-                in STATUS_OFF
-            ):
+        status_value = self._device.get_register_value("status_get")
+        if status_value is not None:
+            description = self._status_description_upper()
+            if self._is_alarm_like_status() or status_value == 0 or description in STATUS_OFF:
                 return HVACMode.OFF
             return HVACMode.HEAT
 

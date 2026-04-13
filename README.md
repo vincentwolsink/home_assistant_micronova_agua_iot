@@ -59,13 +59,67 @@ Or folow these steps:
 2. Install the plugin via HACS (Micronova Agua IOT)
 3. Add the integration through the home assistant configuration flow
 
+## Local Bluetooth mode
+
+This integration now includes an experimental `Bluetooth local` connection mode for Micronova stoves equipped with a local BLE module (for example the Micronova / Navel `T009_*` module seen by Home Assistant).
+
+### What it does
+
+- keeps the existing cloud setup and entity model
+- adds a Home Assistant Bluetooth transport for reading buffers and sending writes locally
+- works with Home Assistant Bluetooth adapters and Bluetooth proxies such as ESPHome `bluetooth_proxy`
+- stores the BLE bootstrap data in the config entry once discovered so normal operation can run locally
+
+### How it works
+
+The local transport talks to the Micronova BLE module with the same command family used by the vendor app:
+
+- `Identity`
+- `GetBufferId`
+- `GetBufferReading`
+- `RequestWriting`
+
+The integration still needs one successful cloud bootstrap to learn the device metadata required for local control:
+
+- BLE identity / MAC reference exposed by the Micronova API
+- BLE security code
+- register map for the stove model
+
+After that bootstrap data is cached in Home Assistant, reads and writes can run locally over Bluetooth through Home Assistant's Bluetooth stack.
+
+### How to enable it
+
+1. Set up the integration normally with your vendor cloud account.
+2. Make sure Home Assistant can reach the stove over Bluetooth, either directly or through a Bluetooth proxy close to the stove.
+3. Open the integration options.
+4. Change `Connection mode` to `Bluetooth local`.
+5. Leave the default BLE service / characteristic UUIDs unless you know your module uses different ones.
+
+### Current scope and limitations
+
+- this mode is experimental
+- the first bootstrap still depends on the vendor cloud API
+- compatibility is expected to vary depending on the Micronova firmware, BLE module, and stove register map
+- no guarantee is made for every supported vendor app or every Micronova-based stove
+
+### Tested hardware
+
+This mode has been validated on:
+
+- vendor app: `Jolly Mec Wi Fi`
+- stove / insert: `SYNTHESIS/1/80/M`
+- user-facing model reference: `Jolly Mec Modular Synthesis 80`
+- local BLE module advertising as `T009_*`
+
+If you test another stove or another vendor app and it works, please report the exact model and module details in your feedback.
+
 ## Credits
 
 Some parts of the code are based on [py-agua-iot](https://github.com/fredericvl/py-agua-iot)
 
 ## Related
 
-For local stove control, without need for the Micronova cloud platform, take a look at one of these projects (custom hardware required). 
+For local stove control with custom hardware on the stove bus, take a look at one of these projects.
 * https://esphome.io/components/micronova.html
 * https://github.com/eni23/micronova-controller
 * https://github.com/fabrizioromanelli/Pellet-Stove-Control
