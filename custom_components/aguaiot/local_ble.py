@@ -30,6 +30,14 @@ DEFAULT_CHAR_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
 DEFAULT_NAME_PREFIX = "T009_"
 
 
+def _is_ble_authorization_error(err: Exception) -> bool:
+    """Return True when the BLE stack rejected the link for authorization reasons."""
+    message = str(err).lower()
+    return "insufficient authorization" in message or (
+        "authorization" in message and "(8)" in message
+    )
+
+
 def _normalize_ble_address(value: str | None) -> str | None:
     """Return a colon-separated BLE address."""
     if not value:
@@ -156,31 +164,19 @@ class LocalBleAguaIOT:
             )
 
         device = self.devices[0]
-        async with self._device_session(device) as session:
-            await session.identity()
-            buffer_ids = await session.get_buffer_ids()
-            if not buffer_ids:
-                raise AguaIOTUpdateError(
-                    f"Bluetooth validation succeeded but no buffer IDs were returned for '{device.name}'."
-                )
-
-            await session.get_buffer_reading(buffer_ids[0])
-            result = {
-                "device_name": device.name,
-                "module_address": session.connected_address
-                or self._device_ble_address(device),
-                "module_name": session.connected_name
-                or self._expected_local_name(device),
-                "buffer_ids": buffer_ids,
-            }
-            _LOGGER.info(
-                "Validated Micronova BLE module for '%s' via %s (%s), buffer_ids=%s",
-                device.name,
-                result["module_address"],
-                result["module_name"],
-                buffer_ids,
-            )
-            return result
+        result = await self._run_authenticated_session(
+            device,
+            "validating the local Bluetooth connection",
+            self._validate_local_connection_session,
+        )
+        _LOGGER.info(
+            "Validated Micronova BLE module for '%s' via %s (%s), buffer_ids=%s",
+            device.name,
+            result["module_address"],
+            result["module_name"],
+            result["buffer_ids"],
+        )
+        return result
 
     async def _bootstrap_from_cloud(self) -> None:
         """Fetch device metadata and register mappings once via the cloud API."""
@@ -252,31 +248,11 @@ class LocalBleAguaIOT:
 
     async def _fetch_device_information(self, device: Device) -> dict[int, int]:
         """Read all current buffer values from the stove over BLE."""
-        async with self._device_session(device) as session:
-            await session.identity()
-            buffer_ids = await session.get_buffer_ids()
-            if not buffer_ids:
-                buffer_ids = [1]
-
-            info: dict[int, int] = {}
-            for buffer_id in buffer_ids:
-                response = await session.get_buffer_reading(buffer_id)
-                payload = response.get("pl", {})
-                items = payload.get("Items") or []
-                values = payload.get("Values") or []
-                if not isinstance(items, list) or not isinstance(values, list):
-                    continue
-
-                for idx, item in enumerate(items):
-                    if idx < len(values):
-                        info[item] = values[idx]
-
-            if not info:
-                raise AguaIOTUpdateError(
-                    f"Bluetooth read returned no register values for '{device.name}'."
-                )
-
-            return info
+        return await self._run_authenticated_session(
+            device,
+            "reading device information",
+            self._fetch_device_information_session,
+        )
 
     async def _request_writing(self, device: Device, items: dict[str, int]) -> None:
         """Write raw register values to the stove over BLE."""
@@ -303,19 +279,106 @@ class LocalBleAguaIOT:
             "Values": values,
         }
 
-        async with self._device_session(device) as session:
-            await session.identity()
-            buffer_ids = await session.get_buffer_ids()
-            if buffer_ids:
-                # Prime the local session the same way the vendor app does:
-                # it reads buffers before sending writes.
-                await session.get_buffer_reading(buffer_ids[0])
-            response = await session.exchange(self._make_enveloped_command(payload))
+        await self._run_authenticated_session(
+            device,
+            "writing stove registers",
+            lambda session: self._request_writing_session(session, payload),
+        )
+
+    async def _validate_local_connection_session(
+        self, session: "_BleMicronovaSession"
+    ) -> dict[str, Any]:
+        """Validate the BLE tunnel through an authenticated session."""
+        buffer_ids = await session.get_buffer_ids()
+        if not buffer_ids:
+            raise AguaIOTUpdateError(
+                f"Bluetooth validation succeeded but no buffer IDs were returned for '{session._device.name}'."
+            )
+
+        await session.get_buffer_reading(buffer_ids[0])
+        return {
+            "device_name": session._device.name,
+            "module_address": session.connected_address
+            or self._device_ble_address(session._device),
+            "module_name": session.connected_name
+            or self._expected_local_name(session._device),
+            "buffer_ids": buffer_ids,
+        }
+
+    async def _fetch_device_information_session(
+        self, session: "_BleMicronovaSession"
+    ) -> dict[int, int]:
+        """Read all current buffer values through an authenticated session."""
+        buffer_ids = await session.get_buffer_ids()
+        if not buffer_ids:
+            buffer_ids = [1]
+
+        info: dict[int, int] = {}
+        for buffer_id in buffer_ids:
+            response = await session.get_buffer_reading(buffer_id)
             payload = response.get("pl", {})
-            if payload.get("NackErrCode") is not None:
-                raise AguaIOTError(
-                    f"Bluetooth write failed for '{device.name}' with NackErrCode={payload['NackErrCode']}"
-                )
+            items = payload.get("Items") or []
+            values = payload.get("Values") or []
+            if not isinstance(items, list) or not isinstance(values, list):
+                continue
+
+            for idx, item in enumerate(items):
+                if idx < len(values):
+                    info[item] = values[idx]
+
+        if not info:
+            raise AguaIOTUpdateError(
+                f"Bluetooth read returned no register values for '{session._device.name}'."
+            )
+
+        return info
+
+    async def _request_writing_session(
+        self, session: "_BleMicronovaSession", payload: dict[str, Any]
+    ) -> None:
+        """Write raw register values through an authenticated session."""
+        buffer_ids = await session.get_buffer_ids()
+        if buffer_ids:
+            # Prime the local session the same way the vendor app does:
+            # it reads buffers before sending writes.
+            await session.get_buffer_reading(buffer_ids[0])
+        response = await session.exchange(self._make_enveloped_command(payload))
+        response_payload = response.get("pl", {})
+        if response_payload.get("NackErrCode") is not None:
+            raise AguaIOTError(
+                f"Bluetooth write failed for '{session._device.name}' with NackErrCode={response_payload['NackErrCode']}"
+            )
+
+    async def _run_authenticated_session(
+        self,
+        device: Device,
+        action: str,
+        operation,
+    ) -> Any:
+        """Run one BLE action with a single retry on lost authorization."""
+        for attempt in range(2):
+            try:
+                async with self._device_session(device) as session:
+                    await session.identity()
+                    return await operation(session)
+            except (BleakError, AguaIOTConnectionError) as err:
+                if not _is_ble_authorization_error(err):
+                    raise
+
+                if attempt == 0:
+                    _LOGGER.warning(
+                        "Micronova BLE link for '%s' lost authorization while %s; retrying once with a fresh connection.",
+                        device.name,
+                        action,
+                    )
+                    await asyncio.sleep(0.5)
+                    continue
+
+                raise AguaIOTConnectionError(
+                    f"Bluetooth connection to '{device.name}' lost authorization while {action}. "
+                    "The Navel/T009 module or Bluetooth proxy dropped its authorized GATT state; "
+                    "reloading the integration or resetting the BLE module may be required."
+                ) from err
 
     def _device_identity_id(self, device: Device) -> str:
         """Return the device id used by the local BLE protocol."""
