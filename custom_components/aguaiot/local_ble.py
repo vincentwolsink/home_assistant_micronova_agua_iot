@@ -28,6 +28,8 @@ _LOGGER = logging.getLogger(__name__)
 DEFAULT_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
 DEFAULT_CHAR_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
 DEFAULT_NAME_PREFIX = "T009_"
+BLE_DISCOVERY_RETRY_INTERVAL = 1
+BLE_DISCOVERY_MAX_WAIT = 30
 
 
 def _is_ble_authorization_error(err: Exception) -> bool:
@@ -452,21 +454,19 @@ class LocalBleAguaIOT:
             }
         )
 
-    async def _async_get_ble_device(self, device: Device):
-        """Resolve the target BLEDevice from Home Assistant's shared scanner."""
+    def _find_ble_device(self, device: Device) -> tuple[Any | None, str]:
+        """Find the target BLEDevice in Home Assistant's shared scanner."""
         address = self._device_ble_address(device)
         candidate_addresses = self._candidate_ble_addresses(device)
         expected_name = self._expected_local_name(device)
         scanner_count = bluetooth.async_scanner_count(self.hass, connectable=True)
 
         if scanner_count == 0:
-            _LOGGER.warning(
-                "No connectable Bluetooth adapters are available in Home Assistant; "
-                "trying direct Bleak connection to %s for '%s'.",
-                address,
-                device.name,
+            return (
+                None,
+                "No connectable Bluetooth adapters or ESPHome Bluetooth proxies are "
+                f"available in Home Assistant for '{device.name}'",
             )
-            return address
 
         for connectable in (True, False):
             for candidate_address in candidate_addresses:
@@ -483,7 +483,7 @@ class LocalBleAguaIOT:
                         connectable,
                         ble_device,
                     )
-                    return ble_device
+                    return ble_device, ""
 
             fallback_prefix_device = None
             for service_info in bluetooth.async_discovered_service_info(
@@ -505,7 +505,7 @@ class LocalBleAguaIOT:
                         connectable,
                         service_name,
                     )
-                    return service_info.device
+                    return service_info.device, ""
 
                 if expected_name and service_name == expected_name:
                     _LOGGER.debug(
@@ -515,7 +515,7 @@ class LocalBleAguaIOT:
                         service_address,
                         connectable,
                     )
-                    return service_info.device
+                    return service_info.device, ""
 
                 if fallback_prefix_device is None and service_name.startswith(
                     DEFAULT_NAME_PREFIX
@@ -529,17 +529,44 @@ class LocalBleAguaIOT:
                     connectable,
                     fallback_prefix_device,
                 )
-                return fallback_prefix_device
+                return fallback_prefix_device, ""
 
-        _LOGGER.warning(
-            "Micronova BLE device for '%s' was not discovered by Home Assistant; "
-            "trying direct Bleak connection to %s (candidates=%s, expected_name=%s).",
-            device.name,
-            address,
-            candidate_addresses,
-            expected_name,
+        return (
+            None,
+            f"Micronova BLE device for '{device.name}' was not discovered by Home "
+            f"Assistant yet (address={address}, candidates={candidate_addresses}, "
+            f"expected_name={expected_name})",
         )
-        return address
+
+    async def _async_get_ble_device(self, device: Device) -> Any:
+        """Resolve the target BLEDevice from Home Assistant's shared scanner."""
+        loop = asyncio.get_running_loop()
+        wait_seconds = min(max(self.buffer_read_timeout, 10), BLE_DISCOVERY_MAX_WAIT)
+        deadline = loop.time() + wait_seconds
+        logged_wait = False
+        last_reason = ""
+
+        while True:
+            ble_device, reason = self._find_ble_device(device)
+            if ble_device is not None:
+                return ble_device
+
+            last_reason = reason
+            remaining = deadline - loop.time()
+            if remaining <= 0:
+                raise AguaIOTConnectionError(
+                    f"{last_reason}. Home Assistant will retry once Bluetooth is ready."
+                )
+
+            if not logged_wait:
+                _LOGGER.info(
+                    "%s; waiting up to %s seconds before failing this update.",
+                    last_reason,
+                    int(wait_seconds),
+                )
+                logged_wait = True
+
+            await asyncio.sleep(min(BLE_DISCOVERY_RETRY_INTERVAL, remaining))
 
     def _device_session(self, device: Device) -> "_BleMicronovaSession":
         """Create a BLE session wrapper for one device."""
@@ -560,31 +587,42 @@ class _BleMicronovaSession:
 
     async def __aenter__(self) -> "_BleMicronovaSession":
         await self._transport._command_lock.acquire()
-        ble_device = await self._transport._async_get_ble_device(self._device)
-        self._resolved_target = ble_device
 
         try:
+            ble_device = await self._transport._async_get_ble_device(self._device)
+            self._resolved_target = ble_device
             self._client = await establish_connection(
                 BleakClientWithServiceCache,
                 ble_device,
                 self._device.name,
                 max_attempts=3,
             )
+            characteristic_uuid = self._resolve_characteristic_uuid()
+            self._characteristic_uuid = characteristic_uuid
+            await self._client.start_notify(characteristic_uuid, self._handle_notify)
+        except AguaIOTConnectionError:
+            await self._cleanup_failed_enter()
+            raise
         except BleakError as err:
-            self._transport._command_lock.release()
+            await self._cleanup_failed_enter()
             raise AguaIOTConnectionError(
                 f"Bluetooth connection to '{self._device.name}' failed: {err}"
             ) from err
         except Exception as err:  # noqa: BLE001
-            self._transport._command_lock.release()
+            await self._cleanup_failed_enter()
             raise AguaIOTConnectionError(
                 f"Bluetooth connection to '{self._device.name}' failed: {err}"
             ) from err
 
-        characteristic_uuid = self._resolve_characteristic_uuid()
-        self._characteristic_uuid = characteristic_uuid
-        await self._client.start_notify(characteristic_uuid, self._handle_notify)
         return self
+
+    async def _cleanup_failed_enter(self) -> None:
+        """Disconnect and release the command lock after a failed enter."""
+        try:
+            if self._client:
+                await self._client.disconnect()
+        finally:
+            self._transport._command_lock.release()
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
         try:
