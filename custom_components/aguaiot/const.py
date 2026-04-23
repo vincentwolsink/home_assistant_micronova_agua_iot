@@ -77,6 +77,13 @@ CONF_READING_ERROR_FIX = "reading_error_fix"
 CONF_UPDATE_INTERVAL = "update_interval"
 CONF_HTTP_TIMEOUT = "http_timeout"
 CONF_BUFFER_READ_TIMEOUT = "buffer_read_timeout"
+CONF_CONNECTION_MODE = "connection_mode"
+CONF_BLE_BOOTSTRAP_DEVICES = "ble_bootstrap_devices"
+CONF_BLE_SERVICE_UUID = "ble_service_uuid"
+CONF_BLE_CHAR_UUID = "ble_char_uuid"
+
+CONNECTION_MODE_CLOUD = "cloud"
+CONNECTION_MODE_BLUETOOTH = "bluetooth_local"
 
 AIR_VARIANTS = ["air", "air2", "air3", "air_palm"]
 WATER_VARIANTS = ["water", "h2o", "h2o_mandata"]

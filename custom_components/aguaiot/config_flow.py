@@ -9,6 +9,7 @@ from .aguaiot import (
     AguaIOTUnauthorized,
     aguaiot,
 )
+from .local_ble import LocalBleAguaIOT
 import voluptuous as vol
 
 from homeassistant.config_entries import (
@@ -23,6 +24,8 @@ from homeassistant.helpers.httpx_client import get_async_client
 
 from .const import (
     CONF_API_URL,
+    CONF_BLE_BOOTSTRAP_DEVICES,
+    CONF_CONNECTION_MODE,
     CONF_CUSTOMER_CODE,
     CONF_LOGIN_API_URL,
     CONF_UUID,
@@ -35,6 +38,8 @@ from .const import (
     CONF_UPDATE_INTERVAL,
     CONF_HTTP_TIMEOUT,
     CONF_BUFFER_READ_TIMEOUT,
+    CONNECTION_MODE_BLUETOOTH,
+    CONNECTION_MODE_CLOUD,
     DOMAIN,
     ENDPOINTS,
 )
@@ -147,82 +152,151 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
         """Manage the options."""
         return await self.async_step_user()
 
-    async def async_step_user(self, user_input=None):
-        """Handle a flow initialized by the user."""
-
-        if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
-
-        """Set up AguaIOT entry."""
+    def _build_client(self, connection_mode):
+        """Create the configured cloud or local BLE transport."""
         entry = self.config_entry
+        return_kwargs = {
+            "api_url": entry.data.get(CONF_API_URL),
+            "customer_code": entry.data.get(CONF_CUSTOMER_CODE),
+            "email": entry.data.get(CONF_EMAIL),
+            "password": entry.data.get(CONF_PASSWORD),
+            "unique_id": entry.data.get(CONF_UUID),
+            "login_api_url": entry.data.get(CONF_LOGIN_API_URL),
+            "brand_id": entry.data.get(CONF_BRAND_ID),
+            "brand": entry.data.get(CONF_BRAND),
+            "async_client": get_async_client(self.hass),
+            "air_temp_fix": self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
+            "reading_error_fix": self.config_entry.options.get(
+                CONF_READING_ERROR_FIX, False
+            ),
+            "language": self.config_entry.options.get(CONF_LANGUAGE, "ENG"),
+            "http_timeout": self.config_entry.options.get(CONF_HTTP_TIMEOUT, 30),
+            "buffer_read_timeout": self.config_entry.options.get(
+                CONF_BUFFER_READ_TIMEOUT, 30
+            ),
+        }
 
-        api_url = entry.data.get(CONF_API_URL)
-        customer_code = entry.data.get(CONF_CUSTOMER_CODE)
-        email = entry.data.get(CONF_EMAIL)
-        password = entry.data.get(CONF_PASSWORD)
-        gen_uuid = entry.data.get(CONF_UUID)
-        login_api_url = entry.data.get(CONF_LOGIN_API_URL)
-        brand_id = entry.data.get(CONF_BRAND_ID)
-        brand = entry.data.get(CONF_BRAND)
-
-        agua = aguaiot(
-            api_url=api_url,
-            customer_code=customer_code,
-            email=email,
-            password=password,
-            unique_id=gen_uuid,
-            login_api_url=login_api_url,
-            brand_id=brand_id,
-            brand=brand,
-            async_client=get_async_client(self.hass),
-        )
-
-        try:
-            await agua.connect()
-        except AguaIOTUnauthorized as e:
-            _LOGGER.error("Agua IOT Unauthorized: %s", e)
-            return False
-        except AguaIOTConnectionError as e:
-            _LOGGER.error("Agua IOT Connection error: %s", e)
-            return False
-        except AguaIOTError as e:
-            _LOGGER.error("Agua IOT error: %s", e)
-            return False
-
-        languages = ["ENG"]
-        if agua.devices:
-            languages = sorted(
-                list(
-                    agua.devices[0].get_register_value_options_languages(
-                        "status_managed_get"
-                    )
-                )
+        if connection_mode == CONNECTION_MODE_BLUETOOTH:
+            return LocalBleAguaIOT(
+                hass=self.hass,
+                cached_devices=entry.data.get(CONF_BLE_BOOTSTRAP_DEVICES),
+                **return_kwargs,
             )
 
+        return aguaiot(**return_kwargs)
+
+    def _languages(self):
+        """Return the available register description languages."""
+        languages = ["ENG"]
+        coordinator = self.config_entry.runtime_data
+        agua = getattr(coordinator, "agua", None)
+        if agua and getattr(agua, "devices", None):
+            try:
+                languages = sorted(
+                    list(
+                        agua.devices[0].get_register_value_options_languages(
+                            "status_managed_get"
+                        )
+                    )
+                )
+            except (KeyError, IndexError, AttributeError):
+                pass
+
+        return languages
+
+    def _build_schema(self, user_input=None):
+        """Build the options form schema."""
+        user_input = user_input or {}
         schema = {
             vol.Optional(
                 CONF_AIR_TEMP_FIX,
-                default=self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
+                default=user_input.get(
+                    CONF_AIR_TEMP_FIX,
+                    self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
+                ),
             ): bool,
             vol.Optional(
                 CONF_READING_ERROR_FIX,
-                default=self.config_entry.options.get(CONF_READING_ERROR_FIX, False),
+                default=user_input.get(
+                    CONF_READING_ERROR_FIX,
+                    self.config_entry.options.get(CONF_READING_ERROR_FIX, False),
+                ),
             ): bool,
             vol.Optional(
                 CONF_UPDATE_INTERVAL,
-                default=self.config_entry.options.get(CONF_UPDATE_INTERVAL, 60),
+                default=user_input.get(
+                    CONF_UPDATE_INTERVAL,
+                    self.config_entry.options.get(CONF_UPDATE_INTERVAL, 60),
+                ),
             ): vol.All(vol.Coerce(int), vol.Range(min=10)),
             vol.Optional(
                 CONF_HTTP_TIMEOUT,
-                default=self.config_entry.options.get(CONF_HTTP_TIMEOUT, 30),
+                default=user_input.get(
+                    CONF_HTTP_TIMEOUT,
+                    self.config_entry.options.get(CONF_HTTP_TIMEOUT, 30),
+                ),
             ): vol.All(vol.Coerce(int), vol.Range(max=60)),
             vol.Optional(
                 CONF_BUFFER_READ_TIMEOUT,
-                default=self.config_entry.options.get(CONF_BUFFER_READ_TIMEOUT, 30),
+                default=user_input.get(
+                    CONF_BUFFER_READ_TIMEOUT,
+                    self.config_entry.options.get(CONF_BUFFER_READ_TIMEOUT, 30),
+                ),
             ): vol.All(vol.Coerce(int), vol.Range(max=60)),
             vol.Optional(
+                CONF_CONNECTION_MODE,
+                default=user_input.get(
+                    CONF_CONNECTION_MODE,
+                    self.config_entry.options.get(
+                        CONF_CONNECTION_MODE, CONNECTION_MODE_CLOUD
+                    ),
+                ),
+            ): vol.In(
+                {
+                    CONNECTION_MODE_CLOUD: "Cloud (Micronova API)",
+                    CONNECTION_MODE_BLUETOOTH: "Bluetooth local (auto-detect)",
+                }
+            ),
+            vol.Optional(
                 CONF_LANGUAGE,
-                default=self.config_entry.options.get(CONF_LANGUAGE, "ENG"),
-            ): vol.In(languages),
+                default=user_input.get(
+                    CONF_LANGUAGE,
+                    self.config_entry.options.get(CONF_LANGUAGE, "ENG"),
+                ),
+            ): vol.In(self._languages()),
         }
-        return self.async_show_form(step_id="user", data_schema=vol.Schema(schema))
+        return vol.Schema(schema)
+
+    async def async_step_user(self, user_input=None):
+        """Handle a flow initialized by the user."""
+        errors = {}
+
+        if user_input is not None:
+            connection_mode = user_input.get(
+                CONF_CONNECTION_MODE,
+                self.config_entry.options.get(
+                    CONF_CONNECTION_MODE, CONNECTION_MODE_CLOUD
+                ),
+            )
+            try:
+                agua = self._build_client(connection_mode)
+                await agua.connect()
+                if connection_mode == CONNECTION_MODE_BLUETOOTH:
+                    await agua.validate_local_connection()
+            except AguaIOTUnauthorized as e:
+                _LOGGER.error("Agua IOT Unauthorized: %s", e)
+                errors["base"] = "unauthorized"
+            except AguaIOTConnectionError as e:
+                _LOGGER.error("Agua IOT Connection error: %s", e)
+                errors["base"] = "connection_error"
+            except AguaIOTError as e:
+                _LOGGER.error("Agua IOT error: %s", e)
+                errors["base"] = "unknown_error"
+            else:
+                return self.async_create_entry(title="", data=user_input)
+
+        return self.async_show_form(
+            step_id="user",
+            data_schema=self._build_schema(user_input),
+            errors=errors,
+        )

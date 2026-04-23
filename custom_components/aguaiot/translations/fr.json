@@ -29,10 +29,15 @@
         "step": {
             "user": {
                 "title": "Options Micronova Agua IOT",
+                "description": "Sélectionnez `Bluetooth local` pour laisser Home Assistant détecter et valider automatiquement un module BLE Micronova à proximité lors de l'envoi du formulaire.",
                 "data": {
                     "air_temp_fix": "[Jolly Mec] Ignorer la température de l'air incorrecte lors de l'utilisation d'un thermostat externe.",
                     "reading_error_fix": "[Bronpi] Filtrer les lectures incorrectes (lorsque le poêle est sans alimentation).",
-                    "language": "Langue pour les descriptions"
+                    "http_timeout": "Délai d'attente des appels API (secondes).",
+                    "buffer_read_timeout": "Délai d'attente des lectures du poêle (secondes).",
+                    "connection_mode": "Mode de connexion.",
+                    "language": "Langue pour les descriptions",
+                    "update_interval": "Temps entre les mises à jour (secondes)."
                 }
             }
         }
