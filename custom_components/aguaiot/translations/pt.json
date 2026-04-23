@@ -1,40 +1,56 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Equipamento já configurado"
-        },
-        "error": {
-            "cannot_connect": "Falha na ligação",
-            "invalid_auth": "Falha na Autenticação ",
-            "unknown": "Erro desconhecido"
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "email": "Email",
-                    "password": "Senha",
-                    "endpoint": "App nome/marca"
-                },
-                "description": "Preencher com os parametros de Agua IOT"
-            }
-        }
+  "config": {
+    "abort": {
+      "already_configured": "Equipamento já configurado"
     },
-    "services": {
-        "sync_clock": {
-          "name": "Sincronizar Relógio do Forno",
-          "description": "Sincroniza a hora e a data do forno com a hora e a data atuais do Home Assistant."
-        }
+    "error": {
+      "cannot_connect": "Falha na ligação",
+      "invalid_auth": "Falha na Autenticação ",
+      "unknown": "Erro desconhecido"
     },
-    "options": {
-        "step": {
-            "user": {
-                "title": "Opções Micronova Agua IOT",
-                "data": {
-                    "air_temp_fix": "[Jolly Mec] Ignorar temperatura do ar incorreta ao usar termostato externo.",
-                    "reading_error_fix": "[Bronpi] Filtrar leituras incorretas (quando o forno está sem energia).",
-                    "language": "Idioma para descrições"
-                }
-            }
-        }
+    "step": {
+      "user": {
+        "data": {
+          "email": "Email",
+          "password": "Senha",
+          "endpoint": "App nome/marca"
+        },
+        "description": "Preencher com os parametros de Agua IOT"
+      }
     }
+  },
+  "services": {
+    "sync_clock": {
+      "name": "Sincronizar Relógio do Forno",
+      "description": "Sincroniza a hora e a data do forno com a hora e a data atuais do Home Assistant."
+    }
+  },
+  "options": {
+    "step": {
+      "user": {
+        "title": "Opções Micronova Agua IOT",
+        "data": {
+          "language": "Idioma para descrições",
+          "connection_mode": "Tryb połączenia:"
+        },
+        "sections": {
+          "device_fixes": {
+            "name": "Poprawki specyficzne dla urządzeń",
+            "data": {
+              "air_temp_fix": "[Jolly Mec] Ignorar temperatura do ar incorreta ao usar termostato externo.",
+              "reading_error_fix": "[Bronpi] Filtrar leituras incorretas (quando o forno está sem energia)."
+            }
+          }
+        }
+      }
+    }
+  },
+  "selector": {
+    "connection_mode": {
+      "options": {
+      "connection_cloud": "Cloud (Micronova API)",
+      "connection_bluetooth": "Bluetooth (auto-detect)"
+      }
+    }
+  }
 }

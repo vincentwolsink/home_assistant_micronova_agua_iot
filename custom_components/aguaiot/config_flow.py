@@ -21,6 +21,7 @@ from homeassistant.config_entries import (
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import callback
 from homeassistant.helpers.httpx_client import get_async_client
+from homeassistant.data_entry_flow import section
 
 from .const import (
     CONF_API_URL,
@@ -209,19 +210,19 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
         user_input = user_input or {}
         schema = {
             vol.Optional(
-                CONF_AIR_TEMP_FIX,
+                CONF_CONNECTION_MODE,
                 default=user_input.get(
-                    CONF_AIR_TEMP_FIX,
-                    self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
+                    CONF_CONNECTION_MODE,
+                    self.config_entry.options.get(
+                        CONF_CONNECTION_MODE, CONNECTION_MODE_CLOUD
+                    ),
                 ),
-            ): bool,
-            vol.Optional(
-                CONF_READING_ERROR_FIX,
-                default=user_input.get(
-                    CONF_READING_ERROR_FIX,
-                    self.config_entry.options.get(CONF_READING_ERROR_FIX, False),
-                ),
-            ): bool,
+            ): vol.In(
+                {
+                    CONNECTION_MODE_CLOUD,
+                    CONNECTION_MODE_BLUETOOTH,
+                }
+            ),
             vol.Optional(
                 CONF_UPDATE_INTERVAL,
                 default=user_input.get(
@@ -244,26 +245,34 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                 ),
             ): vol.All(vol.Coerce(int), vol.Range(max=60)),
             vol.Optional(
-                CONF_CONNECTION_MODE,
-                default=user_input.get(
-                    CONF_CONNECTION_MODE,
-                    self.config_entry.options.get(
-                        CONF_CONNECTION_MODE, CONNECTION_MODE_CLOUD
-                    ),
-                ),
-            ): vol.In(
-                {
-                    CONNECTION_MODE_CLOUD: "Cloud (Micronova API)",
-                    CONNECTION_MODE_BLUETOOTH: "Bluetooth local (auto-detect)",
-                }
-            ),
-            vol.Optional(
                 CONF_LANGUAGE,
                 default=user_input.get(
                     CONF_LANGUAGE,
                     self.config_entry.options.get(CONF_LANGUAGE, "ENG"),
                 ),
             ): vol.In(self._languages()),
+            "device_fixes": section(
+                vol.Schema(
+                    {
+                        vol.Optional(
+                            CONF_AIR_TEMP_FIX,
+                            default=user_input.get(
+                                CONF_AIR_TEMP_FIX,
+                                self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
+                            ),
+                        ): bool,
+                        vol.Optional(
+                            CONF_READING_ERROR_FIX,
+                            default=user_input.get(
+                                CONF_READING_ERROR_FIX,
+                                self.config_entry.options.get(
+                                    CONF_READING_ERROR_FIX, False
+                                ),
+                            ),
+                        ): bool,
+                    }
+                )
+            ),
         }
         return vol.Schema(schema)
 

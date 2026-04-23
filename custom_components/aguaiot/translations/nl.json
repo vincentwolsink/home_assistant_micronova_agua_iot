@@ -1,43 +1,60 @@
 {
-    "config": {
-        "abort": {
-            "device_already_configured": "Het apparaat is reeds geconfigureerd."
-        },
-        "error": {
-            "connection_error": "Verbinding met Agua IOT API is niet mogelijk.",
-            "unauthorized": "Inloggen mislukt, valideer de gebruikersdata.",
-            "unknown_error": "Onbekende fout, valideer de configuratie."
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "email": "Email adres",
-                    "password": "Wachtwoord",
-                    "endpoint": "App naam/merk"
-                },
-                "description": "Vul Agua IOT gegevens in"
-            }
-        }
+  "config": {
+    "abort": {
+      "device_already_configured": "Het apparaat is reeds geconfigureerd."
     },
-    "services": {
-        "sync_clock": {
-          "name": "Synchroniseer Kachel Klok",
-          "description": "Synchroniseer kachel datum en tijd met de huidige Home Assistant datum en tijd."
-        }
+    "error": {
+      "connection_error": "Verbinding met Agua IOT API is niet mogelijk.",
+      "unauthorized": "Inloggen mislukt, valideer de gebruikersdata.",
+      "unknown_error": "Onbekende fout, valideer de configuratie."
     },
-    "options": {
-        "step": {
-            "user": {
-                "title": "Micronova Agua IOT opties",
-                "data": {
-                    "air_temp_fix": "[Jolly Mec] Negeer foutieve air temperature bij gebruik van een externe thermostaat.",
-                    "reading_error_fix": "[Bronpi] Filter foutieve waardes (wanneer kachel geen stroom heeft).",
-                    "http_timeout": "Timeout voor API verzoeken (seconden).",
-                    "buffer_read_timeout": "Timeout voor kachel buffer uitlezen (seconden).",
-                    "language": "Taal voor beschrijvingen.",
-                    "update_interval": "Tijd tussen updates (seconden)."
-                }
-            }
-        }
+    "step": {
+      "user": {
+        "data": {
+          "email": "Email adres",
+          "password": "Wachtwoord",
+          "endpoint": "App naam/merk"
+        },
+        "description": "Vul Agua IOT gegevens in"
+      }
     }
+  },
+  "services": {
+    "sync_clock": {
+      "name": "Synchroniseer Kachel Klok",
+      "description": "Synchroniseer kachel datum en tijd met de huidige Home Assistant datum en tijd."
+    }
+  },
+  "options": {
+    "step": {
+      "user": {
+        "title": "Micronova Agua IOT opties",
+        "data": {
+          "description": "Selecteer `Bluetooth (auto-detect)` zodat Home Assistant automatisch een Micronova BLE-module in de buurt detecteert en valideert bij verzenden van het formulier (experimenteel).",
+          "http_timeout": "Timeout voor API verzoeken (seconden).",
+          "buffer_read_timeout": "Timeout voor kachel buffer uitlezen (seconden).",
+          "language": "Taal voor beschrijvingen.",
+          "update_interval": "Tijd tussen updates (seconden).",
+          "connection_mode": "Connectie modus:"
+        },
+        "sections": {
+          "device_fixes": {
+            "name": "Apparaat specifieke fixes",
+            "data": {
+              "air_temp_fix": "[Jolly Mec] Negeer foutieve air temperature bij gebruik van een externe thermostaat.",
+              "reading_error_fix": "[Bronpi] Filter foutieve waardes (wanneer kachel geen stroom heeft)."
+            }
+          }
+        }
+      }
+    }
+  },
+  "selector": {
+    "connection_mode": {
+      "options": {
+        "connection_cloud": "Cloud (Micronova API)",
+        "connection_bluetooth": "Bluetooth (auto-detect)"
+      }
+    }
+  }
 }
