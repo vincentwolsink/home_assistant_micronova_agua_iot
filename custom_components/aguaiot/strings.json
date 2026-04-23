@@ -33,16 +33,31 @@
     "step": {
       "user": {
         "title": "Micronova Agua IOT options",
-        "description": "Select `Bluetooth local` to let Home Assistant auto-detect and validate a nearby Micronova BLE module when you submit the form.",
+        "description": "Select `Bluetooth (auto-detect)` to let Home Assistant auto-detect and validate a nearby Micronova BLE module when you submit the form (experimental).",
         "data": {
-          "air_temp_fix": "[Jolly Mec] Ignore incorrect air temperature when using external themostat.",
-          "reading_error_fix": "[Bronpi] Filter incorrect readings (when stove is without power).",
           "http_timeout": "Timeout for API calls (seconds).",
           "buffer_read_timeout": "Timeout for stove buffer reading (seconds).",
-          "connection_mode": "Connection mode.",
           "language": "Language for descriptions.",
-          "update_interval": "Time between updates (seconds)."
+          "update_interval": "Time between updates (seconds).",
+          "connection_mode": "Connection mode:"
+        },
+        "sections": {
+          "device_fixes": {
+            "name": "Device specific fixes",
+            "data": {
+              "air_temp_fix": "[Jolly Mec] Ignore incorrect air temperature when using external themostat.",
+              "reading_error_fix": "[Bronpi] Filter incorrect readings (when stove is without power)."
+            }
+          }
         }
+      }
+    }
+  },
+  "selector": {
+    "connection_mode": {
+      "options": {
+        "connection_cloud": "Cloud (Micronova API)",
+        "connection_bluetooth": "Bluetooth (auto-detect)"
       }
     }
   }

@@ -1,45 +1,60 @@
 {
-    "config": {
-        "abort": {
-            "device_already_configured": "L'appareil est déjà configuré."
-        },
-        "error": {
-            "connection_error": "La connection à l'API Agua IOT n'est pas possible.",
-            "unauthorized": "Échec de la connexion, veuillez vérifier vos identifiants.",
-            "unknown_error": "Erreur inconue, veuillez vérifier la configuration."
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "email": "Adresse email",
-                    "password": "Mot de passe",
-                    "endpoint": "App nom/marque"
-                },
-                "description": "Remplissez les paramètres Agua IOT"
-            }
-        }
+  "config": {
+    "abort": {
+      "device_already_configured": "L'appareil est déjà configuré."
     },
-    "services": {
-        "sync_clock": {
-          "name": "Synchroniser l'horloge du poêle",
-          "description": "Synchronise l'heure et la date du poêle avec l'heure et la date actuelles de Home Assistant."
-        }
+    "error": {
+      "connection_error": "La connection à l'API Agua IOT n'est pas possible.",
+      "unauthorized": "Échec de la connexion, veuillez vérifier vos identifiants.",
+      "unknown_error": "Erreur inconue, veuillez vérifier la configuration."
     },
-    "options": {
-        "step": {
-            "user": {
-                "title": "Options Micronova Agua IOT",
-                "description": "Sélectionnez `Bluetooth local` pour laisser Home Assistant détecter et valider automatiquement un module BLE Micronova à proximité lors de l'envoi du formulaire.",
-                "data": {
-                    "air_temp_fix": "[Jolly Mec] Ignorer la température de l'air incorrecte lors de l'utilisation d'un thermostat externe.",
-                    "reading_error_fix": "[Bronpi] Filtrer les lectures incorrectes (lorsque le poêle est sans alimentation).",
-                    "http_timeout": "Délai d'attente des appels API (secondes).",
-                    "buffer_read_timeout": "Délai d'attente des lectures du poêle (secondes).",
-                    "connection_mode": "Mode de connexion.",
-                    "language": "Langue pour les descriptions",
-                    "update_interval": "Temps entre les mises à jour (secondes)."
-                }
-            }
-        }
+    "step": {
+      "user": {
+        "data": {
+          "email": "Adresse email",
+          "password": "Mot de passe",
+          "endpoint": "App nom/marque"
+        },
+        "description": "Remplissez les paramètres Agua IOT"
+      }
     }
+  },
+  "services": {
+    "sync_clock": {
+      "name": "Synchroniser l'horloge du poêle",
+      "description": "Synchronise l'heure et la date du poêle avec l'heure et la date actuelles de Home Assistant."
+    }
+  },
+  "options": {
+    "step": {
+      "user": {
+        "title": "Options Micronova Agua IOT",
+        "description": "Sélectionnez `Bluetooth (auto-detect)` pour laisser Home Assistant détecter et valider automatiquement un module BLE Micronova à proximité lors de l'envoi du formulaire (expérimental).",
+        "data": {
+          "http_timeout": "Délai d'attente des appels API (secondes).",
+          "buffer_read_timeout": "Délai d'attente des lectures du poêle (secondes).",
+          "language": "Langue pour les descriptions",
+          "update_interval": "Temps entre les mises à jour (secondes).",
+          "connection_mode": "Mode de connexion:"
+        },
+        "sections": {
+          "device_fixes": {
+            "name": "Correctifs spécifiques aux appareils",
+            "data": {
+              "air_temp_fix": "[Jolly Mec] Ignorer la température de l'air incorrecte lors de l'utilisation d'un thermostat externe.",
+              "reading_error_fix": "[Bronpi] Filtrer les lectures incorrectes (lorsque le poêle est sans alimentation)."
+            }
+          }
+        }
+      }
+    }
+  },
+  "selector": {
+    "connection_mode": {
+      "options": {
+        "connection_cloud": "Cloud (Micronova API)",
+        "connection_bluetooth": "Bluetooth (auto-detect)"
+      }
+    }
+  }
 }
