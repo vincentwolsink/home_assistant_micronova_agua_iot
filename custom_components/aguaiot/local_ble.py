@@ -28,6 +28,9 @@ _LOGGER = logging.getLogger(__name__)
 DEFAULT_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
 DEFAULT_CHAR_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
 DEFAULT_NAME_PREFIX = "T009_"
+# Newer Micronova/MCZ BLE modules advertise as NAVEL_<suffix> instead of T009_<suffix>.
+# The suffix (last 6 chars of the MAC) is identical, only the family prefix changes.
+LOCAL_NAME_PREFIXES = ("T009_", "NAVEL_")
 BLE_DISCOVERY_RETRY_INTERVAL = 1
 BLE_DISCOVERY_MAX_WAIT = 30
 BLE_DEFAULT_PAYLOAD_SIZE = 20
@@ -562,10 +565,18 @@ class LocalBleAguaIOT:
                     )
                     return service_info.device, ""
 
-                if expected_name and service_name == expected_name:
+                if expected_name and (
+                    service_name == expected_name
+                    or (
+                        len(expected_name) >= 6
+                        and service_name.endswith(expected_name[-6:])
+                        and service_name.startswith(LOCAL_NAME_PREFIXES)
+                    )
+                ):
                     _LOGGER.debug(
-                        "Matched BLE service info for '%s' by exact name %s (address=%s, connectable=%s)",
+                        "Matched BLE service info for '%s' by name %s (expected=%s, address=%s, connectable=%s)",
                         device.name,
+                        service_name,
                         expected_name,
                         service_address,
                         connectable,
@@ -573,7 +584,7 @@ class LocalBleAguaIOT:
                     return service_info.device, ""
 
                 if fallback_prefix_device is None and service_name.startswith(
-                    DEFAULT_NAME_PREFIX
+                    LOCAL_NAME_PREFIXES
                 ):
                     fallback_prefix_device = service_info.device
 
