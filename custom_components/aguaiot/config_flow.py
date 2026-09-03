@@ -25,6 +25,8 @@ from .const import (
     CONF_AIR_TEMP_FIX,
     CONF_API_URL,
     CONF_BLE_BOOTSTRAP_DEVICES,
+    CONF_BLE_CHAR_UUID,
+    CONF_BLE_SERVICE_UUID,
     CONF_BRAND,
     CONF_BRAND_ID,
     CONF_BUFFER_READ_TIMEOUT,
@@ -42,7 +44,7 @@ from .const import (
     DOMAIN,
     ENDPOINTS,
 )
-from .local_ble import LocalBleAguaIOT
+from .local_ble import DEFAULT_CHAR_UUID, DEFAULT_SERVICE_UUID, LocalBleAguaIOT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -178,6 +180,12 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
             return LocalBleAguaIOT(
                 hass=self.hass,
                 cached_devices=entry.data.get(CONF_BLE_BOOTSTRAP_DEVICES),
+                service_uuid=self.config_entry.options.get(
+                    CONF_BLE_SERVICE_UUID, DEFAULT_SERVICE_UUID
+                ),
+                char_uuid=self.config_entry.options.get(
+                    CONF_BLE_CHAR_UUID, DEFAULT_CHAR_UUID
+                ),
                 **return_kwargs,
             )
 

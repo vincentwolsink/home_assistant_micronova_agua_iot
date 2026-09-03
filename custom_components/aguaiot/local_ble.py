@@ -11,6 +11,11 @@ import uuid
 from typing import Any
 
 from bleak import BleakClient, BleakError
+
+try:
+    from bleak.exc import BleakGATTProtocolError
+except ImportError:  # bleak < 3.0
+    BleakGATTProtocolError = BleakError
 from bleak_retry_connector import BleakClientWithServiceCache, establish_connection
 from homeassistant.components import bluetooth
 from homeassistant.core import HomeAssistant
@@ -324,7 +329,7 @@ class LocalBleAguaIOT:
             mask = int(register["mask"])
             item_offsets.append(int(register["offset"]))
             masks.append(mask)
-            bit_data.append(16 if mask > 0xFF else 8)
+            bit_data.append(8)
             values.append(value)
 
         payload = {
@@ -575,8 +580,10 @@ class LocalBleAguaIOT:
                     )
                     return service_info.device, ""
 
-                if fallback_prefix_device is None and service_name.startswith(
-                    LOCAL_NAME_PREFIXES
+                if (
+                    fallback_prefix_device is None
+                    and service_name.startswith(LOCAL_NAME_PREFIXES)
+                    and service_address in candidate_addresses
                 ):
                     fallback_prefix_device = service_info.device
 
@@ -876,16 +883,10 @@ class _BleMicronovaSession:
             )
             expected_len = self._notif_len
         except asyncio.TimeoutError as err:
-            _LOGGER.debug(
-                "No BLE notification received for '%s' command '%s'; "
-                "falling back to direct characteristic read.",
-                self._device.name,
-                cmd_name,
-            )
-            if cmd_name != "RequestWriting":
-                raise AguaIOTUpdateError(
-                    f"Bluetooth response timeout while talking to '{self._device.name}'."
-                ) from err
+            raise AguaIOTUpdateError(
+                f"Bluetooth response timeout while talking to '{self._device.name}' "
+                f"(command '{cmd_name}')."
+            ) from err
 
         response = await self._read_json_response(expected_len)
         self._response_ready.clear()
@@ -921,20 +922,55 @@ class _BleMicronovaSession:
                 response=True,
             )
 
+    async def _read_gatt_char_with_retry(self) -> bytes:
+        """Read a characteristic chunk, retrying transient GATT protocol errors.
+
+        BlueZ intermittently returns Unlikely Error (0x0E) when a read races with
+        the 'response length ready' notification arriving before the response body
+        has been fully written to the characteristic. A short backoff with a few
+        retries smooths over that variation instead of failing the whole update.
+        """
+        attempts = 3
+        delay = 0.2
+        for attempt in range(attempts):
+            try:
+                assert self._client is not None
+                assert self._characteristic_uuid is not None
+                return bytes(
+                    await self._client.read_gatt_char(self._characteristic_uuid)
+                )
+            except BleakGATTProtocolError as err:
+                if attempt == attempts - 1:
+                    raise
+                _LOGGER.debug(
+                    "Transient GATT protocol error reading '%s' (attempt %s/%s): %s",
+                    self._device.name,
+                    attempt + 1,
+                    attempts,
+                    err,
+                )
+                await asyncio.sleep(delay)
+        raise AssertionError("unreachable")  # pragma: no cover
+
     async def _read_json_response(self, expected_len: int | None) -> dict[str, Any]:
         """Read one or more chunks from the characteristic until the JSON body is complete."""
         assert self._client is not None
         assert self._characteristic_uuid is not None
 
-        if not expected_len or expected_len <= 0:
-            raw = await self._client.read_gatt_char(self._characteristic_uuid)
-            return _parse_json_response(bytes(raw))
+        if expected_len is None:
+            raw = await self._read_gatt_char_with_retry()
+            return _parse_json_response(raw)
+
+        if expected_len <= 0:
+            raise AguaIOTUpdateError(
+                f"Bluetooth notification reported an invalid response length for '{self._device.name}'."
+            )
 
         data = bytearray()
         last_chunk: bytes | None = None
 
         for _ in range(32):
-            chunk = bytes(await self._client.read_gatt_char(self._characteristic_uuid))
+            chunk = await self._read_gatt_char_with_retry()
             if not chunk:
                 break
             if chunk == last_chunk:
@@ -956,6 +992,11 @@ def _parse_json_response(raw: bytes) -> dict[str, Any]:
     """Parse a BLE response that may optionally include the Micronova JSON header."""
     if raw.startswith(b"JSON") and len(raw) >= 8:
         body_len = struct.unpack_from("<H", raw, 4)[0]
+        if len(raw) < 8 + body_len:
+            raise AguaIOTUpdateError(
+                f"Truncated Micronova BLE response: header declares {body_len} bytes "
+                f"but only {len(raw) - 8} were received."
+            )
         raw = raw[8 : 8 + body_len]
 
     first_json = raw.find(b"{")
