@@ -536,6 +536,21 @@ SENSORS = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.DURATION,
     ),
+    AguaIOTSensorEntityDescription(
+        key="ore_service_get",
+        name="Service Hours",
+        icon="mdi:wrench-clock",
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        device_class=SensorDeviceClass.DURATION,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="ore_service_soglia_get",
+        name="Threshold Service Hours",
+        icon="mdi:wrench-clock",
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        device_class=SensorDeviceClass.DURATION,
+    ),
 )
 
 SWITCHES = (
