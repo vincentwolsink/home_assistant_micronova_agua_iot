@@ -94,6 +94,25 @@ def _is_ble_authorization_error(err: Exception) -> bool:
     )
 
 
+_ATT_UNLIKELY_ERROR = 0x85
+
+
+def _is_transient_gatt_read_error(err: Exception) -> bool:
+    """Return True for transient GATT read errors that are worth retrying.
+
+    The bleak_esphome backend surfaces BlueZ's Unlikely Error (0x0E) and its
+    re-mapped ATT code (0x85/133) as a plain BleakError whose message embeds the
+    error code, e.g. "error=133". These happen when a read races with the
+    'response length ready' notification and typically succeed on retry.
+    """
+    if isinstance(err, BleakGATTProtocolError):
+        return True
+    match = re.search(r"(?:error|code)=(\d+)", str(err), re.IGNORECASE)
+    if not match:
+        return False
+    return int(match.group(1)) == _ATT_UNLIKELY_ERROR
+
+
 def _normalize_ble_address(value: str | None) -> str | None:
     """Return a colon-separated BLE address."""
     if not value:
@@ -929,6 +948,10 @@ class _BleMicronovaSession:
         the 'response length ready' notification arriving before the response body
         has been fully written to the characteristic. A short backoff with a few
         retries smooths over that variation instead of failing the whole update.
+
+        The bleak_esphome backend reports the same condition as a plain BleakError
+        carrying the ATT Unlikely Error (0x85/133) code in its message; both are
+        treated as transient and retried.
         """
         attempts = 3
         delay = 0.2
@@ -939,11 +962,11 @@ class _BleMicronovaSession:
                 return bytes(
                     await self._client.read_gatt_char(self._characteristic_uuid)
                 )
-            except BleakGATTProtocolError as err:
-                if attempt == attempts - 1:
+            except (BleakGATTProtocolError, BleakError) as err:
+                if not _is_transient_gatt_read_error(err) or attempt == attempts - 1:
                     raise
                 _LOGGER.debug(
-                    "Transient GATT protocol error reading '%s' (attempt %s/%s): %s",
+                    "Transient GATT error reading '%s' (attempt %s/%s): %s",
                     self._device.name,
                     attempt + 1,
                     attempts,
