@@ -96,6 +96,25 @@ def _is_ble_authorization_error(err: Exception) -> bool:
 
 _ATT_UNLIKELY_ERROR = 0x85
 
+_STALE_GATT_MSGS = (
+    "Service Discovery has not been performed",
+    "was not found",
+)
+
+
+def _is_stale_gatt_state(err: Exception) -> bool:
+    """Return True when the GATT cache no longer reflects the live connection.
+
+    This happens when the OS/BLE-proxy transport transparently drops and re-establishes
+    the link mid-session, invalidating the services/characteristics cached during the
+    earlier (successful) discovery. Any subsequent GATT op then fails because bleak
+    reports that discovery has not been performed, or that a previously-known
+    characteristic is missing. The only recovery is a fresh connection + service
+    discovery, so callers escalate to a connection-level error that triggers one.
+    """
+    message = str(err)
+    return any(msg in message for msg in _STALE_GATT_MSGS)
+
 
 def _is_transient_gatt_read_error(err: Exception) -> bool:
     """Return True for transient GATT read errors that are worth retrying.
@@ -437,28 +456,32 @@ class LocalBleAguaIOT:
         action: str,
         operation,
     ) -> Any:
-        """Run one BLE action with a single retry on lost authorization."""
+        """Run one BLE action with a single retry on connection failures."""
         for attempt in range(2):
             try:
                 async with self._device_session(device) as session:
                     await session.identity()
                     return await operation(session)
             except (BleakError, AguaIOTConnectionError) as err:
-                if not _is_ble_authorization_error(err):
+                retryable = isinstance(
+                    err, AguaIOTConnectionError
+                ) or _is_ble_authorization_error(err)
+                if not retryable:
                     raise
 
                 if attempt == 0:
                     _LOGGER.warning(
-                        "Micronova BLE link for '%s' lost authorization while %s; retrying once with a fresh connection.",
+                        "Micronova BLE link for '%s' failed while %s (%s); retrying once with a fresh connection.",
                         device.name,
                         action,
+                        err,
                     )
                     await asyncio.sleep(0.5)
                     continue
 
                 raise AguaIOTConnectionError(
-                    f"Bluetooth connection to '{device.name}' lost authorization while {action}. "
-                    "The Navel/T009 module or Bluetooth proxy dropped its authorized GATT state; "
+                    f"Bluetooth connection to '{device.name}' failed while {action}. "
+                    "The Navel/T009 module or Bluetooth proxy dropped its connection state; "
                     "reloading the integration or resetting the BLE module may be required."
                 ) from err
 
@@ -787,8 +810,8 @@ class _BleMicronovaSession:
             try:
                 if self._client:
                     await self._client.disconnect()
-            except EOFError:
-                pass  # BlueZ already closed the connection
+            except (EOFError, BleakError):
+                pass  # connection already closed/dropped by the transport
             finally:
                 self._transport._command_lock.release()
 
@@ -925,9 +948,7 @@ class _BleMicronovaSession:
         self._response_ready.clear()
         self._notif_len = None
 
-        await self._client.write_gatt_char(
-            self._characteristic_uuid, header, response=True
-        )
+        await self._write_gatt_char(header)
 
         # Use the ATT payload size guaranteed by the default BLE MTU.
         # Reading BleakClient.mtu_size on BlueZ emits a warning unless BlueZ-specific
@@ -935,11 +956,23 @@ class _BleMicronovaSession:
         # Home Assistant logs. The Micronova tunnel works with safe 20-byte chunks.
         for index in range(0, len(body), BLE_DEFAULT_PAYLOAD_SIZE):
             chunk = body[index : index + BLE_DEFAULT_PAYLOAD_SIZE]
+            await self._write_gatt_char(chunk)
+
+    async def _write_gatt_char(self, data: bytes) -> None:
+        """Write one chunk, escalating stale GATT state to a connection error."""
+        assert self._client is not None
+        assert self._characteristic_uuid is not None
+        try:
             await self._client.write_gatt_char(
-                self._characteristic_uuid,
-                chunk,
-                response=True,
+                self._characteristic_uuid, data, response=True
             )
+        except (BleakGATTProtocolError, BleakError) as err:
+            if _is_stale_gatt_state(err):
+                raise AguaIOTConnectionError(
+                    f"BLE GATT services lost for '{self._device.name}'; "
+                    "the connection was reset and needs a fresh session."
+                ) from err
+            raise
 
     async def _read_gatt_char_with_retry(self) -> bytes:
         """Read a characteristic chunk, retrying transient GATT protocol errors.
@@ -963,6 +996,11 @@ class _BleMicronovaSession:
                     await self._client.read_gatt_char(self._characteristic_uuid)
                 )
             except (BleakGATTProtocolError, BleakError) as err:
+                if _is_stale_gatt_state(err):
+                    raise AguaIOTConnectionError(
+                        f"BLE GATT services lost for '{self._device.name}'; "
+                        "the connection was reset and needs a fresh session."
+                    ) from err
                 if not _is_transient_gatt_read_error(err) or attempt == attempts - 1:
                     raise
                 _LOGGER.debug(
