@@ -78,6 +78,7 @@ For local stove control with custom hardware on the stove bus, take a look at on
 * https://github.com/eni23/micronova-controller
 * https://github.com/fabrizioromanelli/Pellet-Stove-Control
 * https://github.com/philibertc/micronova_controller
+* https://github.com/Shad107/OpenXtraflame
 
 [releases-shield]: https://img.shields.io/github/v/release/vincentwolsink/home_assistant_micronova_agua_iot.svg?style=for-the-badge
 [releases]: https://github.com/vincentwolsink/home_assistant_micronova_agua_iot/releases
