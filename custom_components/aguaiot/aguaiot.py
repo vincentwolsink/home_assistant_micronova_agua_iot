@@ -397,7 +397,7 @@ class aguaiot:
                 buffer_read_loop(res_req["idRequest"]),
                 self.buffer_read_timeout,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise AguaIOTUpdateError(
                 f"Timeout on waiting device buffer read to complete within {self.buffer_read_timeout} seconds."
             )

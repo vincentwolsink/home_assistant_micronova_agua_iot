@@ -8,7 +8,7 @@ import logging
 import re
 import struct
 import uuid
-from typing import Any
+from typing import Any, Self
 
 from bleak import BleakClient, BleakError
 
@@ -19,7 +19,6 @@ except ImportError:  # bleak < 3.0
 from bleak_retry_connector import BleakClientWithServiceCache, establish_connection
 from homeassistant.components import bluetooth
 from homeassistant.core import HomeAssistant
-from typing_extensions import Self
 
 from .aguaiot import (
     AguaIOTConnectionError,
@@ -924,7 +923,7 @@ class _BleMicronovaSession:
                 timeout=notify_timeout,
             )
             expected_len = self._notif_len
-        except asyncio.TimeoutError as err:
+        except TimeoutError as err:
             raise AguaIOTUpdateError(
                 f"Bluetooth response timeout while talking to '{self._device.name}' "
                 f"(command '{cmd_name}')."
