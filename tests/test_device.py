@@ -129,6 +129,56 @@ class TestGetRegisterValue:
         val = device.get_register_value("status_get")
         assert val is None
 
+    @pytest.mark.parametrize(
+        "formula,mask,formatted",
+        [
+            ("#", 65535, 32768),
+            ("#/2", 65535, 16384),
+            ("#+30", 65535, 32798),
+            ("#", 255, 0),
+        ],
+    )
+    def test_reading_error_fix_uses_raw_word(
+        self, aguaiot_mock, formula, mask, formatted
+    ):
+        register_map = {
+            "temp_get": {
+                "reg_key": "temp_get",
+                "offset": 1,
+                "mask": mask,
+                "formula": formula,
+                "formula_inverse": "#",
+            }
+        }
+        device = build_device_from_fixture(aguaiot_mock, "test", register_map)
+        device._Device__register_dict = device._Device__build_register_dict({1: 32768})
+        assert device.get_register("temp_get")["value"] == formatted
+
+        # Without the fix the failed read is exposed as is
+        assert device.get_register_value("temp_get") == formatted
+
+        aguaiot_mock.reading_error_fix = True
+        assert device.get_register_value("temp_get") is None
+
+    def test_reading_error_fix_keeps_valid_masked_values(self, aguaiot_mock):
+        aguaiot_mock.reading_error_fix = True
+        device = build_device_from_fixture(
+            aguaiot_mock,
+            "test",
+            {
+                "status_get": {
+                    "reg_key": "status_get",
+                    "offset": 1,
+                    "mask": 255,
+                    "formula": "#",
+                    "formula_inverse": "#",
+                    "value_raw": "0",
+                    "value": 0,
+                }
+            },
+        )
+        assert device.get_register_value("status_get") == 0
+
     def test_air_temp_fix_only_affects_air_keys(self, aguaiot_mock):
         aguaiot_mock.air_temp_fix = True
         device = build_device_from_fixture(
