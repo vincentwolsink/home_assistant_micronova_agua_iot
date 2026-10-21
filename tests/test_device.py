@@ -148,16 +148,19 @@ class TestGetRegisterValue:
                 "mask": mask,
                 "formula": formula,
                 "formula_inverse": "#",
+                "value_raw": "32768",
             }
         }
-        device = build_device_from_fixture(aguaiot_mock, "test", register_map)
-        device._Device__register_dict = device._Device__build_register_dict({1: 32768})
-        assert device.get_register("temp_get")["value"] == formatted
-
         # Without the fix the failed read is exposed as is
+        device = build_device_from_fixture(aguaiot_mock, "test", register_map)
+        assert device.get_register("temp_get")["value"] == formatted
         assert device.get_register_value("temp_get") == formatted
 
+        # With the fix the failed read is dropped, also when the mask or the
+        # formula hides the error value
         aguaiot_mock.reading_error_fix = True
+        device = build_device_from_fixture(aguaiot_mock, "test", register_map)
+        assert device.get_register("temp_get")["value"] is None
         assert device.get_register_value("temp_get") is None
 
     def test_reading_error_fix_keeps_valid_masked_values(self, aguaiot_mock):

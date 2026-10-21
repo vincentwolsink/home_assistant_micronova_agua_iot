@@ -526,7 +526,18 @@ class Device:
             register_dict[key] = dict(register)
             if offset in raw_data:
                 raw_value = raw_data[offset]
-                register_dict[key]["value_word"] = int(raw_value)
+                # Fix for reading errors from wifi module. Check the raw word,
+                # as masks and formulas hide the failed read value.
+                if (
+                    self.__aguaiot.reading_error_fix
+                    and int(raw_value) == READING_ERROR_VALUE
+                ):
+                    _LOGGER.debug(
+                        f"Applied reading_error_fix. Dropped value for register {key}"
+                    )
+                    register_dict[key]["value_raw"] = None
+                    register_dict[key]["value"] = None
+                    continue
                 register_dict[key]["value_raw"] = str(raw_value & register["mask"])
                 try:
                     formula = (
@@ -544,7 +555,6 @@ class Device:
                 except (KeyError, ValueError):
                     register_dict[key]["value"] = None
             else:
-                register_dict[key]["value_word"] = None
                 register_dict[key]["value_raw"] = None
                 register_dict[key]["value"] = None
 
@@ -617,17 +627,6 @@ class Device:
 
     def get_register_value(self, key):
         value = self.get_register(key).get("value")
-
-        # Fix for reading errors from wifi module. Check the unmasked word, as
-        # masks and formulas hide the failed read value.
-        if (
-            self.__aguaiot.reading_error_fix
-            and self.get_register(key).get("value_word") == READING_ERROR_VALUE
-        ):
-            _LOGGER.debug(
-                f"Applied reading_error_fix. Dropped value {value} for register {key}"
-            )
-            return
 
         # Fix for stoves abusing air temp register
         if (
