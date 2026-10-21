@@ -280,8 +280,8 @@ class aguaiot:
             await dev.update_mapping()
 
     async def update(self):
-        for dev in self.devices:
-            await dev.update()
+        """Update the register values of all devices."""
+        await update_devices(self.devices)
 
     async def handle_webcall(self, method, url, payload):
         if time.time() > self.token_expires:
@@ -771,3 +771,26 @@ class AguaIOTUpdateError(AguaIOTError):
 
     def __init__(self, message):
         super().__init__(message)
+
+
+async def update_devices(devices, delay=0):
+    """Update the register values of all devices.
+
+    A failing device does not stop the other devices from being updated.
+    When every device failed the error is raised, so the coordinator can
+    mark the update as failed.
+    """
+    errors = []
+    for index, dev in enumerate(devices):
+        if index and delay:
+            await asyncio.sleep(delay)
+        try:
+            await dev.update()
+        except AguaIOTError as e:
+            _LOGGER.error("Failed to update device '%s': %s", dev.name, e)
+            errors.append(e)
+
+    if errors and len(errors) == len(devices):
+        raise AguaIOTUpdateError(
+            "Failed to update all devices: " + ", ".join(str(error) for error in errors)
+        )

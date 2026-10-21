@@ -4,7 +4,21 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from tests.helpers import AguaIOTUnauthorized, aguaiot
+from tests.helpers import AguaIOTUnauthorized, AguaIOTUpdateError, aguaiot
+
+
+class FakeDevice:
+    """Device stub which fails or succeeds on every update."""
+
+    def __init__(self, name, fail=False):
+        self.name = name
+        self.fail = fail
+        self.updated = False
+
+    async def update(self):
+        if self.fail:
+            raise AguaIOTUpdateError(f"Failed to update {self.name}")
+        self.updated = True
 
 
 class TestHeaders:
@@ -225,3 +239,37 @@ class TestConnectFlow:
 
         with pytest.raises(AguaIOTUnauthorized):
             await inst.login()
+
+
+class TestUpdate:
+    @pytest.mark.asyncio
+    async def test_failing_device_raises_error(self, aguaiot_mock):
+        aguaiot_mock.devices = [FakeDevice("failing", fail=True)]
+
+        with pytest.raises(AguaIOTUpdateError):
+            await aguaiot_mock.update()
+
+    @pytest.mark.asyncio
+    async def test_failing_device_does_not_stop_other_devices(self, aguaiot_mock):
+        working = FakeDevice("working")
+        aguaiot_mock.devices = [FakeDevice("failing", fail=True), working]
+
+        await aguaiot_mock.update()
+
+        assert working.updated is True
+
+    @pytest.mark.asyncio
+    async def test_all_devices_failing_raises_error(self, aguaiot_mock):
+        aguaiot_mock.devices = [
+            FakeDevice("failing-1", fail=True),
+            FakeDevice("failing-2", fail=True),
+        ]
+
+        with pytest.raises(AguaIOTUpdateError):
+            await aguaiot_mock.update()
+
+    @pytest.mark.asyncio
+    async def test_no_devices_does_not_raise_error(self, aguaiot_mock):
+        aguaiot_mock.devices = []
+
+        await aguaiot_mock.update()

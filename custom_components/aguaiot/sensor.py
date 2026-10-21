@@ -104,7 +104,7 @@ class AguaIOTHeatingSensor(CoordinatorEntity, SensorEntity):
             cur_value = self._device.get_register_value_description(
                 self.entity_description.key
             )
-            if cur_value not in options:
+            if cur_value is not None and cur_value not in options:
                 options.append(cur_value)
 
             return options

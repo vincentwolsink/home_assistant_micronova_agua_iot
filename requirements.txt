@@ -3,3 +3,4 @@ pytest-asyncio>=1.0
 PyJWT>=2.0
 httpx>=0.28
 simpleeval>=1.0
+homeassistant>=2025.2.0
