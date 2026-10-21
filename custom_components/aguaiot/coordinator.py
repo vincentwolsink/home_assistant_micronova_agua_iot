@@ -29,6 +29,7 @@ from .const import (
     CONF_BUFFER_READ_TIMEOUT,
     CONF_CONNECTION_MODE,
     CONF_CUSTOMER_CODE,
+    CONF_DEVICE_FIXES,
     CONF_HTTP_TIMEOUT,
     CONF_LANGUAGE,
     CONF_LOGIN_API_URL,
@@ -40,7 +41,6 @@ from .const import (
     DOMAIN,
 )
 from .local_ble import DEFAULT_CHAR_UUID, DEFAULT_SERVICE_UUID, LocalBleAguaIOT
-from .options import get_device_fix
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -73,8 +73,16 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         login_api_url = config_entry.data.get(CONF_LOGIN_API_URL)
         brand_id = config_entry.data.get(CONF_BRAND_ID)
         brand = config_entry.data.get(CONF_BRAND)
-        air_temp_fix = get_device_fix(config_entry.options, CONF_AIR_TEMP_FIX)
-        reading_error_fix = get_device_fix(config_entry.options, CONF_READING_ERROR_FIX)
+        # Device fixes are stored in the device_fixes section, legacy entries
+        # stored them flat.
+        device_fixes = config_entry.options.get(CONF_DEVICE_FIXES) or {}
+        air_temp_fix = device_fixes.get(
+            CONF_AIR_TEMP_FIX, config_entry.options.get(CONF_AIR_TEMP_FIX, False)
+        )
+        reading_error_fix = device_fixes.get(
+            CONF_READING_ERROR_FIX,
+            config_entry.options.get(CONF_READING_ERROR_FIX, False),
+        )
         language = config_entry.options.get(CONF_LANGUAGE)
         http_timeout = config_entry.options.get(CONF_HTTP_TIMEOUT, 30)
         buffer_read_timeout = config_entry.options.get(CONF_BUFFER_READ_TIMEOUT, 30)
