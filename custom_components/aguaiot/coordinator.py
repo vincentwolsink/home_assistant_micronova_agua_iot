@@ -128,7 +128,9 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
             await self.agua.connect()
             await self._async_persist_ble_bootstrap_if_needed()
         except AguaIOTUpdateError as e:
-            _LOGGER.error("Agua IOT Update error: %s", e)
+            # Raising here makes Home Assistant retry the setup of this config
+            # entry instead of setting up the platforms without any data.
+            raise UpdateFailed(f"Agua IOT Update error: {e}") from e
         except AguaIOTUnauthorized as e:
             raise UpdateFailed(f"Agua IOT Unauthorized: {e}") from e
         except AguaIOTConnectionError as e:
@@ -142,7 +144,11 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
             await self.agua.update()
             await self._async_persist_ble_bootstrap_if_needed()
         except AguaIOTUpdateError as e:
-            _LOGGER.error("Agua IOT Update error: %s", e)
+            # Raising here marks the update as failed. During the first
+            # refresh this makes Home Assistant retry the setup of this config
+            # entry, so the entities are only added once the devices have been
+            # read successfully.
+            raise UpdateFailed(f"Agua IOT Update error: {e}") from e
         except AguaIOTUnauthorized as e:
             raise UpdateFailed(f"Agua IOT Unauthorized: {e}") from e
         except AguaIOTConnectionError as e:

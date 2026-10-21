@@ -26,6 +26,7 @@ from .aguaiot import (
     AguaIOTUpdateError,
     Device,
     aguaiot,
+    update_devices,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -251,10 +252,7 @@ class LocalBleAguaIOT:
             if len(self.devices) > 1
             else BLE_INTER_DEVICE_UPDATE_DELAY_SINGLE
         )
-        for index, dev in enumerate(self.devices):
-            if index:
-                await asyncio.sleep(inter_device_delay)
-            await dev.update()
+        await update_devices(self.devices, delay=inter_device_delay)
 
     async def validate_local_connection(self) -> dict[str, Any]:
         """Detect and validate the local BLE module for the first configured stove."""
