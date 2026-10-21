@@ -27,6 +27,9 @@ HEADER_ACCEPT = "application/json, text/javascript, */*; q=0.01"
 HEADER_CONTENT_TYPE = "application/json"
 HEADER = {"Accept": HEADER_ACCEPT, "Content-Type": HEADER_CONTENT_TYPE}
 
+# Raw value returned by the wifi module when a register read fails
+READING_ERROR_VALUE = 0x8000
+
 
 class aguaiot:
     def __init__(
@@ -394,7 +397,7 @@ class aguaiot:
                 buffer_read_loop(res_req["idRequest"]),
                 self.buffer_read_timeout,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise AguaIOTUpdateError(
                 f"Timeout on waiting device buffer read to complete within {self.buffer_read_timeout} seconds."
             )
@@ -523,6 +526,18 @@ class Device:
             register_dict[key] = dict(register)
             if offset in raw_data:
                 raw_value = raw_data[offset]
+                # Fix for reading errors from wifi module. Check the raw word,
+                # as masks and formulas hide the failed read value.
+                if (
+                    self.__aguaiot.reading_error_fix
+                    and int(raw_value) == READING_ERROR_VALUE
+                ):
+                    _LOGGER.debug(
+                        f"Applied reading_error_fix. Dropped value for register {key}"
+                    )
+                    register_dict[key]["value_raw"] = None
+                    register_dict[key]["value"] = None
+                    continue
                 register_dict[key]["value_raw"] = str(raw_value & register["mask"])
                 try:
                     formula = (
@@ -612,16 +627,6 @@ class Device:
 
     def get_register_value(self, key):
         value = self.get_register(key).get("value")
-
-        # Fix for reading errors from wifi module
-        if (
-            self.__aguaiot.reading_error_fix
-            and int(self.get_register(key).get("value_raw", 0)) == 32768
-        ):
-            _LOGGER.debug(
-                f"Applied reading_error_fix. Dropped value {value} for register {key}"
-            )
-            return
 
         # Fix for stoves abusing air temp register
         if (

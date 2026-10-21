@@ -32,6 +32,7 @@ from .const import (
     CONF_BUFFER_READ_TIMEOUT,
     CONF_CONNECTION_MODE,
     CONF_CUSTOMER_CODE,
+    CONF_DEVICE_FIXES,
     CONF_ENDPOINT,
     CONF_HTTP_TIMEOUT,
     CONF_LANGUAGE,
@@ -155,6 +156,9 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
     def _build_client(self, connection_mode):
         """Create the configured cloud or local BLE transport."""
         entry = self.config_entry
+        # Device fixes are stored in the device_fixes section, legacy entries
+        # stored them flat.
+        device_fixes = entry.options.get(CONF_DEVICE_FIXES) or {}
         return_kwargs = {
             "api_url": entry.data.get(CONF_API_URL),
             "customer_code": entry.data.get(CONF_CUSTOMER_CODE),
@@ -165,9 +169,11 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
             "brand_id": entry.data.get(CONF_BRAND_ID),
             "brand": entry.data.get(CONF_BRAND),
             "async_client": get_async_client(self.hass),
-            "air_temp_fix": self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
-            "reading_error_fix": self.config_entry.options.get(
-                CONF_READING_ERROR_FIX, False
+            "air_temp_fix": device_fixes.get(
+                CONF_AIR_TEMP_FIX, entry.options.get(CONF_AIR_TEMP_FIX, False)
+            ),
+            "reading_error_fix": device_fixes.get(
+                CONF_READING_ERROR_FIX, entry.options.get(CONF_READING_ERROR_FIX, False)
             ),
             "language": self.config_entry.options.get(CONF_LANGUAGE, "ENG"),
             "http_timeout": self.config_entry.options.get(CONF_HTTP_TIMEOUT, 30),
@@ -211,6 +217,24 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
     def _build_schema(self, user_input=None):
         """Build the options form schema."""
         user_input = user_input or {}
+        # Device fixes are stored in the device_fixes section, legacy entries
+        # stored them flat. Submitted values take precedence over stored ones.
+        submitted_fixes = user_input.get(CONF_DEVICE_FIXES) or {}
+        stored_fixes = self.config_entry.options.get(CONF_DEVICE_FIXES) or {}
+        air_temp_fix_default = submitted_fixes.get(
+            CONF_AIR_TEMP_FIX,
+            stored_fixes.get(
+                CONF_AIR_TEMP_FIX,
+                self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
+            ),
+        )
+        reading_error_fix_default = submitted_fixes.get(
+            CONF_READING_ERROR_FIX,
+            stored_fixes.get(
+                CONF_READING_ERROR_FIX,
+                self.config_entry.options.get(CONF_READING_ERROR_FIX, False),
+            ),
+        )
         schema = {
             vol.Optional(
                 CONF_CONNECTION_MODE,
@@ -254,24 +278,16 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                     self.config_entry.options.get(CONF_LANGUAGE, "ENG"),
                 ),
             ): vol.In(self._languages()),
-            "device_fixes": section(
+            CONF_DEVICE_FIXES: section(
                 vol.Schema(
                     {
                         vol.Optional(
                             CONF_AIR_TEMP_FIX,
-                            default=user_input.get(
-                                CONF_AIR_TEMP_FIX,
-                                self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
-                            ),
+                            default=air_temp_fix_default,
                         ): bool,
                         vol.Optional(
                             CONF_READING_ERROR_FIX,
-                            default=user_input.get(
-                                CONF_READING_ERROR_FIX,
-                                self.config_entry.options.get(
-                                    CONF_READING_ERROR_FIX, False
-                                ),
-                            ),
+                            default=reading_error_fix_default,
                         ): bool,
                     }
                 )
