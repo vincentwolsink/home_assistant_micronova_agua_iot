@@ -25,6 +25,7 @@ from homeassistant.components.switch import (
 )
 from homeassistant.const import (
     REVOLUTIONS_PER_MINUTE,
+    EntityCategory,
     Platform,
     UnitOfPressure,
     UnitOfTemperature,
@@ -295,6 +296,24 @@ BINARY_SENSORS = (
         icon="mdi:electric-switch",
         icon_on="mdi:electric-switch-closed",
     ),
+    AguaIOTBinarySensorEntityDescription(
+        key="ext_puffertherm_get",
+        name="External Puffer Thermostat",
+        icon="mdi:electric-switch",
+        icon_on="mdi:electric-switch-closed",
+    ),
+    AguaIOTBinarySensorEntityDescription(
+        key="ext_boiltherm_get",
+        name="External Boiler Thermostat",
+        icon="mdi:electric-switch",
+        icon_on="mdi:electric-switch-closed",
+    ),
+    AguaIOTBinarySensorEntityDescription(
+        key="flussostat_group_get",
+        name="Flow Switch",
+        icon="mdi:water-pump-off",
+        icon_on="mdi:water-pump",
+    ),
 )
 
 SENSORS = (
@@ -552,6 +571,38 @@ SENSORS = (
         native_unit_of_measurement=UnitOfTime.HOURS,
         device_class=SensorDeviceClass.DURATION,
     ),
+    AguaIOTSensorEntityDescription(
+        key="temp_h2o_boiler2_get",
+        name="Boiler Temperature",
+        icon="mdi:water-boiler",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="temp_h2o_puffer_h_get",
+        name="Puffer Temperature High",
+        icon="mdi:storage-tank",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="temp_h2o_puffer_l_get",
+        name="Puffer Temperature Low",
+        icon="mdi:storage-tank-outline",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTSensorEntityDescription(
+        key="vie_3_get",
+        name="Three-way Valve",
+        icon="mdi:valve",
+        native_unit_of_measurement=None,
+        state_class=None,
+        device_class=SensorDeviceClass.ENUM,
+    ),
 )
 
 SWITCHES = (
@@ -584,6 +635,13 @@ SWITCHES = (
         name="ECO Stop",
         icon="mdi:leaf-off",
         device_class=SwitchDeviceClass.SWITCH,
+    ),
+    SwitchEntityDescription(
+        key="sleep_mode_set",
+        name="Sleep Mode",
+        icon="mdi:sleep",
+        device_class=SwitchDeviceClass.SWITCH,
+        entity_category=EntityCategory.CONFIG,
     ),
 )
 
@@ -645,6 +703,22 @@ NUMBERS = (
         name="Combustion Quality",
         icon="mdi:fire-circle",
         native_step=1,
+    ),
+    AguaIOTNumberEntityDescription(
+        key="temp_h2o_boiler_set",
+        name="Boiler Setpoint",
+        icon="mdi:water-boiler",
+        native_step=1,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        device_class=NumberDeviceClass.TEMPERATURE,
+    ),
+    AguaIOTNumberEntityDescription(
+        key="temp_h2o_puffer_set",
+        name="Puffer Setpoint",
+        icon="mdi:storage-tank",
+        native_step=1,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        device_class=NumberDeviceClass.TEMPERATURE,
     ),
 )
 
