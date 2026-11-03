@@ -59,6 +59,10 @@ Or folow these steps:
 2. Install the plugin via HACS (Micronova Agua IOT)
 3. Add the integration through the home assistant configuration flow
 
+## EEPROM writes
+
+EEPROM writes are enabled by default, with configurable limits of 3 attempts per hour and 5 per day for each stove. Cloud, Bluetooth and local MQTT share these counts across restarts. See [EEPROM protection](docs/LOCAL_MQTT.md#eeprom-protection) for settings and counting rules.
+
 ## Local Bluetooth mode
 
 This integration now includes an experimental `Bluetooth` connection mode for Micronova stoves equipped with a local BLE module (for example the Micronova / Navel `T009_*` module seen by Home Assistant).
@@ -66,6 +70,12 @@ This integration now includes an experimental `Bluetooth` connection mode for Mi
 You can enable this mode via the integration options after setup.
 
 For more information see [BLUETOOTH](docs/BLUETOOTH.md).
+
+## Local Wi-Fi MQTT mode
+
+This integration supports local control for Micronova stoves equipped with a Navel 2.0 Wi-Fi module.
+
+Connect through Home Assistant MQTT or configure an MQTT endpoint for each stove. See [local MQTT setup](docs/LOCAL_MQTT.md) for connection and DNS settings.
 
 ## Credits
 
