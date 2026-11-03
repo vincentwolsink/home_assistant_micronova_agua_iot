@@ -29,13 +29,16 @@
     "step": {
       "user": {
         "title": "Options Micronova Agua IOT",
-        "description": "Sélectionnez `Bluetooth (auto-detect)` pour laisser Home Assistant détecter et valider automatiquement un module BLE Micronova à proximité lors de l'envoi du formulaire (expérimental).",
+        "description": "Choisissez le mode de connexion pour tous les poêles de ce compte. Configurez MQTT séparément pour chaque poêle.",
         "data": {
           "http_timeout": "Délai d'attente des appels API (secondes).",
           "buffer_read_timeout": "Délai d'attente des lectures du poêle (secondes).",
           "language": "Langue pour les descriptions",
           "update_interval": "Temps entre les mises à jour (secondes).",
-          "connection_mode": "Mode de connexion:"
+          "connection_mode": "Mode de connexion:",
+          "configure_mqtt": "Configurer MQTT par poêle",
+          "max_eeprom_writes_per_hour": "Tentatives maximales d’écriture EEPROM par heure et par poêle",
+          "max_eeprom_writes_per_day": "Tentatives maximales d’écriture EEPROM par jour et par poêle"
         },
         "sections": {
           "device_fixes": {
@@ -46,14 +49,49 @@
             }
           }
         }
+      },
+      "mqtt_device": {
+        "title": "Choisir le poêle",
+        "data": {
+          "device": "Poêle"
+        }
+      },
+      "mqtt_settings": {
+        "title": "Connexion MQTT",
+        "description": "Laissez le serveur vide pour utiliser Home Assistant MQTT. Un mot de passe vide conserve le précédent. Les confirmations applicatives doivent être prises en charge par le serveur ; laissez cette option désactivée pour les courtiers ordinaires.",
+        "data": {
+          "device_mac": "Adresse MAC Wi-Fi",
+          "hostname": "Serveur MQTT",
+          "port": "Port",
+          "username": "Utilisateur",
+          "password": "Mot de passe",
+          "write_confirmation": "Exiger une confirmation applicative des écritures",
+          "allow_eeprom_writes": "Autoriser les écritures EEPROM"
+        },
+        "data_description": {
+          "allow_eeprom_writes": "Activé par défaut. Les limites sont configurables dans les options de l’intégration, initialement 3 par heure et 5 par jour et par poêle, partagées entre cloud, Bluetooth et MQTT. Les tentatives échouées restent comptées car la livraison peut être incertaine. Désactivez pour bloquer les écritures EEPROM."
+        }
       }
+    },
+    "error": {
+      "stove_not_responding": "Aucune mesure récente reçue. Vérifiez la connexion du poêle, la redirection DNS et MQTT.",
+      "connection_error": "La connection à l'API Agua IOT n'est pas possible.",
+      "unauthorized": "Échec de la connexion, veuillez vérifier vos identifiants.",
+      "unknown_error": "Erreur inconue, veuillez vérifier la configuration.",
+      "mqtt_unavailable": "Configurez Home Assistant MQTT ou un serveur par poêle.",
+      "invalid_mac": "Saisissez une adresse MAC Wi-Fi unique de 12 caractères hexadécimaux.",
+      "write_confirmation_requires_host": "Les confirmations d’écriture nécessitent un hôte MQTT explicite."
+    },
+    "abort": {
+      "no_cached_devices": "Connectez-vous une fois au cloud pour enregistrer les données du poêle."
     }
   },
   "selector": {
     "connection_mode": {
       "options": {
         "connection_cloud": "Cloud (Micronova API)",
-        "connection_bluetooth": "Bluetooth (auto-detect)"
+        "connection_bluetooth": "Bluetooth (auto-detect)",
+        "connection_local_mqtt": "MQTT local"
       }
     }
   }

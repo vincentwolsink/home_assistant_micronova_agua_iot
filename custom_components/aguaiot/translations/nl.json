@@ -35,7 +35,10 @@
           "buffer_read_timeout": "Timeout voor kachel buffer uitlezen (seconden).",
           "language": "Taal voor beschrijvingen.",
           "update_interval": "Tijd tussen updates (seconden).",
-          "connection_mode": "Connectie modus:"
+          "connection_mode": "Connectie modus:",
+          "configure_mqtt": "MQTT per kachel instellen",
+          "max_eeprom_writes_per_hour": "Maximaal aantal EEPROM-schrijfpogingen per uur per kachel",
+          "max_eeprom_writes_per_day": "Maximaal aantal EEPROM-schrijfpogingen per dag per kachel"
         },
         "sections": {
           "device_fixes": {
@@ -45,15 +48,51 @@
               "reading_error_fix": "[Bronpi] Filter foutieve waardes (wanneer kachel geen stroom heeft)."
             }
           }
+        },
+        "description": "Kies de verbindingsmodus voor alle kachels in dit account. Configureer MQTT afzonderlijk per kachel."
+      },
+      "mqtt_device": {
+        "title": "Kachel kiezen",
+        "data": {
+          "device": "Kachel"
+        }
+      },
+      "mqtt_settings": {
+        "title": "MQTT-verbinding",
+        "description": "Laat de host leeg voor Home Assistant MQTT. Een leeg wachtwoord behoudt het opgeslagen wachtwoord. De server moet toepassingsbevestigingen ondersteunen; laat dit uitgeschakeld voor gewone brokers.",
+        "data": {
+          "device_mac": "Wifi-MAC-adres",
+          "hostname": "MQTT-host",
+          "port": "Poort",
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord",
+          "write_confirmation": "Toepassingsbevestiging voor schrijfacties vereisen",
+          "allow_eeprom_writes": "EEPROM-schrijfacties toestaan"
+        },
+        "data_description": {
+          "allow_eeprom_writes": "Standaard ingeschakeld. De limieten zijn instelbaar in de integratieopties, aanvankelijk 3 per uur en 5 per dag per kachel, gedeeld door cloud, Bluetooth en MQTT. Mislukte pogingen blijven meetellen omdat de aflevering onzeker kan zijn. Schakel uit om EEPROM-schrijven te blokkeren."
         }
       }
+    },
+    "error": {
+      "stove_not_responding": "Geen actuele meting ontvangen. Controleer de kachelverbinding, DNS-verwijzing en MQTT.",
+      "connection_error": "Verbinding met Agua IOT API is niet mogelijk.",
+      "unauthorized": "Inloggen mislukt, valideer de gebruikersdata.",
+      "unknown_error": "Onbekende fout, valideer de configuratie.",
+      "mqtt_unavailable": "Configureer Home Assistant MQTT of een server per kachel.",
+      "invalid_mac": "Voer een uniek wifi-MAC-adres met 12 hexadecimale tekens in.",
+      "write_confirmation_requires_host": "Schrijfbevestigingen vereisen een expliciete MQTT-host."
+    },
+    "abort": {
+      "no_cached_devices": "Maak eenmaal verbinding met de cloud om de kachelgegevens op te slaan."
     }
   },
   "selector": {
     "connection_mode": {
       "options": {
         "connection_cloud": "Cloud (Micronova API)",
-        "connection_bluetooth": "Bluetooth (auto-detect)"
+        "connection_bluetooth": "Bluetooth (auto-detect)",
+        "connection_local_mqtt": "Lokale MQTT"
       }
     }
   }

@@ -38,9 +38,11 @@ from .const import (
     CONF_UUID,
     CONNECTION_MODE_BLUETOOTH,
     CONNECTION_MODE_CLOUD,
+    CONNECTION_MODE_LOCAL_MQTT,
     DOMAIN,
 )
 from .local_ble import DEFAULT_CHAR_UUID, DEFAULT_SERVICE_UUID, LocalBleAguaIOT
+from .local_mqtt import LocalMqttAguaIOT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -112,6 +114,7 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
             },
         }
 
+        self._cloud_cache_saved = False
         device_options = config_entry.options.get("mqtt_devices", {})
         if connection_mode == CONNECTION_MODE_BLUETOOTH:
             self.agua = LocalBleAguaIOT(
@@ -126,10 +129,24 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
                 device_options=device_options,
                 **client_kwargs,
             )
+        elif connection_mode == CONNECTION_MODE_LOCAL_MQTT:
+            self.agua = LocalMqttAguaIOT(
+                hass=hass,
+                mqtt_devices=device_options,
+                cached_devices=config_entry.data.get(CONF_BLE_BOOTSTRAP_DEVICES),
+                **client_kwargs,
+            )
         else:
             self.agua = aguaiot(
                 **client_kwargs, hass=hass, device_options=device_options
             )
+
+    @property
+    def connection_mode(self) -> str:
+        """Return the active connection mode."""
+        return self.config_entry.options.get(
+            CONF_CONNECTION_MODE, CONNECTION_MODE_CLOUD
+        )
 
     async def _async_setup(self) -> None:
         """Connect to the AguaIOT platform"""
@@ -166,8 +183,30 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
             raise UpdateFailed(f"Agua IOT error: {e}") from e
 
     async def _async_persist_ble_bootstrap_if_needed(self) -> None:
-        """Persist BLE bootstrap data when it is freshly learned from the cloud."""
-        if not isinstance(self.agua, LocalBleAguaIOT) or not self.agua.cache_dirty:
+        """Persist bootstrap data when it is freshly learned from the cloud."""
+        # Cache the first complete cloud mapping for subsequent local connections.
+        if self.connection_mode == CONNECTION_MODE_CLOUD:
+            if self._cloud_cache_saved:
+                return
+            devices = [device.export_cache() for device in self.agua.devices]
+            if (
+                devices
+                and all(device.get("register_map") for device in devices)
+                and devices != self.config_entry.data.get(CONF_BLE_BOOTSTRAP_DEVICES)
+            ):
+                self.hass.config_entries.async_update_entry(
+                    self.config_entry,
+                    data={
+                        **self.config_entry.data,
+                        CONF_BLE_BOOTSTRAP_DEVICES: devices,
+                    },
+                )
+            self._cloud_cache_saved = bool(devices) and all(
+                device.get("register_map") for device in devices
+            )
+            return
+
+        if not hasattr(self.agua, "cache_dirty") or not self.agua.cache_dirty:
             return
 
         updated_data = {

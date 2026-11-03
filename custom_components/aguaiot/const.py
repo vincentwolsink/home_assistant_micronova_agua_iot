@@ -87,6 +87,7 @@ CONF_BLE_CHAR_UUID = "ble_char_uuid"
 
 CONNECTION_MODE_CLOUD = "connection_cloud"
 CONNECTION_MODE_BLUETOOTH = "connection_bluetooth"
+CONNECTION_MODE_LOCAL_MQTT = "connection_local_mqtt"
 
 AIR_VARIANTS = ["air", "air2", "air3", "air_palm"]
 WATER_VARIANTS = ["water", "water_boiler", "water_puffer", "h2o", "h2o_mandata"]

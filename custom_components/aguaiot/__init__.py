@@ -1,5 +1,7 @@
 """Support for Micronova Agua IOT heating devices."""
 
+import asyncio
+
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import Event, HomeAssistant
@@ -30,13 +32,20 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     )
     config_entry.runtime_data = coordinator
 
-    await coordinator.async_config_entry_first_refresh()
-    await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+    try:
+        await coordinator.async_config_entry_first_refresh()
+        await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+    except (Exception, asyncio.CancelledError):
+        # HA may retry setup with a new coordinator. Release this attempt's client.
+        if hasattr(coordinator.agua, "close"):
+            await coordinator.agua.close()
+        raise
 
     # Services
     async def async_close_connection(event: Event) -> None:
         """Close AguaIOT connection on HA Stop."""
-        # await agua.close()
+        if hasattr(coordinator.agua, "close"):
+            await coordinator.agua.close()
 
     config_entry.async_on_unload(
         hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, async_close_connection)
@@ -46,4 +55,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    return await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        config_entry, PLATFORMS
+    )
+    if unload_ok:
+        coordinator: AguaIOTDataUpdateCoordinator = config_entry.runtime_data
+        if hasattr(coordinator.agua, "close"):
+            await coordinator.agua.close()
+    return unload_ok

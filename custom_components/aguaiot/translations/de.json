@@ -31,7 +31,10 @@
         "title": "Micronova Agua IOT Optionen",
         "data": {
           "language": "Sprache für Beschreibungen",
-          "connection_mode": "Verbindungsmodus:"
+          "connection_mode": "Verbindungsmodus:",
+          "configure_mqtt": "MQTT pro Ofen konfigurieren",
+          "max_eeprom_writes_per_hour": "Maximale EEPROM-Schreibversuche pro Stunde und Ofen",
+          "max_eeprom_writes_per_day": "Maximale EEPROM-Schreibversuche pro Tag und Ofen"
         },
         "sections": {
           "device_fixes": {
@@ -41,15 +44,51 @@
               "reading_error_fix": "[Bronpi] Inkorrekte Messwerte filtern (wenn der Ofen ohne Strom ist)."
             }
           }
+        },
+        "description": "Wähle den Verbindungsmodus für alle Öfen dieses Kontos. Die MQTT-Verbindung konfigurierst du je Ofen."
+      },
+      "mqtt_device": {
+        "title": "Ofen auswählen",
+        "data": {
+          "device": "Ofen"
+        }
+      },
+      "mqtt_settings": {
+        "title": "MQTT-Verbindung",
+        "description": "Host leer lassen, um Home Assistant MQTT zu nutzen. Ein leeres Passwort behält das gespeicherte Passwort bei. Schreibbestätigungen müssen vom Endpunkt unterstützt werden; bei normalen Brokern ausgeschaltet lassen.",
+        "data": {
+          "device_mac": "WLAN-MAC-Adresse",
+          "hostname": "MQTT-Host",
+          "port": "Port",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "write_confirmation": "Anwendungsbestätigung für Schreibbefehle verlangen",
+          "allow_eeprom_writes": "EEPROM-Schreibzugriffe erlauben"
+        },
+        "data_description": {
+          "allow_eeprom_writes": "Standardmäßig eingeschaltet. Die Grenzen sind in den Integrationsoptionen einstellbar, anfangs 3 pro Stunde und 5 pro Tag je Ofen, gemeinsam für Cloud, Bluetooth und MQTT. Fehlgeschlagene Versuche bleiben gezählt, da die Zustellung unklar sein kann. Ausschalten sperrt EEPROM-Schreiben."
         }
       }
+    },
+    "error": {
+      "stove_not_responding": "Keine aktuellen Messwerte empfangen. Prüfe Ofenverbindung, Hostnamen-Umleitung und MQTT-Einstellungen.",
+      "connection_error": "Die Verbindung mit Agua IOT API ist nicht möglich.",
+      "unauthorized": "Anmeldung fehlgeschlagen, bitte überprüfen Sie die Anmeldedaten.",
+      "unknown_error": "Unbekannter Fehler, bitte die Einstellung überprüfen.",
+      "mqtt_unavailable": "Richte Home Assistant MQTT ein oder hinterlege einen Endpunkt pro Ofen.",
+      "invalid_mac": "Trage eine eindeutige WLAN-MAC-Adresse mit 12 Hexadezimalstellen ein.",
+      "write_confirmation_requires_host": "Schreibbestätigungen erfordern einen ausdrücklich angegebenen MQTT-Host."
+    },
+    "abort": {
+      "no_cached_devices": "Verbinde dich einmal über die Cloud, um die Ofendaten zu speichern."
     }
   },
   "selector": {
     "connection_mode": {
       "options": {
-      "connection_cloud": "Cloud (Micronova API)",
-      "connection_bluetooth": "Bluetooth (auto-detect)"
+        "connection_cloud": "Cloud (Micronova API)",
+        "connection_bluetooth": "Bluetooth (auto-detect)",
+        "connection_local_mqtt": "Lokales MQTT"
       }
     }
   }

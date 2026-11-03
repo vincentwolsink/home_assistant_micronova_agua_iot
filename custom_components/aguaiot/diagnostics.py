@@ -10,6 +10,10 @@ from homeassistant.core import HomeAssistant
 TO_REDACT = {
     CONF_PASSWORD,
     CONF_EMAIL,
+    "mqtt_devices",
+    "reg_code",
+    "security_code",
+    "assistance_code",
 }
 
 

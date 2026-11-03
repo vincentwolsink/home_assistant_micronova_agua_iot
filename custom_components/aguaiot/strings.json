@@ -33,13 +33,16 @@
     "step": {
       "user": {
         "title": "Micronova Agua IOT options",
-        "description": "Select `Bluetooth (auto-detect)` to let Home Assistant auto-detect and validate a nearby Micronova BLE module when you submit the form (experimental).",
+        "description": "Choose the connection mode for all stoves in this account. Configure MQTT separately for each stove.",
         "data": {
           "http_timeout": "Timeout for API calls (seconds).",
           "buffer_read_timeout": "Timeout for stove buffer reading (seconds).",
           "language": "Language for descriptions.",
           "update_interval": "Time between updates (seconds).",
-          "connection_mode": "Connection mode:"
+          "connection_mode": "Connection mode:",
+          "configure_mqtt": "Configure MQTT per stove",
+          "max_eeprom_writes_per_hour": "Maximum EEPROM write attempts per hour, per stove",
+          "max_eeprom_writes_per_day": "Maximum EEPROM write attempts per day, per stove"
         },
         "sections": {
           "device_fixes": {
@@ -50,14 +53,49 @@
             }
           }
         }
+      },
+      "mqtt_device": {
+        "title": "Choose stove",
+        "data": {
+          "device": "Stove"
+        }
+      },
+      "mqtt_settings": {
+        "title": "MQTT connection",
+        "description": "Leave the host empty to use Home Assistant MQTT. Password blank keeps the saved password. Application write receipts must be supported by the endpoint; leave disabled for ordinary brokers.",
+        "data": {
+          "device_mac": "Wi-Fi MAC address",
+          "hostname": "MQTT host",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password",
+          "write_confirmation": "Require application write receipt",
+          "allow_eeprom_writes": "Allow EEPROM writes"
+        },
+        "data_description": {
+          "allow_eeprom_writes": "Enabled by default. Limits are configurable in the integration options, initially 3 per hour and 5 per day per stove, shared by cloud, Bluetooth and MQTT. Failed attempts remain counted because delivery may be uncertain. Turn off to block EEPROM writes."
+        }
       }
+    },
+    "error": {
+      "stove_not_responding": "No fresh reading received. Check the stove connection, hostname redirect and MQTT settings.",
+      "connection_error": "Connection to Agua IOT API not possible.",
+      "unauthorized": "Failed to login, please check credentials.",
+      "unknown_error": "Unknown error, please double check configuration.",
+      "mqtt_unavailable": "Configure Home Assistant MQTT or enter a per-stove endpoint.",
+      "invalid_mac": "Enter a unique Wi-Fi MAC address with 12 hexadecimal digits.",
+      "write_confirmation_requires_host": "Write confirmations require an explicit MQTT host."
+    },
+    "abort": {
+      "no_cached_devices": "Connect through the cloud once to cache the stove metadata."
     }
   },
   "selector": {
     "connection_mode": {
       "options": {
         "connection_cloud": "Cloud (Micronova API)",
-        "connection_bluetooth": "Bluetooth (auto-detect)"
+        "connection_bluetooth": "Bluetooth (auto-detect)",
+        "connection_local_mqtt": "Local MQTT"
       }
     }
   }
