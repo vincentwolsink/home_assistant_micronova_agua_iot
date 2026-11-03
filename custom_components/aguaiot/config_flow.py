@@ -45,6 +45,7 @@ from .const import (
     DOMAIN,
     ENDPOINTS,
 )
+from .fixture import create_fixture_client
 from .local_ble import DEFAULT_CHAR_UUID, DEFAULT_SERVICE_UUID, LocalBleAguaIOT
 
 _LOGGER = logging.getLogger(__name__)
@@ -90,7 +91,7 @@ class AguaIOTConfigFlow(ConfigFlow, domain=DOMAIN):
 
             try:
                 gen_uuid = str(uuid.uuid1())
-                agua = aguaiot(
+                agua = create_fixture_client() or aguaiot(
                     api_url=api_url,
                     customer_code=customer_code,
                     email=email,
@@ -181,6 +182,9 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                 CONF_BUFFER_READ_TIMEOUT, 30
             ),
         }
+
+        if (fixture_client := create_fixture_client(**return_kwargs)) is not None:
+            return fixture_client
 
         if connection_mode == CONNECTION_MODE_BLUETOOTH:
             return LocalBleAguaIOT(
