@@ -37,7 +37,6 @@
           "update_interval": "Time between updates (seconds).",
           "connection_mode": "Connection mode:",
           "configure_mqtt": "Configure MQTT per stove",
-          "max_eeprom_writes_per_hour": "Maximum EEPROM write attempts per hour, per stove",
           "max_eeprom_writes_per_day": "Maximum EEPROM write attempts per day, per stove"
         },
         "sections": {
@@ -65,11 +64,7 @@
           "port": "Port",
           "username": "Username",
           "password": "Password",
-          "write_confirmation": "Require application write receipt",
-          "allow_eeprom_writes": "Allow EEPROM writes"
-        },
-        "data_description": {
-          "allow_eeprom_writes": "Enabled by default. Limits are configurable in the integration options, initially 3 per hour and 5 per day per stove, shared by cloud, Bluetooth and MQTT. Failed attempts remain counted because delivery may be uncertain. Turn off to block EEPROM writes."
+          "write_confirmation": "Require application write receipt"
         }
       }
     },

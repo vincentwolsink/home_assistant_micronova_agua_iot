@@ -183,11 +183,11 @@ async def test_cloud_polling_does_not_rewrite_bootstrap_on_every_value_change():
 )
 def test_configured_eeprom_limits_reach_every_transport(monkeypatch, mode):
     entry = make_config_entry(mode)
-    entry.options.update(max_eeprom_writes_per_hour=50, max_eeprom_writes_per_day=250)
+    entry.options.update(max_eeprom_writes_per_day=250)
     ble = MagicMock()
     monkeypatch.setattr(coordinator_module, "LocalBleAguaIOT", ble)
     coordinator = AguaIOTDataUpdateCoordinator(hass=MagicMock(), config_entry=entry)
-    expected = {"max_eeprom_writes_per_hour": 50, "max_eeprom_writes_per_day": 250}
+    expected = {"max_eeprom_writes_per_day": 250}
     if mode == const.CONNECTION_MODE_BLUETOOTH:
         assert ble.call_args.kwargs["eeprom_limits"] == expected
     else:

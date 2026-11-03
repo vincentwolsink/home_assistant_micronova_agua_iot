@@ -17,22 +17,15 @@ def budget_env(monkeypatch, eeprom_hass):
 
 
 @pytest.mark.asyncio
-async def test_hourly_limit_restart_and_stove_isolation(budget_env):
+async def test_daily_limit_restart_and_stove_isolation(budget_env):
     hass, now = budget_env
     guard = eeprom.EepromBudget(hass, "one")
-    for _ in range(eeprom.DEFAULT_HOURLY_LIMIT):
+    for _ in range(eeprom.DEFAULT_DAILY_LIMIT):
         await guard.reserve()
     restarted = eeprom.EepromBudget(hass, "one")
     with pytest.raises(eeprom.AguaIOTError, match="limit reached"):
         await restarted.reserve()
     await eeprom.EepromBudget(hass, "two").reserve()
-    now[0] += 3600
-    # Fill the remaining daily allowance after the hourly window expires.
-    for _ in range(eeprom.DEFAULT_DAILY_LIMIT - eeprom.DEFAULT_HOURLY_LIMIT):
-        await restarted.reserve()
-        now[0] += 3600
-    with pytest.raises(eeprom.AguaIOTError, match="limit reached"):
-        await restarted.reserve()
     now[0] += 86400
     await restarted.reserve()
 
@@ -68,10 +61,10 @@ async def test_silent_storage_failure_blocks_reservation(budget_env, monkeypatch
 
 
 @pytest.mark.asyncio
-async def test_ram_write_ignores_the_block_and_the_budget(budget_env):
+async def test_ram_write_ignores_the_budget(budget_env):
     hass, _ = budget_env
     hass.data = {}
-    await eeprom.reserve_eeprom_write(hass, "DEV_01", [33], allowed=False)
+    await eeprom.reserve_eeprom_write(hass, "DEV_01", [33])
     assert hass.data == {}
 
 
@@ -93,7 +86,7 @@ async def test_old_mqtt_history_still_counts(budget_env):
     hass, now = budget_env
     hass.data = {}
     old = eeprom.Store(hass, 1, "aguaiot.mqtt.AABBCCDDEEFF.eeprom")
-    await old.async_save([now[0]] * 15)
+    await old.async_save([now[0]] * eeprom.DEFAULT_DAILY_LIMIT)
     with pytest.raises(eeprom.AguaIOTError, match="limit reached"):
         await eeprom.reserve_eeprom_write(
             hass, "DEV_01", [32768], legacy_id="AABBCCDDEEFF"
@@ -115,20 +108,21 @@ async def test_configured_limits_can_be_raised_on_an_existing_budget(budget_env)
     hass, now = budget_env
     device = SimpleNamespace(id_device="DEV_01", product_serial="AABBCCDDEEFF")
     # Existing installations have no per-stove setting and are enabled by default.
-    for _ in range(3):
+    for _ in range(eeprom.DEFAULT_DAILY_LIMIT):
         await eeprom.reserve_device_write(hass, device, [32893], {})
     with pytest.raises(eeprom.AguaIOTError, match="limit reached"):
         await eeprom.reserve_device_write(hass, device, [32893], {})
-    limits = {"max_eeprom_writes_per_hour": 60, "max_eeprom_writes_per_day": 200}
-    for _ in range(57):
+    limits = {"max_eeprom_writes_per_day": 200}
+    for _ in range(200 - eeprom.DEFAULT_DAILY_LIMIT):
         await eeprom.reserve_device_write(hass, device, [32893], {}, limits=limits)
-    with pytest.raises(eeprom.AguaIOTError, match="60 commands per hour"):
+    with pytest.raises(eeprom.AguaIOTError, match="200 commands per day"):
         await eeprom.reserve_device_write(hass, device, [32893], {}, limits=limits)
-    # Lowering the limits immediately applies to the already stored history.
-    now[0] += 3600
-    with pytest.raises(eeprom.AguaIOTError, match="limit reached"):
+    # Lowering the limit immediately applies to the already stored history.
+    with pytest.raises(eeprom.AguaIOTError, match="10 commands per day"):
         await eeprom.reserve_device_write(hass, device, [32893], {})
-    await eeprom.reserve_device_write(hass, device, [32893], {}, limits=limits)
+    # The daily window frees the budget again.
+    now[0] += 86400
+    await eeprom.reserve_device_write(hass, device, [32893], {})
 
 
 @pytest.mark.asyncio
@@ -137,10 +131,16 @@ async def test_concurrent_attempts_cannot_exceed_the_budget(budget_env):
 
     hass, _ = budget_env
     results = await asyncio.gather(
-        *(eeprom.reserve_eeprom_write(hass, "one", [32768]) for _ in range(10)),
+        *(
+            eeprom.reserve_eeprom_write(hass, "one", [32768])
+            for _ in range(eeprom.DEFAULT_DAILY_LIMIT + 10)
+        ),
         return_exceptions=True,
     )
-    assert sum(not isinstance(result, Exception) for result in results) == 3
+    assert (
+        sum(not isinstance(result, Exception) for result in results)
+        == eeprom.DEFAULT_DAILY_LIMIT
+    )
     assert all(
         isinstance(result, eeprom.AguaIOTError)
         for result in results

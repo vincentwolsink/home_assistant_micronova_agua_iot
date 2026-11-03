@@ -405,44 +405,9 @@ async def test_explicit_mac_uses_shared_ha_mqtt_without_other_integration(mqtt_a
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "payload",
-    [
-        {"temp_air_set": 23},
-        {"Cmd": "RequestWriting", "Items": [33, 32768], "Values": [1, 23]},
-    ],
-)
-async def test_eeprom_disabled_blocks_entire_command_before_publish(mqtt_api, payload):
+@pytest.mark.parametrize("offset", [32767, 32768])
+async def test_only_high_offsets_use_the_eeprom_budget(mqtt_api, offset):
     client = make_test_instance(cached_devices=make_dummy_cached_devices())
-    await client.connect()
-    client._identity_ready.set()
-    mqtt_api.async_publish.reset_mock()
-    client._fetch_device_information = AsyncMock(
-        return_value=dict(client._register_values)
-    )
-    await client.update()
-    client._mqtt_devices = {"DEV_01": {"allow_eeprom_writes": False}}
-    before = dict(client._register_values)
-    try:
-        with pytest.raises(
-            local_mqtt_module.AguaIOTError, match="EEPROM writes are blocked"
-        ):
-            await client._request_writing(client.devices[0], payload)
-        mqtt_api.async_publish.assert_not_awaited()
-        assert client._register_values == before
-    finally:
-        await client.close()
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "offset,allowed", [(32767, False), (32768, True), (32768, None)]
-)
-async def test_ram_and_explicit_eeprom_opt_in(mqtt_api, offset, allowed):
-    client = make_test_instance(cached_devices=make_dummy_cached_devices())
-    client._mqtt_devices = (
-        {} if allowed is None else {"DEV_01": {"allow_eeprom_writes": allowed}}
-    )
     client.hass.data = {
         "aguaiot": {"eeprom_budgets": {"DEV_01": MagicMock(reserve=AsyncMock())}}
     }
@@ -562,10 +527,7 @@ async def test_two_stoves_keep_registers_and_endpoints_separate(mqtt_api):
     cached.append(second)
     mqtt_api.async_subscribe.side_effect = lambda *args, **kwargs: MagicMock()
     client = make_test_instance(cached_devices=cached)
-    client.eeprom_limits = {
-        "max_eeprom_writes_per_hour": 9,
-        "max_eeprom_writes_per_day": 25,
-    }
+    client.eeprom_limits = {"max_eeprom_writes_per_day": 25}
     try:
         await client.connect()
         first, second = client._children

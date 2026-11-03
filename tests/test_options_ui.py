@@ -33,8 +33,8 @@ def test_existing_options_get_configurable_eeprom_defaults(monkeypatch):
     stored = validated
     assert stored["http_timeout"] == 20
     assert "allow_eeprom_writes" not in stored
-    assert stored["max_eeprom_writes_per_hour"] == 3
-    assert stored["max_eeprom_writes_per_day"] == 5
+    assert "max_eeprom_writes_per_hour" not in stored
+    assert stored["max_eeprom_writes_per_day"] == 10
 
 
 def test_options_work_before_runtime_setup(monkeypatch):
@@ -59,7 +59,7 @@ async def test_per_stove_endpoint_preserves_password_and_other_devices(monkeypat
             "connection_mode": "connection_cloud",
             "language": "DEU",
             "mqtt_devices": {
-                "one": {"password": "test-only-secret", "allow_eeprom_writes": False},
+                "one": {"password": "test-only-secret"},
                 "two": {"device_mac": "112233445566"},
             },
         },
@@ -86,7 +86,6 @@ async def test_per_stove_endpoint_preserves_password_and_other_devices(monkeypat
     assert result["data"]["mqtt_devices"]["two"] == entry.options["mqtt_devices"]["two"]
     assert result["data"]["mqtt_devices"]["one"]["password"] == "test-only-secret"
     assert result["data"]["mqtt_devices"]["one"]["device_mac"] == "AABBCCDDEEFF"
-    assert result["data"]["mqtt_devices"]["one"]["allow_eeprom_writes"] is False
 
 
 def test_eeprom_limits_have_no_fixed_upper_ceiling(monkeypatch):
@@ -96,14 +95,14 @@ def test_eeprom_limits_have_no_fixed_upper_ceiling(monkeypatch):
     monkeypatch.setattr(options, "_languages", lambda: ["ENG"])
     schema = options._build_schema()
     data = {
-        "max_eeprom_writes_per_hour": 1000,
         "max_eeprom_writes_per_day": 10000,
         "device_fixes": {},
     }
-    assert schema(data)["max_eeprom_writes_per_day"] == 10000
-    for key in ("max_eeprom_writes_per_hour", "max_eeprom_writes_per_day"):
-        with pytest.raises(flow.vol.Invalid):
-            schema({**data, key: 0})
+    validated = schema(data)
+    assert validated["max_eeprom_writes_per_day"] == 10000
+    assert "max_eeprom_writes_per_hour" not in validated
+    with pytest.raises(flow.vol.Invalid):
+        schema({**data, "max_eeprom_writes_per_day": 0})
 
 
 @pytest.mark.asyncio
@@ -124,19 +123,17 @@ async def test_mqtt_setup_preserves_pending_options_and_validates_them(monkeypat
             "configure_mqtt": True,
             "connection_mode": "connection_local_mqtt",
             "language": "DEU",
-            "max_eeprom_writes_per_hour": 10,
             "max_eeprom_writes_per_day": 40,
         }
     )
     await options.async_step_mqtt_device({"device": "one"})
     shown = await options.async_step_mqtt_settings()
-    # A new device inherits enabled EEPROM writes.
     values = shown["data_schema"]({"device_mac": "AABBCCDDEEFF"})
-    assert values["allow_eeprom_writes"] is True
+    assert "allow_eeprom_writes" not in values
     result = await options.async_step_mqtt_settings(values)
     assert result["data"]["connection_mode"] == "connection_local_mqtt"
     assert result["data"]["language"] == "DEU"
-    assert result["data"]["max_eeprom_writes_per_hour"] == 10
+    assert "max_eeprom_writes_per_hour" not in result["data"]
     assert result["data"]["max_eeprom_writes_per_day"] == 40
     assert "configure_mqtt" not in result["data"]
     client.validate_local_connection.assert_awaited_once()

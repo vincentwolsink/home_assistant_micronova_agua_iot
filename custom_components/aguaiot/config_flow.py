@@ -49,7 +49,7 @@ from .const import (
 )
 
 from .fixture import create_fixture_client
-from .eeprom import DEFAULT_DAILY_LIMIT, DEFAULT_HOURLY_LIMIT, clean_mac
+from .eeprom import DEFAULT_DAILY_LIMIT, clean_mac
 from .local_ble import DEFAULT_CHAR_UUID, DEFAULT_SERVICE_UUID, LocalBleAguaIOT
 from .local_mqtt import LocalMqttAguaIOT, LocalMqttSetupError
 
@@ -184,7 +184,7 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
             ),
             "eeprom_limits": {
                 key: options[key]
-                for key in ("max_eeprom_writes_per_hour", "max_eeprom_writes_per_day")
+                for key in ("max_eeprom_writes_per_day",)
                 if key in options
             },
             "language": options.get(CONF_LANGUAGE, "ENG"),
@@ -321,18 +321,15 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                 )
             ),
         }
-        for key, default in (
-            ("max_eeprom_writes_per_hour", DEFAULT_HOURLY_LIMIT),
-            ("max_eeprom_writes_per_day", DEFAULT_DAILY_LIMIT),
-        ):
-            schema[
-                vol.Optional(
-                    key,
-                    default=user_input.get(
-                        key, self.config_entry.options.get(key, default)
-                    ),
-                )
-            ] = vol.All(vol.Coerce(int), vol.Range(min=1))
+        key = "max_eeprom_writes_per_day"
+        schema[
+            vol.Optional(
+                key,
+                default=user_input.get(
+                    key, self.config_entry.options.get(key, DEFAULT_DAILY_LIMIT)
+                ),
+            )
+        ] = vol.All(vol.Coerce(int), vol.Range(min=1))
         return vol.Schema(schema)
 
     async def async_step_user(self, user_input=None):
@@ -453,10 +450,6 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                             type=selector.TextSelectorType.PASSWORD
                         )
                     ),
-                    vol.Optional(
-                        "allow_eeprom_writes",
-                        default=defaults.get("allow_eeprom_writes", True),
-                    ): selector.BooleanSelector(),
                     vol.Optional(
                         "write_confirmation",
                         default=defaults.get("write_confirmation", False),

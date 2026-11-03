@@ -37,7 +37,6 @@
           "update_interval": "Temps entre les mises à jour (secondes).",
           "connection_mode": "Mode de connexion:",
           "configure_mqtt": "Configurer MQTT par poêle",
-          "max_eeprom_writes_per_hour": "Tentatives maximales d’écriture EEPROM par heure et par poêle",
           "max_eeprom_writes_per_day": "Tentatives maximales d’écriture EEPROM par jour et par poêle"
         },
         "sections": {
@@ -65,11 +64,7 @@
           "port": "Port",
           "username": "Utilisateur",
           "password": "Mot de passe",
-          "write_confirmation": "Exiger une confirmation applicative des écritures",
-          "allow_eeprom_writes": "Autoriser les écritures EEPROM"
-        },
-        "data_description": {
-          "allow_eeprom_writes": "Activé par défaut. Les limites sont configurables dans les options de l’intégration, initialement 3 par heure et 5 par jour et par poêle, partagées entre cloud, Bluetooth et MQTT. Les tentatives échouées restent comptées car la livraison peut être incertaine. Désactivez pour bloquer les écritures EEPROM."
+          "write_confirmation": "Exiger une confirmation applicative des écritures"
         }
       }
     },

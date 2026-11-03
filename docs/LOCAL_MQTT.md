@@ -17,9 +17,9 @@ Polling reads RAM and the active setpoint/status registers listed in the cached 
 
 ## EEPROM protection
 
-Writes to offsets at or above 32768 remain enabled by default, including for existing installations without stored EEPROM settings. The integration options expose `max_eeprom_writes_per_hour` and `max_eeprom_writes_per_day`, initially 3 and 5. Both accept any positive integer; there is no fixed upper ceiling. Each stove has a separate budget shared by cloud, Bluetooth and local MQTT. A command writing several registers counts as one attempt.
+Writes to offsets at or above 32768 are enabled, including for existing installations without stored EEPROM settings. The integration options expose `max_eeprom_writes_per_day`, initially 10. It accepts any positive integer; there is no fixed upper ceiling. Each stove has a separate rolling 24-hour budget shared by cloud, Bluetooth and local MQTT. A command writing several registers counts as one attempt.
 
-The attempt is saved before handing the command to the transport and remains counted on errors or cancellation, since a failed response does not prove the write was not applied. Local writes are not automatically retried. If the history cannot be read or saved, EEPROM writes are blocked. RAM reads and writes are not counted. Turn off "Allow EEPROM writes" in the stove's MQTT settings to explicitly block EEPROM writes from this integration. Only writes sent by this integration are counted.
+The attempt is saved before handing the command to the transport and remains counted on errors or cancellation, since a failed response does not prove the write was not applied. Local writes are not automatically retried. If the history cannot be read or saved, EEPROM writes are blocked. RAM reads and writes are not counted. Only writes sent by this integration are counted.
 
 Existing entity IDs and device registrations are retained; switching connection mode does not require removing the integration. One connection mode applies to all stoves in an account. MQTT endpoints can be configured separately per stove.
 

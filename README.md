@@ -61,7 +61,7 @@ Or folow these steps:
 
 ## EEPROM writes
 
-EEPROM writes are enabled by default, with configurable limits of 3 attempts per hour and 5 per day for each stove. Cloud, Bluetooth and local MQTT share these counts across restarts. See [EEPROM protection](docs/LOCAL_MQTT.md#eeprom-protection) for settings and counting rules.
+EEPROM writes are enabled by default, with a configurable limit of 10 attempts per day for each stove. Cloud, Bluetooth and local MQTT share these counts across restarts. See [EEPROM protection](docs/LOCAL_MQTT.md#eeprom-protection) for settings and counting rules.
 
 ## Local Bluetooth mode
 

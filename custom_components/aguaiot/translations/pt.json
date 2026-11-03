@@ -33,7 +33,6 @@
           "language": "Idioma para descrições",
           "connection_mode": "Tryb połączenia:",
           "configure_mqtt": "Configurar MQTT por salamandra",
-          "max_eeprom_writes_per_hour": "Máximo de tentativas de escrita EEPROM por hora e salamandra",
           "max_eeprom_writes_per_day": "Máximo de tentativas de escrita EEPROM por dia e salamandra"
         },
         "sections": {
@@ -62,11 +61,7 @@
           "port": "Porta",
           "username": "Utilizador",
           "password": "Palavra-passe",
-          "write_confirmation": "Exigir confirmação da aplicação para escritas",
-          "allow_eeprom_writes": "Permitir escritas na EEPROM"
-        },
-        "data_description": {
-          "allow_eeprom_writes": "Ativado por predefinição. Os limites são configuráveis nas opções da integração, inicialmente 3 por hora e 5 por dia por salamandra, partilhados entre cloud, Bluetooth e MQTT. As tentativas falhadas continuam a contar porque a entrega pode ser incerta. Desative para bloquear escritas EEPROM."
+          "write_confirmation": "Exigir confirmação da aplicação para escritas"
         }
       }
     },

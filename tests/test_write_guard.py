@@ -73,35 +73,10 @@ def cloud(hass, device_options):
 
 
 @pytest.mark.asyncio
-async def test_cloud_block_skips_the_request():
-    client = cloud(SimpleNamespace(data={}), {"DEV_01": {"allow_eeprom_writes": False}})
-    with pytest.raises(AguaIOTError, match="blocked"):
-        await client._request_writing(stove(32893), {"temp_air_set": 22})
-    client.handle_webcall.assert_not_awaited()
-
-
-@pytest.mark.asyncio
 async def test_cloud_ram_write_still_posts():
     client = cloud(SimpleNamespace(data={}), {})
     await client._request_writing(stove(33), {"status_managed_set": 1})
     assert client.handle_webcall.await_args_list[0].args[0] == "POST"
-
-
-@pytest.mark.asyncio
-async def test_bluetooth_block_skips_the_session():
-    ble = real_ble_class()(
-        SimpleNamespace(data={}),
-        "https://example.com",
-        "123456",
-        "a@b.c",
-        "pw",
-        "uuid",
-        device_options={"DEV_01": {"allow_eeprom_writes": False}},
-    )
-    ble._run_authenticated_session = AsyncMock()
-    with pytest.raises(AguaIOTError, match="blocked"):
-        await ble._request_writing(stove(32893), {"temp_air_set": 22})
-    ble._run_authenticated_session.assert_not_awaited()
 
 
 @pytest.mark.asyncio

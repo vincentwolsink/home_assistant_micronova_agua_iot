@@ -37,7 +37,6 @@
           "update_interval": "Tijd tussen updates (seconden).",
           "connection_mode": "Connectie modus:",
           "configure_mqtt": "MQTT per kachel instellen",
-          "max_eeprom_writes_per_hour": "Maximaal aantal EEPROM-schrijfpogingen per uur per kachel",
           "max_eeprom_writes_per_day": "Maximaal aantal EEPROM-schrijfpogingen per dag per kachel"
         },
         "sections": {
@@ -66,11 +65,7 @@
           "port": "Poort",
           "username": "Gebruikersnaam",
           "password": "Wachtwoord",
-          "write_confirmation": "Toepassingsbevestiging voor schrijfacties vereisen",
-          "allow_eeprom_writes": "EEPROM-schrijfacties toestaan"
-        },
-        "data_description": {
-          "allow_eeprom_writes": "Standaard ingeschakeld. De limieten zijn instelbaar in de integratieopties, aanvankelijk 3 per uur en 5 per dag per kachel, gedeeld door cloud, Bluetooth en MQTT. Mislukte pogingen blijven meetellen omdat de aflevering onzeker kan zijn. Schakel uit om EEPROM-schrijven te blokkeren."
+          "write_confirmation": "Toepassingsbevestiging voor schrijfacties vereisen"
         }
       }
     },

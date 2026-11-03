@@ -10,9 +10,8 @@ from homeassistant.helpers.storage import Store
 
 from .aguaiot import AguaIOTError
 
-# Defaults used when no limits have been configured.
-DEFAULT_HOURLY_LIMIT = 3
-DEFAULT_DAILY_LIMIT = 5
+# Default used when no limit has been configured.
+DEFAULT_DAILY_LIMIT = 10
 EEPROM_OFFSET_THRESHOLD = 32768
 
 
@@ -36,14 +35,8 @@ def legacy_mac_for(device, device_options, explicit=None):
     )
 
 
-def writes_allowed(device_options, device_id):
-    """Read the EEPROM write setting, defaulting to enabled."""
-    settings = (device_options or {}).get(str(device_id), {})
-    return settings.get("allow_eeprom_writes", True) is True
-
-
 class EepromBudget:
-    """Track EEPROM write attempts in rolling hourly and daily windows."""
+    """Track EEPROM write attempts in a rolling daily window."""
 
     def __init__(self, hass, stove_id, legacy_id=None):
         self.hass = hass
@@ -78,18 +71,11 @@ class EepromBudget:
         ):
             raise ValueError("Invalid EEPROM history")
 
-    async def reserve(
-        self, hourly_limit=DEFAULT_HOURLY_LIMIT, daily_limit=DEFAULT_DAILY_LIMIT
-    ):
+    async def reserve(self, daily_limit=DEFAULT_DAILY_LIMIT):
         async with self.lock:
             try:
-                if (
-                    type(hourly_limit) is not int
-                    or hourly_limit < 1
-                    or type(daily_limit) is not int
-                    or daily_limit < 1
-                ):
-                    raise ValueError("EEPROM limits must be positive integers")
+                if type(daily_limit) is not int or daily_limit < 1:
+                    raise ValueError("EEPROM limit must be a positive integer")
                 if self.history is None:
                     history = await self._load(self.store)
                     if history is None and self.legacy_id:
@@ -107,14 +93,11 @@ class EepromBudget:
                 now = time.time()
                 # Keep future reservations if the system clock moves backwards.
                 self.history = [stamp for stamp in self.history if now - stamp < 86400]
-                if (
-                    len(self.history) >= daily_limit
-                    or sum(now - stamp < 3600 for stamp in self.history) >= hourly_limit
-                ):
+                if len(self.history) >= daily_limit:
                     raise AguaIOTError(
                         "EEPROM write limit reached for this stove. "
-                        f"The limit is {hourly_limit} commands per hour and "
-                        f"{daily_limit} commands per day. Try again later."
+                        f"The limit is {daily_limit} commands per day. "
+                        "Try again later."
                     )
                 self.history.append(now)
                 await self.store.async_save(self.history)
@@ -126,9 +109,7 @@ class EepromBudget:
                 ) from err
 
 
-async def reserve_eeprom_write(
-    hass, stove_id, offsets, *, allowed=True, legacy_id=None, limits=None
-):
+async def reserve_eeprom_write(hass, stove_id, offsets, *, legacy_id=None, limits=None):
     """Reserve a write attempt for commands containing EEPROM offsets."""
     parsed = []
     for offset in offsets:
@@ -138,8 +119,6 @@ async def reserve_eeprom_write(
         parsed.append(value)
     if not any(value >= EEPROM_OFFSET_THRESHOLD for value in parsed):
         return
-    if allowed is not True:
-        raise AguaIOTError("EEPROM writes are blocked for this stove.")
     if hass is None or not stove_id:
         raise AguaIOTError(
             "Cannot verify the EEPROM write budget. No command was sent."
@@ -151,7 +130,6 @@ async def reserve_eeprom_write(
         budgets[stove_id] = budget
     limits = limits or {}
     return await budget.reserve(
-        hourly_limit=limits.get("max_eeprom_writes_per_hour", DEFAULT_HOURLY_LIMIT),
         daily_limit=limits.get("max_eeprom_writes_per_day", DEFAULT_DAILY_LIMIT),
     )
 
@@ -164,7 +142,6 @@ async def reserve_device_write(
         hass,
         str(getattr(device, "id_device", "") or ""),
         offsets,
-        allowed=writes_allowed(device_options, getattr(device, "id_device", "")),
         legacy_id=legacy_mac_for(device, device_options, explicit=explicit_mac),
         limits=limits,
     )

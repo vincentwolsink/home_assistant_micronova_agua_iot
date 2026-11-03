@@ -31,7 +31,7 @@ def test_translation_keys_and_placeholders(language):
             "mqtt_device": options["step"]["mqtt_device"],
             "limits": {
                 key: options["step"]["user"]["data"][key]
-                for key in ("max_eeprom_writes_per_hour", "max_eeprom_writes_per_day")
+                for key in ("max_eeprom_writes_per_day",)
             },
             "receipt_error": options["error"]["write_confirmation_requires_host"],
         }

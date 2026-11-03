@@ -110,13 +110,13 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
             "buffer_read_timeout": buffer_read_timeout,
             "eeprom_limits": {
                 key: config_entry.options[key]
-                for key in ("max_eeprom_writes_per_hour", "max_eeprom_writes_per_day")
+                for key in ("max_eeprom_writes_per_day",)
                 if key in config_entry.options
             },
         }
 
         self._cloud_cache_saved = False
-        device_options = config_entry.options.get("mqtt_devices", {})        
+        device_options = config_entry.options.get("mqtt_devices", {})
 
         if (fixture_client := create_fixture_client(**client_kwargs)) is not None:
             self.agua = fixture_client
