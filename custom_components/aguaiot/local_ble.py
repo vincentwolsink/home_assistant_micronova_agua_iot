@@ -193,6 +193,8 @@ class LocalBleAguaIOT:
         service_uuid: str = DEFAULT_SERVICE_UUID,
         char_uuid: str = DEFAULT_CHAR_UUID,
         cached_devices: list[dict[str, Any]] | None = None,
+        device_options: dict | None = None,
+        eeprom_limits: dict | None = None,
     ) -> None:
         self.hass = hass
         self.api_url = api_url.rstrip("/")
@@ -216,6 +218,8 @@ class LocalBleAguaIOT:
 
         self._session_uuid = str(uuid.uuid4()).upper()
         self._cached_devices = cached_devices or []
+        self.device_options = device_options or {}
+        self.eeprom_limits = eeprom_limits or {}
         self._cache_dirty = False
         self._command_lock = asyncio.Lock()
 
@@ -367,6 +371,16 @@ class LocalBleAguaIOT:
             bit_data.append(8)
             values.append(value)
 
+        from .eeprom import reserve_device_write
+
+        await reserve_device_write(
+            self.hass,
+            device,
+            item_offsets,
+            self.device_options,
+            limits=self.eeprom_limits,
+        )
+
         payload = {
             "Cmd": "RequestWriting",
             "Protocol": "RWMSmaster",
@@ -381,6 +395,7 @@ class LocalBleAguaIOT:
             device,
             "writing stove registers",
             lambda session: self._request_writing_session(session, payload),
+            retry=False,
         )
 
     async def _validate_local_connection_session(
@@ -452,9 +467,11 @@ class LocalBleAguaIOT:
         device: Device,
         action: str,
         operation,
+        *,
+        retry: bool = True,
     ) -> Any:
-        """Run one BLE action with a single retry on connection failures."""
-        for attempt in range(2):
+        """Run a BLE action, optionally retrying a failed connection once."""
+        for attempt in range(2 if retry else 1):
             try:
                 async with self._device_session(device) as session:
                     await session.identity()
@@ -466,7 +483,7 @@ class LocalBleAguaIOT:
                 if not retryable:
                     raise
 
-                if attempt == 0:
+                if retry and attempt == 0:
                     _LOGGER.warning(
                         "Micronova BLE link for '%s' failed while %s (%s); retrying once with a fresh connection.",
                         device.name,

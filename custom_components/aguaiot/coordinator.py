@@ -105,8 +105,14 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
             "language": language,
             "http_timeout": http_timeout,
             "buffer_read_timeout": buffer_read_timeout,
+            "eeprom_limits": {
+                key: config_entry.options[key]
+                for key in ("max_eeprom_writes_per_hour", "max_eeprom_writes_per_day")
+                if key in config_entry.options
+            },
         }
 
+        device_options = config_entry.options.get("mqtt_devices", {})
         if connection_mode == CONNECTION_MODE_BLUETOOTH:
             self.agua = LocalBleAguaIOT(
                 hass=hass,
@@ -117,10 +123,13 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
                 char_uuid=config_entry.options.get(
                     CONF_BLE_CHAR_UUID, DEFAULT_CHAR_UUID
                 ),
+                device_options=device_options,
                 **client_kwargs,
             )
         else:
-            self.agua = aguaiot(**client_kwargs)
+            self.agua = aguaiot(
+                **client_kwargs, hass=hass, device_options=device_options
+            )
 
     async def _async_setup(self) -> None:
         """Connect to the AguaIOT platform"""

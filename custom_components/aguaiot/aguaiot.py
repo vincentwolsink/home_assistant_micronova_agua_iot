@@ -49,6 +49,10 @@ class aguaiot:
         language="ENG",
         http_timeout=30,
         buffer_read_timeout=30,
+        *,
+        hass=None,
+        device_options=None,
+        eeprom_limits=None,
     ):
         self.api_url = api_url.rstrip("/")
         self.customer_code = customer_code
@@ -71,6 +75,9 @@ class aguaiot:
         self.air_temp_fix = air_temp_fix
         self.reading_error_fix = reading_error_fix
         self.language = language
+        self.hass = hass
+        self.device_options = device_options or {}
+        self.eeprom_limits = eeprom_limits or {}
 
         if not self.async_client:
             self.async_client = httpx.AsyncClient()
@@ -439,6 +446,12 @@ class aguaiot:
             set_values.append(items[key])
             set_bits.append(8)
             set_endians.append("L")
+
+        from .eeprom import reserve_device_write
+
+        await reserve_device_write(
+            self.hass, device, set_items, self.device_options, limits=self.eeprom_limits
+        )
 
         payload = {
             "id_device": device.id_device,
