@@ -6,6 +6,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntityDescription,
 )
+from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.climate import (
     ClimateEntityDescription,
 )
@@ -117,6 +118,7 @@ PLATFORMS = [
     Platform.SWITCH,
     Platform.NUMBER,
     Platform.SELECT,
+    Platform.BUTTON,
 ]
 
 ENDPOINTS = {
@@ -642,6 +644,14 @@ SWITCHES = (
         icon="mdi:sleep",
         device_class=SwitchDeviceClass.SWITCH,
         entity_category=EntityCategory.CONFIG,
+    ),
+)
+
+BUTTONS = (
+    ButtonEntityDescription(
+        key="allarm_reset_set",
+        name="Reset Alarm",
+        icon="mdi:alarm-light-off-outline",
     ),
 )
 
