@@ -515,6 +515,10 @@ class Device:
 
     async def update(self):
         raw_data = await self.__aguaiot._fetch_device_information(self)
+        self.apply_raw_data(raw_data)
+
+    def apply_raw_data(self, raw_data):
+        """Build the register values from a raw buffer read."""
         self.__register_dict = self.__build_register_dict(raw_data)
 
     def __build_register_dict(self, raw_data):

@@ -40,6 +40,7 @@ from .const import (
     CONNECTION_MODE_CLOUD,
     DOMAIN,
 )
+from .fixture import create_fixture_client
 from .local_ble import DEFAULT_CHAR_UUID, DEFAULT_SERVICE_UUID, LocalBleAguaIOT
 
 _LOGGER = logging.getLogger(__name__)
@@ -107,7 +108,9 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
             "buffer_read_timeout": buffer_read_timeout,
         }
 
-        if connection_mode == CONNECTION_MODE_BLUETOOTH:
+        if (fixture_client := create_fixture_client(**client_kwargs)) is not None:
+            self.agua = fixture_client
+        elif connection_mode == CONNECTION_MODE_BLUETOOTH:
             self.agua = LocalBleAguaIOT(
                 hass=hass,
                 cached_devices=config_entry.data.get(CONF_BLE_BOOTSTRAP_DEVICES),
