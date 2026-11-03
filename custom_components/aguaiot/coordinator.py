@@ -41,6 +41,7 @@ from .const import (
     CONNECTION_MODE_LOCAL_MQTT,
     DOMAIN,
 )
+from .fixture import create_fixture_client
 from .local_ble import DEFAULT_CHAR_UUID, DEFAULT_SERVICE_UUID, LocalBleAguaIOT
 from .local_mqtt import LocalMqttAguaIOT
 
@@ -115,8 +116,11 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         }
 
         self._cloud_cache_saved = False
-        device_options = config_entry.options.get("mqtt_devices", {})
-        if connection_mode == CONNECTION_MODE_BLUETOOTH:
+        device_options = config_entry.options.get("mqtt_devices", {})        
+
+        if (fixture_client := create_fixture_client(**client_kwargs)) is not None:
+            self.agua = fixture_client
+        elif connection_mode == CONNECTION_MODE_BLUETOOTH:
             self.agua = LocalBleAguaIOT(
                 hass=hass,
                 cached_devices=config_entry.data.get(CONF_BLE_BOOTSTRAP_DEVICES),
