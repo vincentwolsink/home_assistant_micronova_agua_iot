@@ -31,7 +31,8 @@
         "title": "Micronova Agua IOT Optionen",
         "data": {
           "language": "Sprache für Beschreibungen",
-          "connection_mode": "Verbindungsmodus:"
+          "connection_mode": "Verbindungsmodus:",
+          "max_eeprom_writes_per_day": "Maximale EEPROM-Schreibversuche pro Tag und Ofen"
         },
         "sections": {
           "device_fixes": {
@@ -42,14 +43,33 @@
             }
           }
         }
+      },
+      "mqtt_settings": {
+        "title": "MQTT-Verbindung",
+        "description": "Host leer lassen, um einen lokalen MQTT-Server/eine lokale MQTT-App zu nutzen.",
+        "data": {
+          "hostname": "MQTT-Host",
+          "port": "Port",
+          "username": "Benutzername",
+          "password": "Passwort"
+        }
       }
+    },
+    "error": {
+      "stove_not_responding": "Keine aktuellen Messwerte empfangen. Prüfe Ofenverbindung, Hostnamen-Umleitung und MQTT-Einstellungen.",
+      "connection_error": "Die Verbindung mit Agua IOT API ist nicht möglich.",
+      "unauthorized": "Anmeldung fehlgeschlagen, bitte überprüfen Sie die Anmeldedaten.",
+      "unknown_error": "Unbekannter Fehler, bitte die Einstellung überprüfen.",
+      "mqtt_unavailable": "Richte Home Assistant MQTT ein oder hinterlege einen MQTT-Endpunkt.",
+      "invalid_mac": "Die Cloud hat für einen Ofen keine WLAN-MAC-Adresse geliefert. Verbinde dich einmal über die Cloud, um die Daten zu aktualisieren."
     }
   },
   "selector": {
     "connection_mode": {
       "options": {
-      "connection_cloud": "Cloud (Micronova API)",
-      "connection_bluetooth": "Bluetooth (auto-detect)"
+        "connection_cloud": "Cloud (Micronova API)",
+        "connection_bluetooth": "Bluetooth (auto-detect)",
+        "connection_local_mqtt": "Lokales MQTT"
       }
     }
   }

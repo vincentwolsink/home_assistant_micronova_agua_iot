@@ -82,12 +82,14 @@ CONF_UPDATE_INTERVAL = "update_interval"
 CONF_HTTP_TIMEOUT = "http_timeout"
 CONF_BUFFER_READ_TIMEOUT = "buffer_read_timeout"
 CONF_CONNECTION_MODE = "connection_mode"
+CONF_MQTT_SETTINGS = "mqtt_settings"
 CONF_BLE_BOOTSTRAP_DEVICES = "ble_bootstrap_devices"
 CONF_BLE_SERVICE_UUID = "ble_service_uuid"
 CONF_BLE_CHAR_UUID = "ble_char_uuid"
 
 CONNECTION_MODE_CLOUD = "connection_cloud"
 CONNECTION_MODE_BLUETOOTH = "connection_bluetooth"
+CONNECTION_MODE_LOCAL_MQTT = "connection_local_mqtt"
 
 AIR_VARIANTS = ["air", "air2", "air3", "air_palm"]
 WATER_VARIANTS = ["water", "water_boiler", "water_puffer", "h2o", "h2o_mandata"]

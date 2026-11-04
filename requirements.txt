@@ -4,3 +4,4 @@ PyJWT>=2.0
 httpx>=0.28
 simpleeval>=1.0
 homeassistant>=2025.2.0
+aiomqtt==2.5.1

@@ -15,7 +15,7 @@
           "password": "Password",
           "endpoint": "App name/brand"
         },
-        "description": "Fill in Agua IOT parameters"
+        "description": "Please supply your account credentials for the stove vendor app"
       }
     }
   },
@@ -29,13 +29,13 @@
     "step": {
       "user": {
         "title": "Micronova Agua IOT options",
-        "description": "Select `Bluetooth (auto-detect)` to let Home Assistant auto-detect and validate a nearby Micronova BLE module when you submit the form (experimental).",
         "data": {
           "http_timeout": "Timeout for API calls (seconds).",
           "buffer_read_timeout": "Timeout for stove buffer reading (seconds).",
           "language": "Language for descriptions.",
           "update_interval": "Time between updates (seconds).",
-          "connection_mode": "Connection mode:"
+          "connection_mode": "Connection mode:",
+          "max_eeprom_writes_per_day": "Maximum EEPROM write attempts per day, per stove"
         },
         "sections": {
           "device_fixes": {
@@ -46,14 +46,33 @@
             }
           }
         }
+      },
+      "mqtt_settings": {
+        "title": "MQTT connection",
+        "description": "Leave the host empty to use a local MQTT server/app.",
+        "data": {
+          "hostname": "MQTT host",
+          "port": "Port",
+          "username": "Username",
+          "password": "Password"
+        }
       }
+    },
+    "error": {
+      "stove_not_responding": "No fresh reading received. Check the stove connection, hostname redirect and MQTT settings.",
+      "connection_error": "Connection to Agua IOT API not possible.",
+      "unauthorized": "Failed to login, please check credentials.",
+      "unknown_error": "Unknown error, please double check configuration.",
+      "mqtt_unavailable": "Configure Home Assistant MQTT or enter an MQTT endpoint.",
+      "invalid_mac": "The cloud did not provide a Wi-Fi MAC address for a stove. Connect through the cloud once to refresh its metadata."
     }
   },
   "selector": {
     "connection_mode": {
       "options": {
-      "connection_cloud": "Cloud (Micronova API)",
-      "connection_bluetooth": "Bluetooth (auto-detect)"
+        "connection_cloud": "Cloud (Micronova API)",
+        "connection_bluetooth": "Bluetooth (auto-detect)",
+        "connection_local_mqtt": "Local MQTT"
       }
     }
   }

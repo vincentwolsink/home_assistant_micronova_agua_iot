@@ -35,7 +35,8 @@
           "buffer_read_timeout": "Timeout voor kachel buffer uitlezen (seconden).",
           "language": "Taal voor beschrijvingen.",
           "update_interval": "Tijd tussen updates (seconden).",
-          "connection_mode": "Connectie modus:"
+          "connection_mode": "Connectie modus:",
+          "max_eeprom_writes_per_day": "Maximaal aantal EEPROM-schrijfpogingen per dag per kachel"
         },
         "sections": {
           "device_fixes": {
@@ -46,14 +47,33 @@
             }
           }
         }
+      },
+      "mqtt_settings": {
+        "title": "MQTT-verbinding",
+        "description": "Laat de host leeg om een lokale MQTT-server/app te gebruiken.",
+        "data": {
+          "hostname": "MQTT-host",
+          "port": "Poort",
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord"
+        }
       }
+    },
+    "error": {
+      "stove_not_responding": "Geen actuele meting ontvangen. Controleer de kachelverbinding, DNS-verwijzing en MQTT.",
+      "connection_error": "Verbinding met Agua IOT API is niet mogelijk.",
+      "unauthorized": "Inloggen mislukt, valideer de gebruikersdata.",
+      "unknown_error": "Onbekende fout, valideer de configuratie.",
+      "mqtt_unavailable": "Configureer Home Assistant MQTT of voer een MQTT-server in.",
+      "invalid_mac": "De cloud heeft voor een kachel geen wifi-MAC-adres geleverd. Maak eenmaal verbinding met de cloud om de gegevens bij te werken."
     }
   },
   "selector": {
     "connection_mode": {
       "options": {
         "connection_cloud": "Cloud (Micronova API)",
-        "connection_bluetooth": "Bluetooth (auto-detect)"
+        "connection_bluetooth": "Bluetooth (auto-detect)",
+        "connection_local_mqtt": "Lokale MQTT"
       }
     }
   }
