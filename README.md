@@ -75,7 +75,7 @@ For more information see [BLUETOOTH](docs/BLUETOOTH.md).
 
 This integration supports local control for Micronova stoves equipped with a Navel 2.0 Wi-Fi module.
 
-Connect through Home Assistant MQTT or configure one shared MQTT endpoint for all stoves. Wi-Fi MAC addresses are read from the cloud. See [local MQTT setup](docs/LOCAL_MQTT.md) for connection and DNS settings.
+Connect through Home Assistant MQTT or configure one shared MQTT endpoint for all stoves. See [local MQTT setup](docs/LOCAL_MQTT.md) for connection and DNS settings.
 
 ## Credits
 
