@@ -3,7 +3,7 @@
     "flow_title": "Micronova Agua IOT",
     "step": {
       "user": {
-        "description": "[%key:common::config_flow::description%]",
+        "description": "Please supply your account credentials for the stove vendor app",
         "data": {
           "api_url": "[%key:common::config_flow::data::api_url%]",
           "login_api_url": "[%key:common::config_flow::data::login_api_url%]",
@@ -33,14 +33,12 @@
     "step": {
       "user": {
         "title": "Micronova Agua IOT options",
-        "description": "Choose the connection mode for all stoves in this account. Configure MQTT separately for each stove.",
         "data": {
           "http_timeout": "Timeout for API calls (seconds).",
           "buffer_read_timeout": "Timeout for stove buffer reading (seconds).",
           "language": "Language for descriptions.",
           "update_interval": "Time between updates (seconds).",
           "connection_mode": "Connection mode:",
-          "configure_mqtt": "Configure MQTT per stove",
           "max_eeprom_writes_per_day": "Maximum EEPROM write attempts per day, per stove"
         },
         "sections": {
@@ -53,22 +51,14 @@
           }
         }
       },
-      "mqtt_device": {
-        "title": "Choose stove",
-        "data": {
-          "device": "Stove"
-        }
-      },
       "mqtt_settings": {
         "title": "MQTT connection",
-        "description": "Leave the host empty to use Home Assistant MQTT. Password blank keeps the saved password. Application write receipts must be supported by the endpoint; leave disabled for ordinary brokers.",
+        "description": "Leave the host empty to use a local MQTT server/app.",
         "data": {
-          "device_mac": "Wi-Fi MAC address",
           "hostname": "MQTT host",
           "port": "Port",
           "username": "Username",
-          "password": "Password",
-          "write_confirmation": "Require application write receipt"
+          "password": "Password"
         }
       }
     },
@@ -77,12 +67,8 @@
       "connection_error": "Connection to Agua IOT API not possible.",
       "unauthorized": "Failed to login, please check credentials.",
       "unknown_error": "Unknown error, please double check configuration.",
-      "mqtt_unavailable": "Configure Home Assistant MQTT or enter a per-stove endpoint.",
-      "invalid_mac": "Enter a unique Wi-Fi MAC address with 12 hexadecimal digits.",
-      "write_confirmation_requires_host": "Write confirmations require an explicit MQTT host."
-    },
-    "abort": {
-      "no_cached_devices": "Connect through the cloud once to cache the stove metadata."
+      "mqtt_unavailable": "Configure Home Assistant MQTT or enter an MQTT endpoint.",
+      "invalid_mac": "The cloud did not provide a Wi-Fi MAC address for a stove. Connect through the cloud once to refresh its metadata."
     }
   },
   "selector": {

@@ -193,7 +193,6 @@ class LocalBleAguaIOT:
         service_uuid: str = DEFAULT_SERVICE_UUID,
         char_uuid: str = DEFAULT_CHAR_UUID,
         cached_devices: list[dict[str, Any]] | None = None,
-        device_options: dict | None = None,
         eeprom_limits: dict | None = None,
     ) -> None:
         self.hass = hass
@@ -218,7 +217,6 @@ class LocalBleAguaIOT:
 
         self._session_uuid = str(uuid.uuid4()).upper()
         self._cached_devices = cached_devices or []
-        self.device_options = device_options or {}
         self.eeprom_limits = eeprom_limits or {}
         self._cache_dirty = False
         self._command_lock = asyncio.Lock()
@@ -314,6 +312,7 @@ class LocalBleAguaIOT:
                 self,
                 device_info=dev.device_info_data,
                 register_map=dev.export_register_map(),
+                mac=dev.wifi_mac,
             )
             for dev in cloud.devices
         ]
@@ -334,6 +333,7 @@ class LocalBleAguaIOT:
                 self,
                 device_info=entry.get("device_info"),
                 register_map=entry.get("register_map"),
+                mac=entry.get("mac"),
             )
             for entry in cached_devices
         ]
@@ -377,7 +377,6 @@ class LocalBleAguaIOT:
             self.hass,
             device,
             item_offsets,
-            self.device_options,
             limits=self.eeprom_limits,
         )
 

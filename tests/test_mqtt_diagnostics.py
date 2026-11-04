@@ -24,12 +24,10 @@ async def test_direct_mqtt_settings_are_redacted():
             ]
         },
         "options": {
-            "mqtt_devices": {
-                "stove": {
-                    "hostname": "broker.example",
-                    "username": "private-user",
-                    "password": "private-test-secret",
-                }
+            "mqtt_settings": {
+                "hostname": "broker.example",
+                "username": "private-user",
+                "password": "private-test-secret",
             }
         },
     }

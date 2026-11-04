@@ -109,20 +109,20 @@ async def test_configured_limits_can_be_raised_on_an_existing_budget(budget_env)
     device = SimpleNamespace(id_device="DEV_01", product_serial="AABBCCDDEEFF")
     # Existing installations have no per-stove setting and are enabled by default.
     for _ in range(eeprom.DEFAULT_DAILY_LIMIT):
-        await eeprom.reserve_device_write(hass, device, [32893], {})
+        await eeprom.reserve_device_write(hass, device, [32893])
     with pytest.raises(eeprom.AguaIOTError, match="limit reached"):
-        await eeprom.reserve_device_write(hass, device, [32893], {})
+        await eeprom.reserve_device_write(hass, device, [32893])
     limits = {"max_eeprom_writes_per_day": 200}
     for _ in range(200 - eeprom.DEFAULT_DAILY_LIMIT):
-        await eeprom.reserve_device_write(hass, device, [32893], {}, limits=limits)
+        await eeprom.reserve_device_write(hass, device, [32893], limits=limits)
     with pytest.raises(eeprom.AguaIOTError, match="200 commands per day"):
-        await eeprom.reserve_device_write(hass, device, [32893], {}, limits=limits)
+        await eeprom.reserve_device_write(hass, device, [32893], limits=limits)
     # Lowering the limit immediately applies to the already stored history.
     with pytest.raises(eeprom.AguaIOTError, match="10 commands per day"):
-        await eeprom.reserve_device_write(hass, device, [32893], {})
+        await eeprom.reserve_device_write(hass, device, [32893])
     # The daily window frees the budget again.
     now[0] += 86400
-    await eeprom.reserve_device_write(hass, device, [32893], {})
+    await eeprom.reserve_device_write(hass, device, [32893])
 
 
 @pytest.mark.asyncio

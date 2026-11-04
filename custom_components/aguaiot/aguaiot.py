@@ -51,7 +51,6 @@ class aguaiot:
         buffer_read_timeout=30,
         *,
         hass=None,
-        device_options=None,
         eeprom_limits=None,
     ):
         self.api_url = api_url.rstrip("/")
@@ -76,7 +75,6 @@ class aguaiot:
         self.reading_error_fix = reading_error_fix
         self.language = language
         self.hass = hass
-        self.device_options = device_options or {}
         self.eeprom_limits = eeprom_limits or {}
 
         if not self.async_client:
@@ -278,6 +276,7 @@ class aguaiot:
                     res2["device_info"][0]["id_registers_map"],
                     self,
                     device_info=res2["device_info"][0],
+                    mac=dev.get("mac"),
                 )
             )
 
@@ -450,7 +449,7 @@ class aguaiot:
         from .eeprom import reserve_device_write
 
         await reserve_device_write(
-            self.hass, device, set_items, self.device_options, limits=self.eeprom_limits
+            self.hass, device, set_items, limits=self.eeprom_limits
         )
 
         payload = {
@@ -507,6 +506,7 @@ class Device:
         aguaiot,
         device_info=None,
         register_map=None,
+        mac=None,
     ):
         self.id = id
         self.id_device = id_device
@@ -520,6 +520,7 @@ class Device:
         self.__device_info = device_info or {}
         self.__register_map_dict = register_map or {}
         self.__register_dict = {}
+        self.__mac = mac or self.__device_info.get("mac")
 
     async def update_mapping(self):
         self.__register_map_dict = await self.__aguaiot._fetch_device_registers_mapping(
@@ -615,6 +616,11 @@ class Device:
         return self.__device_info
 
     @property
+    def wifi_mac(self):
+        """Return the Navel Wi-Fi MAC reported by the cloud."""
+        return self.__mac
+
+    @property
     def ble_mac(self):
         return self.__device_info.get("mac")
 
@@ -635,6 +641,7 @@ class Device:
             "is_online": self.is_online,
             "name_product": self.name_product,
             "id_registers_map": self.id_registers_map,
+            "mac": self.__mac,
             "device_info": copy.deepcopy(self.__device_info),
             "register_map": self.export_register_map(),
         }

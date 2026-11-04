@@ -21,7 +21,8 @@ def make_dummy_cached_devices():
             "id": 1,
             "id_device": "DEV_01",
             "id_product": 10,
-            "product_serial": "A1B2C3D4E5F6",
+            "product_serial": "SERIAL-123456",
+            "mac": "A1B2C3D4E5F6",
             "name": "Living Room Stove",
             "is_online": True,
             "name_product": "Pellet Stove",
@@ -388,20 +389,29 @@ async def test_poll_never_reports_cached_readings_as_live(mqtt_api, connected):
 
 
 @pytest.mark.asyncio
-async def test_explicit_mac_uses_shared_ha_mqtt_without_other_integration(mqtt_api):
+async def test_cloud_mac_uses_shared_ha_mqtt_without_other_integration(mqtt_api):
     cached = make_dummy_cached_devices()
-    cached[0]["product_serial"] = "1234567890123"
+    cached[0]["mac"] = "AA:BB:CC:DD:EE:FF"
     cached[0]["id_device"] = "cloud-id"
     client = make_test_instance(cached_devices=cached)
     client.hass.data = {}
-    client._mqtt_devices = {"cloud-id": {"device_mac": "AABBCCDDEEFF"}}
     try:
         await client.connect()
         assert client._device_mac == "AABBCCDDEEFF"
         assert not client._owns_mqtt
-        assert cached[0]["product_serial"] == "1234567890123"
     finally:
         await client.close()
+
+
+@pytest.mark.asyncio
+async def test_missing_cloud_mac_is_actionable(mqtt_api):
+    cached = make_dummy_cached_devices()
+    cached[0].pop("mac")
+    client = make_test_instance(cached_devices=cached)
+    with pytest.raises(local_mqtt_module.LocalMqttSetupError) as err:
+        await client.connect()
+    assert err.value.key == "invalid_mac"
+    mqtt_api.async_subscribe.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -523,7 +533,7 @@ async def test_two_stoves_keep_registers_and_endpoints_separate(mqtt_api):
 
     cached = make_dummy_cached_devices()
     second = copy.deepcopy(cached[0])
-    second.update(id_device="DEV_02", product_serial="112233445566")
+    second.update(id_device="DEV_02", mac="112233445566")
     cached.append(second)
     mqtt_api.async_subscribe.side_effect = lambda *args, **kwargs: MagicMock()
     client = make_test_instance(cached_devices=cached)

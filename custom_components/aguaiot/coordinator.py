@@ -33,6 +33,7 @@ from .const import (
     CONF_HTTP_TIMEOUT,
     CONF_LANGUAGE,
     CONF_LOGIN_API_URL,
+    CONF_MQTT_SETTINGS,
     CONF_READING_ERROR_FIX,
     CONF_UPDATE_INTERVAL,
     CONF_UUID,
@@ -116,7 +117,7 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         }
 
         self._cloud_cache_saved = False
-        device_options = config_entry.options.get("mqtt_devices", {})
+        mqtt_settings = config_entry.options.get(CONF_MQTT_SETTINGS, {})
 
         if (fixture_client := create_fixture_client(**client_kwargs)) is not None:
             self.agua = fixture_client
@@ -130,20 +131,17 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
                 char_uuid=config_entry.options.get(
                     CONF_BLE_CHAR_UUID, DEFAULT_CHAR_UUID
                 ),
-                device_options=device_options,
                 **client_kwargs,
             )
         elif connection_mode == CONNECTION_MODE_LOCAL_MQTT:
             self.agua = LocalMqttAguaIOT(
                 hass=hass,
-                mqtt_devices=device_options,
+                mqtt_settings=mqtt_settings,
                 cached_devices=config_entry.data.get(CONF_BLE_BOOTSTRAP_DEVICES),
                 **client_kwargs,
             )
         else:
-            self.agua = aguaiot(
-                **client_kwargs, hass=hass, device_options=device_options
-            )
+            self.agua = aguaiot(**client_kwargs, hass=hass)
 
     @property
     def connection_mode(self) -> str:

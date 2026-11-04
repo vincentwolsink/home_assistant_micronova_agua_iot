@@ -32,7 +32,6 @@
         "data": {
           "language": "Idioma para descrições",
           "connection_mode": "Tryb połączenia:",
-          "configure_mqtt": "Configurar MQTT por salamandra",
           "max_eeprom_writes_per_day": "Máximo de tentativas de escrita EEPROM por dia e salamandra"
         },
         "sections": {
@@ -43,25 +42,16 @@
               "reading_error_fix": "[Bronpi] Filtrar leituras incorretas (quando o forno está sem energia)."
             }
           }
-        },
-        "description": "Escolha o modo de ligação para todas as salamandras desta conta. Configure o MQTT separadamente para cada salamandra."
-      },
-      "mqtt_device": {
-        "title": "Selecionar salamandra",
-        "data": {
-          "device": "Salamandra"
         }
       },
       "mqtt_settings": {
         "title": "Ligação MQTT",
-        "description": "Deixe o servidor vazio para utilizar o Home Assistant MQTT. Uma palavra-passe vazia mantém a anterior. As confirmações da aplicação devem ser suportadas pelo servidor; mantenha desativado para brokers comuns.",
+        "description": "Deixe o servidor vazio para utilizar um servidor/aplicação MQTT local.",
         "data": {
-          "device_mac": "Endereço MAC Wi-Fi",
           "hostname": "Servidor MQTT",
           "port": "Porta",
           "username": "Utilizador",
-          "password": "Palavra-passe",
-          "write_confirmation": "Exigir confirmação da aplicação para escritas"
+          "password": "Palavra-passe"
         }
       }
     },
@@ -70,12 +60,8 @@
       "connection_error": "Não foi possível estabelecer ligação.",
       "unauthorized": "Falha na autenticação. Verifique as credenciais.",
       "unknown_error": "Erro desconhecido. Verifique a configuração.",
-      "mqtt_unavailable": "Configure o Home Assistant MQTT ou um servidor por salamandra.",
-      "invalid_mac": "Introduza um endereço MAC Wi-Fi único com 12 caracteres hexadecimais.",
-      "write_confirmation_requires_host": "As confirmações de escrita requerem um anfitrião MQTT explícito."
-    },
-    "abort": {
-      "no_cached_devices": "Ligue-se uma vez à cloud para guardar os dados da salamandra."
+      "mqtt_unavailable": "Configure o Home Assistant MQTT ou introduza um servidor MQTT.",
+      "invalid_mac": "A cloud não forneceu um endereço MAC Wi-Fi para uma salamandra. Ligue-se uma vez à cloud para atualizar os dados."
     }
   },
   "selector": {

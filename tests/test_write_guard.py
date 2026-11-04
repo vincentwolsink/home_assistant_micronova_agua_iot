@@ -52,7 +52,7 @@ def stove(offset):
     )
 
 
-def cloud(hass, device_options):
+def cloud(hass):
     client = aguaiot(
         "https://example.com",
         "123456",
@@ -61,7 +61,6 @@ def cloud(hass, device_options):
         "uuid",
         async_client=MagicMock(),
         hass=hass,
-        device_options=device_options,
     )
     client.handle_webcall = AsyncMock(
         side_effect=[
@@ -74,7 +73,7 @@ def cloud(hass, device_options):
 
 @pytest.mark.asyncio
 async def test_cloud_ram_write_still_posts():
-    client = cloud(SimpleNamespace(data={}), {})
+    client = cloud(SimpleNamespace(data={}))
     await client._request_writing(stove(33), {"status_managed_set": 1})
     assert client.handle_webcall.await_args_list[0].args[0] == "POST"
 
@@ -97,7 +96,7 @@ async def test_bluetooth_ram_write_still_opens_a_session():
 
 @pytest.mark.asyncio
 async def test_cloud_write_error_keeps_the_count(eeprom_hass):
-    client = cloud(eeprom_hass, {})
+    client = cloud(eeprom_hass)
     client.handle_webcall = AsyncMock(side_effect=AguaIOTError("nope"))
     with pytest.raises(AguaIOTError, match="nope"):
         await client._request_writing(stove(32893), {"temp_air_set": 22})
@@ -123,7 +122,7 @@ async def test_cloud_status_failure_keeps_the_count(eeprom_hass, monkeypatch):
             return {"idRequest": "job-1"}
         return False
 
-    client = cloud(eeprom_hass, {})
+    client = cloud(eeprom_hass)
     client.handle_webcall = AsyncMock(side_effect=webcall)
     with pytest.raises(AguaIOTError, match="Error while request device writing"):
         await client._request_writing(stove(32893), {"temp_air_set": 22})
@@ -134,7 +133,7 @@ async def test_cloud_status_failure_keeps_the_count(eeprom_hass, monkeypatch):
 
 @pytest.mark.asyncio
 async def test_cloud_ram_error_does_not_open_a_budget(eeprom_hass):
-    client = cloud(eeprom_hass, {})
+    client = cloud(eeprom_hass)
     client.handle_webcall = AsyncMock(side_effect=AguaIOTError("nope"))
     with pytest.raises(AguaIOTError, match="nope"):
         await client._request_writing(stove(33), {"status_managed_set": 1})

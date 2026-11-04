@@ -120,6 +120,13 @@ class TestLoadFixtures:
         assert register["value"] == expected["value"]
 
     @pytest.mark.asyncio
+    async def test_local_connection_validation_is_a_no_op(self):
+        client = fixture_module.FixtureAguaIOT(FIXTURES_DIR)
+        await client.connect()
+
+        assert await client.validate_local_connection() == {"fixture": True}
+
+    @pytest.mark.asyncio
     async def test_missing_fixture_path_raises(self):
         client = fixture_module.FixtureAguaIOT(FIXTURES_DIR / "does-not-exist")
 

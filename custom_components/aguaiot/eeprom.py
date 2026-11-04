@@ -25,14 +25,9 @@ def clean_mac(value):
     return None
 
 
-def legacy_mac_for(device, device_options, explicit=None):
+def legacy_mac_for(device, explicit=None):
     """Resolve the MAC address used by legacy MQTT write histories."""
-    settings = (device_options or {}).get(str(getattr(device, "id_device", "")), {})
-    return (
-        clean_mac(explicit)
-        or clean_mac(settings.get("device_mac"))
-        or clean_mac(getattr(device, "product_serial", None))
-    )
+    return clean_mac(explicit) or clean_mac(getattr(device, "product_serial", None))
 
 
 class EepromBudget:
@@ -135,13 +130,13 @@ async def reserve_eeprom_write(hass, stove_id, offsets, *, legacy_id=None, limit
 
 
 async def reserve_device_write(
-    hass, device, offsets, device_options, explicit_mac=None, *, limits=None
+    hass, device, offsets, explicit_mac=None, *, limits=None
 ):
     """Apply the shared stove budget before a cloud, Bluetooth or MQTT write."""
     return await reserve_eeprom_write(
         hass,
         str(getattr(device, "id_device", "") or ""),
         offsets,
-        legacy_id=legacy_mac_for(device, device_options, explicit=explicit_mac),
+        legacy_id=legacy_mac_for(device, explicit=explicit_mac),
         limits=limits,
     )

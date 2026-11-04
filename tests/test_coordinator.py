@@ -134,6 +134,17 @@ class TestConnectionModes:
         assert isinstance(coordinator.agua, LocalMqttAguaIOT)
         assert coordinator.connection_mode == const.CONNECTION_MODE_LOCAL_MQTT
 
+    def test_local_mqtt_receives_global_settings(self):
+        entry = make_config_entry(const.CONNECTION_MODE_LOCAL_MQTT)
+        entry.options[const.CONF_MQTT_SETTINGS] = {
+            "hostname": "broker.example",
+            "port": 1883,
+        }
+        coordinator = AguaIOTDataUpdateCoordinator(hass=MagicMock(), config_entry=entry)
+        assert (
+            coordinator.agua._mqtt_settings == entry.options[const.CONF_MQTT_SETTINGS]
+        )
+
 
 class TestCloudBootstrapForLocalConnections:
     @pytest.mark.asyncio

@@ -4,14 +4,12 @@ Use an MQTT 3.1.1 broker or protocol-compatible endpoint reachable by both Home 
 
 1. Connect Agua IOT through the cloud once to cache device metadata and register maps.
 2. Point the stove vendor hostname to your broker using your router or local DNS service.
-3. In Agua IOT options, enable **Configure MQTT per stove** to enter the Wi-Fi MAC and connection settings. Leave the host empty to use the existing Home Assistant MQTT integration, or enter a host, port and credentials for a separate connection.
-4. Select **Local MQTT** as connection mode. The mode is accepted after fresh readings arrive from every stove in the account.
+3. In Agua IOT options, select **Local MQTT** as connection mode. The shared MQTT connection settings appear next; the Wi-Fi MAC of each stove is read from the cloud, so it does not need to be entered. Leave the host empty to use the existing Home Assistant MQTT integration, or enter a host, port and credentials for a separate connection.
+4. Save the settings. The mode is accepted after fresh readings arrive from every stove in the account.
 
 Each stove has separate topics, register cache and application session. Configure the broker ACLs for the stove topics below. Stove firmware credentials may be shared and MQTT traffic is unencrypted; use a trusted LAN.
 
 Topics are `navel/<MAC>` and `master/responses/navel/<MAC>`, with 12 uppercase hexadecimal MAC digits. Retained responses are ignored and commands are never retained or automatically retried.
-
-Application write confirmations require an explicit MQTT host and support from that endpoint. Leave disabled for ordinary MQTT brokers. When enabled, the client waits for an `mt: G` response with matching `mi`, `pl.Cmd: MqttWriteResult`, boolean `Accepted` and optional `Reason`. An accepted receipt confirms forwarding, not physical execution. Missing receipts mean uncertain delivery; writes are not replayed.
 
 Polling reads RAM and the active setpoint/status registers listed in the cached model map, including EEPROM registers. Schedule settings are excluded. Reading EEPROM does not consume write cycles. The initial cache is not accepted as a live connection check.
 
@@ -21,7 +19,7 @@ Writes to offsets at or above 32768 are enabled, including for existing installa
 
 The attempt is saved before handing the command to the transport and remains counted on errors or cancellation, since a failed response does not prove the write was not applied. Local writes are not automatically retried. If the history cannot be read or saved, EEPROM writes are blocked. RAM reads and writes are not counted. Only writes sent by this integration are counted.
 
-Existing entity IDs and device registrations are retained; switching connection mode does not require removing the integration. One connection mode applies to all stoves in an account. MQTT endpoints can be configured separately per stove.
+Existing entity IDs and device registrations are retained; switching connection mode does not require removing the integration. One connection mode and one MQTT endpoint configuration apply to all stoves in an account.
 
 Compatibility depends on the Navel protocol and a valid register map for the actual stove. A vendor hostname such as `remote.mcz.it` alone does not establish compatibility.
 

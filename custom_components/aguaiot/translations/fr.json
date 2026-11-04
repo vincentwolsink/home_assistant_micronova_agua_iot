@@ -29,14 +29,12 @@
     "step": {
       "user": {
         "title": "Options Micronova Agua IOT",
-        "description": "Choisissez le mode de connexion pour tous les poêles de ce compte. Configurez MQTT séparément pour chaque poêle.",
         "data": {
           "http_timeout": "Délai d'attente des appels API (secondes).",
           "buffer_read_timeout": "Délai d'attente des lectures du poêle (secondes).",
           "language": "Langue pour les descriptions",
           "update_interval": "Temps entre les mises à jour (secondes).",
           "connection_mode": "Mode de connexion:",
-          "configure_mqtt": "Configurer MQTT par poêle",
           "max_eeprom_writes_per_day": "Tentatives maximales d’écriture EEPROM par jour et par poêle"
         },
         "sections": {
@@ -49,22 +47,14 @@
           }
         }
       },
-      "mqtt_device": {
-        "title": "Choisir le poêle",
-        "data": {
-          "device": "Poêle"
-        }
-      },
       "mqtt_settings": {
         "title": "Connexion MQTT",
-        "description": "Laissez le serveur vide pour utiliser Home Assistant MQTT. Un mot de passe vide conserve le précédent. Les confirmations applicatives doivent être prises en charge par le serveur ; laissez cette option désactivée pour les courtiers ordinaires.",
+        "description": "Laissez le serveur vide pour utiliser un serveur/une application MQTT local(e).",
         "data": {
-          "device_mac": "Adresse MAC Wi-Fi",
           "hostname": "Serveur MQTT",
           "port": "Port",
           "username": "Utilisateur",
-          "password": "Mot de passe",
-          "write_confirmation": "Exiger une confirmation applicative des écritures"
+          "password": "Mot de passe"
         }
       }
     },
@@ -73,12 +63,8 @@
       "connection_error": "La connection à l'API Agua IOT n'est pas possible.",
       "unauthorized": "Échec de la connexion, veuillez vérifier vos identifiants.",
       "unknown_error": "Erreur inconue, veuillez vérifier la configuration.",
-      "mqtt_unavailable": "Configurez Home Assistant MQTT ou un serveur par poêle.",
-      "invalid_mac": "Saisissez une adresse MAC Wi-Fi unique de 12 caractères hexadécimaux.",
-      "write_confirmation_requires_host": "Les confirmations d’écriture nécessitent un hôte MQTT explicite."
-    },
-    "abort": {
-      "no_cached_devices": "Connectez-vous une fois au cloud pour enregistrer les données du poêle."
+      "mqtt_unavailable": "Configurez Home Assistant MQTT ou saisissez un serveur MQTT.",
+      "invalid_mac": "Le cloud n'a pas fourni d'adresse MAC Wi-Fi pour un poêle. Connectez-vous une fois au cloud pour actualiser ses données."
     }
   },
   "selector": {

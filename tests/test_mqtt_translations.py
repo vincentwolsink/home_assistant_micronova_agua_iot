@@ -28,12 +28,10 @@ def test_translation_keys_and_placeholders(language):
         options = data["options"]
         return {
             "mqtt_settings": options["step"]["mqtt_settings"],
-            "mqtt_device": options["step"]["mqtt_device"],
             "limits": {
                 key: options["step"]["user"]["data"][key]
                 for key in ("max_eeprom_writes_per_day",)
             },
-            "receipt_error": options["error"]["write_confirmation_requires_host"],
         }
 
     expected = flatten(added_strings(reference))
@@ -46,3 +44,13 @@ def test_translation_keys_and_placeholders(language):
         assert set(re.findall(r"\{[^{}]+\}", text)) == set(
             re.findall(r"\{[^{}]+\}", expected[key])
         ), key
+
+
+@pytest.mark.parametrize("language", ["en", "de", "fr", "nl", "pt"])
+def test_mqtt_configuration_is_global(language):
+    options = json.loads((BASE / f"translations/{language}.json").read_text())[
+        "options"
+    ]
+    assert "mqtt_device" not in options["step"]
+    assert "device_mac" not in options["step"]["mqtt_settings"]["data"]
+    assert "no_cached_devices" not in options.get("abort", {})

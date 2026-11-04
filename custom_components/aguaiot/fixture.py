@@ -175,6 +175,10 @@ class FixtureAguaIOT:
         """Refresh every device from its in-memory register values."""
         await update_devices(self.devices)
 
+    async def validate_local_connection(self) -> dict:
+        """Accept the local connection check; fixtures are always available."""
+        return {"fixture": True}
+
     async def _fetch_device_information(self, device):
         """Return the raw register values of a fixture device."""
         return self._raw_data[device.id_device]

@@ -36,7 +36,6 @@
           "language": "Taal voor beschrijvingen.",
           "update_interval": "Tijd tussen updates (seconden).",
           "connection_mode": "Connectie modus:",
-          "configure_mqtt": "MQTT per kachel instellen",
           "max_eeprom_writes_per_day": "Maximaal aantal EEPROM-schrijfpogingen per dag per kachel"
         },
         "sections": {
@@ -47,25 +46,16 @@
               "reading_error_fix": "[Bronpi] Filter foutieve waardes (wanneer kachel geen stroom heeft)."
             }
           }
-        },
-        "description": "Kies de verbindingsmodus voor alle kachels in dit account. Configureer MQTT afzonderlijk per kachel."
-      },
-      "mqtt_device": {
-        "title": "Kachel kiezen",
-        "data": {
-          "device": "Kachel"
         }
       },
       "mqtt_settings": {
         "title": "MQTT-verbinding",
-        "description": "Laat de host leeg voor Home Assistant MQTT. Een leeg wachtwoord behoudt het opgeslagen wachtwoord. De server moet toepassingsbevestigingen ondersteunen; laat dit uitgeschakeld voor gewone brokers.",
+        "description": "Laat de host leeg om een lokale MQTT-server/app te gebruiken.",
         "data": {
-          "device_mac": "Wifi-MAC-adres",
           "hostname": "MQTT-host",
           "port": "Poort",
           "username": "Gebruikersnaam",
-          "password": "Wachtwoord",
-          "write_confirmation": "Toepassingsbevestiging voor schrijfacties vereisen"
+          "password": "Wachtwoord"
         }
       }
     },
@@ -74,12 +64,8 @@
       "connection_error": "Verbinding met Agua IOT API is niet mogelijk.",
       "unauthorized": "Inloggen mislukt, valideer de gebruikersdata.",
       "unknown_error": "Onbekende fout, valideer de configuratie.",
-      "mqtt_unavailable": "Configureer Home Assistant MQTT of een server per kachel.",
-      "invalid_mac": "Voer een uniek wifi-MAC-adres met 12 hexadecimale tekens in.",
-      "write_confirmation_requires_host": "Schrijfbevestigingen vereisen een expliciete MQTT-host."
-    },
-    "abort": {
-      "no_cached_devices": "Maak eenmaal verbinding met de cloud om de kachelgegevens op te slaan."
+      "mqtt_unavailable": "Configureer Home Assistant MQTT of voer een MQTT-server in.",
+      "invalid_mac": "De cloud heeft voor een kachel geen wifi-MAC-adres geleverd. Maak eenmaal verbinding met de cloud om de gegevens bij te werken."
     }
   },
   "selector": {

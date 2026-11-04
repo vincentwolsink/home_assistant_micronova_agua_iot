@@ -51,41 +51,50 @@ def test_options_work_before_runtime_setup(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_per_stove_endpoint_preserves_password_and_other_devices(monkeypatch):
+async def test_global_mqtt_settings_preserve_password_and_other_options(monkeypatch):
     options = flow.AguaIOTOptionsFlowHandler()
     entry = MagicMock(
-        data={"ble_bootstrap_devices": [{"id_device": "one", "name": "Stove"}]},
         options={
-            "connection_mode": "connection_cloud",
+            "connection_mode": "connection_local_mqtt",
             "language": "DEU",
-            "mqtt_devices": {
-                "one": {"password": "test-only-secret"},
-                "two": {"device_mac": "112233445566"},
+            "mqtt_settings": {
+                "hostname": "old.example",
+                "port": 1883,
+                "password": "test-only-secret",
             },
         },
     )
     monkeypatch.setattr(type(options), "config_entry", property(lambda _self: entry))
-    client = MagicMock(connect=AsyncMock(), close=AsyncMock())
+    client = MagicMock(
+        connect=AsyncMock(), validate_local_connection=AsyncMock(), close=AsyncMock()
+    )
     monkeypatch.setattr(options, "_build_client", lambda *_args: client)
-    await options.async_step_mqtt_device({"device": "one"})
-    shown = await options.async_step_mqtt_settings()
+    shown = await options.async_step_user({"connection_mode": "connection_local_mqtt"})
+    assert shown["step_id"] == "mqtt_settings"
     assert "test-only-secret" not in str(shown)
-    invalid = await options.async_step_mqtt_settings({"device_mac": "112233445566"})
-    assert invalid["errors"] == {"device_mac": "invalid_mac"}
     result = await options.async_step_mqtt_settings(
         {
-            "device_mac": "aa:bb:cc:dd:ee:ff",
             "hostname": "broker.example",
             "port": 1883,
             "username": "client",
-            "write_confirmation": False,
         }
     )
-    assert result["data"]["connection_mode"] == "connection_cloud"
+    assert result["data"]["connection_mode"] == "connection_local_mqtt"
     assert result["data"]["language"] == "DEU"
-    assert result["data"]["mqtt_devices"]["two"] == entry.options["mqtt_devices"]["two"]
-    assert result["data"]["mqtt_devices"]["one"]["password"] == "test-only-secret"
-    assert result["data"]["mqtt_devices"]["one"]["device_mac"] == "AABBCCDDEEFF"
+    assert result["data"]["mqtt_settings"]["hostname"] == "broker.example"
+    assert result["data"]["mqtt_settings"]["password"] == "test-only-secret"
+
+
+@pytest.mark.asyncio
+async def test_cloud_mode_does_not_open_mqtt_settings(monkeypatch):
+    options = flow.AguaIOTOptionsFlowHandler()
+    entry = MagicMock(options={"connection_mode": "connection_cloud"})
+    monkeypatch.setattr(type(options), "config_entry", property(lambda _self: entry))
+    client = MagicMock(connect=AsyncMock(), close=AsyncMock())
+    monkeypatch.setattr(options, "_build_client", lambda *_args: client)
+    result = await options.async_step_user({"connection_mode": "connection_cloud"})
+    assert result["data"]["connection_mode"] == "connection_cloud"
+    client.connect.assert_awaited_once()
 
 
 def test_eeprom_limits_have_no_fixed_upper_ceiling(monkeypatch):
@@ -118,44 +127,23 @@ async def test_mqtt_setup_preserves_pending_options_and_validates_them(monkeypat
     )
     build = MagicMock(return_value=client)
     monkeypatch.setattr(options, "_build_client", build)
-    await options.async_step_user(
+    shown = await options.async_step_user(
         {
-            "configure_mqtt": True,
             "connection_mode": "connection_local_mqtt",
             "language": "DEU",
             "max_eeprom_writes_per_day": 40,
         }
     )
-    await options.async_step_mqtt_device({"device": "one"})
-    shown = await options.async_step_mqtt_settings()
-    values = shown["data_schema"]({"device_mac": "AABBCCDDEEFF"})
+    assert shown["step_id"] == "mqtt_settings"
+    values = shown["data_schema"]({})
     assert "allow_eeprom_writes" not in values
     result = await options.async_step_mqtt_settings(values)
     assert result["data"]["connection_mode"] == "connection_local_mqtt"
     assert result["data"]["language"] == "DEU"
     assert "max_eeprom_writes_per_hour" not in result["data"]
     assert result["data"]["max_eeprom_writes_per_day"] == 40
-    assert "configure_mqtt" not in result["data"]
     client.validate_local_connection.assert_awaited_once()
     client.close.assert_awaited_once()
-
-
-@pytest.mark.asyncio
-async def test_receipt_setting_requires_an_explicit_host(monkeypatch):
-    options = flow.AguaIOTOptionsFlowHandler()
-    entry = MagicMock(options={})
-    monkeypatch.setattr(type(options), "config_entry", property(lambda _self: entry))
-    options._mqtt_device = "one"
-    result = await options.async_step_mqtt_settings(
-        {
-            "device_mac": "AABBCCDDEEFF",
-            "hostname": "  ",
-            "write_confirmation": True,
-        }
-    )
-    assert result["errors"] == {
-        "write_confirmation": "write_confirmation_requires_host"
-    }
 
 
 def test_empty_runtime_languages_preserve_existing_language(monkeypatch):

@@ -63,7 +63,7 @@ class LocalMqttAguaIOT:
         language: str | None = "ENG",
         http_timeout: int | None = 30,
         buffer_read_timeout: int | None = 30,
-        mqtt_devices: dict | None = None,
+        mqtt_settings: dict | None = None,
         eeprom_limits: dict | None = None,
         cached_devices: list[dict[str, Any]] | None = None,
     ) -> None:
@@ -86,7 +86,7 @@ class LocalMqttAguaIOT:
         self.devices: list[Device] = []
 
         self._session_uuid = str(uuid.uuid4()).upper()
-        self._mqtt_devices = mqtt_devices or {}
+        self._mqtt_settings = mqtt_settings or {}
         self.eeprom_limits = eeprom_limits or {}
         self._cached_devices = cached_devices or []
         self._cache_dirty = False
@@ -164,13 +164,12 @@ class LocalMqttAguaIOT:
                 self,
                 device_info=entry.get("device_info"),
                 register_map=reg_map,
+                mac=entry.get("mac"),
             )
             self.devices.append(dev)
 
             if not self._device_mac:
-                self._device_mac = clean_mac(entry.get("product_serial")) or clean_mac(
-                    entry.get("id_device")
-                )
+                self._device_mac = clean_mac(dev.wifi_mac)
 
             if not self._security_code:
                 dev_info = entry.get("device_info") or {}
@@ -216,15 +215,14 @@ class LocalMqttAguaIOT:
                     self,
                     device_info=dev.device_info_data,
                     register_map=reg_map,
+                    mac=dev.wifi_mac,
                 )
             )
         self._cache_dirty = True
 
         for dev in self.devices:
             if not self._device_mac:
-                self._device_mac = clean_mac(dev.product_serial) or clean_mac(
-                    dev.id_device
-                )
+                self._device_mac = clean_mac(dev.wifi_mac)
             if not self._security_code:
                 dev_info = dev.device_info_data or {}
                 self._security_code = dev_info.get("reg_code") or dev_info.get(
@@ -300,7 +298,7 @@ class LocalMqttAguaIOT:
                     language=self.language,
                     http_timeout=self.http_timeout,
                     buffer_read_timeout=self.buffer_read_timeout,
-                    mqtt_devices=self._mqtt_devices,
+                    mqtt_settings=self._mqtt_settings,
                     eeprom_limits=self.eeprom_limits,
                     cached_devices=[cached],
                 )
@@ -320,15 +318,11 @@ class LocalMqttAguaIOT:
         """Subscribe using the configured endpoint or Home Assistant MQTT."""
         if self._unsubscribe is not None:
             return
-        settings = self._mqtt_devices.get(str(self.devices[0].id_device), {})
-        if settings.get("device_mac"):
-            mac = clean_mac(settings["device_mac"])
-            if not mac:
-                raise LocalMqttSetupError("invalid_mac", "Invalid stove MAC address")
-            self._device_mac = mac
+        settings = self._mqtt_settings
         if not self._device_mac:
             raise LocalMqttSetupError(
-                "invalid_mac", "Configure the stove Wi-Fi MAC address."
+                "invalid_mac",
+                "The cloud did not provide a Wi-Fi MAC address for this stove.",
             )
         if settings.get("hostname"):
             info = {
@@ -341,22 +335,16 @@ class LocalMqttAguaIOT:
                 info,
                 self._on_mqtt_reconnect,
                 on_disconnect=self._on_mqtt_disconnect,
-                write_confirmation=settings.get("write_confirmation", False),
             )
             self._owns_mqtt = True
             await self._mqtt.start()
         else:
-            if settings.get("write_confirmation"):
-                raise LocalMqttSetupError(
-                    "write_confirmation_requires_host",
-                    "Write confirmations require an explicit MQTT host.",
-                )
             mqtt = await async_import_module(self.hass, "homeassistant.components.mqtt")
 
             if not await mqtt.async_wait_for_mqtt_client(self.hass):
                 raise LocalMqttSetupError(
                     "mqtt_unavailable",
-                    "Configure Home Assistant MQTT or a per-device MQTT endpoint.",
+                    "Configure Home Assistant MQTT or an MQTT endpoint.",
                 )
             self._mqtt = mqtt
             self._unsubscribe_connection = mqtt.async_subscribe_connection_status(
@@ -478,11 +466,7 @@ class LocalMqttAguaIOT:
             },
         }
 
-        target_mac = (
-            self._device_mac
-            or self._clean_identifier(device.product_serial)
-            or "UNKNOWN"
-        )
+        target_mac = self._device_mac
         try:
             await self._send_mqtt_publish(f"navel/{target_mac}", query)
             await asyncio.wait_for(
@@ -532,18 +516,13 @@ class LocalMqttAguaIOT:
             payload = payload_or_items
             item_offsets = [int(x) for x in payload.get("Items", [])]
 
-        target_mac = (
-            self._device_mac
-            or self._clean_identifier(device.product_serial)
-            or "UNKNOWN"
-        )
+        target_mac = self._device_mac
         async with self._write_lock:
             await self._await_stove_identity()
             await reserve_device_write(
                 self.hass,
                 device,
                 item_offsets,
-                self._mqtt_devices,
                 explicit_mac=target_mac,
                 limits=self.eeprom_limits,
             )
