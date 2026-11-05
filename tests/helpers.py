@@ -3,6 +3,16 @@ import os
 import sys
 import types
 
+# Home Assistant >= 2026.11 uses httpx2 and requires httpx to be aliased to it
+# before anything imports httpx. The component modules below import httpx, so
+# this has to happen before loading them.
+try:
+    import httpx2
+except ImportError:  # Older Home Assistant releases use httpx directly.
+    pass
+else:
+    httpx2.alias_httpx()
+
 COMPONENT_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "custom_components", "aguaiot")
 )
@@ -43,6 +53,7 @@ aguaiot = _aguaiot_module.aguaiot
 AguaIOTError = _aguaiot_module.AguaIOTError
 AguaIOTUnauthorized = _aguaiot_module.AguaIOTUnauthorized
 AguaIOTUpdateError = _aguaiot_module.AguaIOTUpdateError
+AguaIOTConnectionError = _aguaiot_module.AguaIOTConnectionError
 
 
 def compute_information_dict(register_map):
