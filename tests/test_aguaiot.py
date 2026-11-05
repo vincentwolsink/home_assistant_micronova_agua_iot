@@ -1,10 +1,16 @@
 """Test the aguaiot class."""
 
+import json
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from tests.helpers import AguaIOTUnauthorized, AguaIOTUpdateError, aguaiot
+from tests.helpers import (
+    AguaIOTConnectionError,
+    AguaIOTUnauthorized,
+    AguaIOTUpdateError,
+    aguaiot,
+)
 
 
 class FakeDevice:
@@ -273,3 +279,142 @@ class TestUpdate:
         aguaiot_mock.devices = []
 
         await aguaiot_mock.update()
+
+
+class TestHttpClient:
+    """Exercise the component with a real HTTP client transport.
+
+    The component imports ``httpx`` at module level.  Home Assistant aliases that
+    name to ``httpx2`` on newer releases, while older releases use ``httpx``.
+    These tests import ``httpx`` lazily, after ``tests.helpers`` has installed
+    the alias, so both setups exercise the same code path.
+    """
+
+    @pytest.mark.asyncio
+    async def test_login_over_http_client(self):
+        import time
+
+        import httpx
+        import jwt
+
+        token = jwt.encode(
+            {"exp": int(time.time()) + 3600},
+            "test-secret-key-that-is-at-least-32-bytes-long",
+            algorithm="HS256",
+        )
+        captured = {}
+
+        async def handler(request):
+            captured["method"] = request.method
+            captured["url"] = str(request.url)
+            captured["authorization"] = request.headers.get("Authorization")
+            captured["local"] = request.headers.get("local")
+            captured["payload"] = json.loads(request.content)
+            return httpx.Response(
+                200,
+                json={"token": token, "refresh_token": "refresh-123"},
+            )
+
+        inst = aguaiot(
+            api_url="https://example.com",
+            customer_code="000000",
+            email="test@example.com",
+            password="test",
+            unique_id="test-uuid",
+            async_client=httpx.AsyncClient(transport=httpx.MockTransport(handler)),
+        )
+
+        try:
+            assert await inst.login() is True
+        finally:
+            await inst.async_client.aclose()
+
+        assert captured["method"] == "POST"
+        assert captured["url"] == "https://example.com/userLogin"
+        assert captured["authorization"] == "test-uuid"
+        assert captured["local"] == "true"
+        assert captured["payload"] == {
+            "email": "test@example.com",
+            "password": "test",
+        }
+        assert inst.token == token
+        assert inst.refresh_token == "refresh-123"
+        assert inst.token_expires > time.time()
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        ("method", "expected_url", "expected_payload"),
+        [
+            ("GET", "https://example.com/deviceList?id=1", {}),
+            ("POST", "https://example.com/deviceList", {"id": "1"}),
+        ],
+    )
+    async def test_handle_webcall_over_http_client(
+        self, method, expected_url, expected_payload
+    ):
+        import time
+
+        import httpx
+
+        captured = {}
+
+        async def handler(request):
+            captured["method"] = request.method
+            captured["url"] = str(request.url)
+            captured["authorization"] = request.headers.get("Authorization")
+            captured["local"] = request.headers.get("local")
+            captured["payload"] = json.loads(request.content) if request.content else {}
+            return httpx.Response(200, json={"result": "ok"})
+
+        inst = aguaiot(
+            api_url="https://example.com",
+            customer_code="000000",
+            email="test@example.com",
+            password="test",
+            unique_id="test-uuid",
+            async_client=httpx.AsyncClient(transport=httpx.MockTransport(handler)),
+        )
+        inst.token = "token-123"
+        inst.refresh_token = "refresh-123"
+        inst.token_expires = time.time() + 3600
+
+        try:
+            result = await inst.handle_webcall(
+                method, "https://example.com/deviceList", {"id": "1"}
+            )
+        finally:
+            await inst.async_client.aclose()
+
+        assert result == {"result": "ok"}
+        assert captured["method"] == method
+        assert captured["url"] == expected_url
+        assert captured["authorization"] == "token-123"
+        assert captured["local"] == "false"
+        assert captured["payload"] == expected_payload
+
+    @pytest.mark.asyncio
+    async def test_handle_webcall_transport_error(self):
+        import time
+
+        import httpx
+
+        async def handler(request):
+            raise httpx.ConnectError("connection refused")
+
+        inst = aguaiot(
+            api_url="https://example.com",
+            customer_code="000000",
+            email="test@example.com",
+            password="test",
+            unique_id="test-uuid",
+            async_client=httpx.AsyncClient(transport=httpx.MockTransport(handler)),
+        )
+        inst.token = "token-123"
+        inst.refresh_token = "refresh-123"
+        inst.token_expires = time.time() + 3600
+
+        try:
+            with pytest.raises(AguaIOTConnectionError):
+                await inst.handle_webcall("GET", "https://example.com/deviceList", {})
+        finally:
+            await inst.async_client.aclose()
