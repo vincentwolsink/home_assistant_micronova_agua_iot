@@ -439,6 +439,15 @@ class LocalMqttAguaIOT:
 
         return sorted(offsets)
 
+    def _collect_word_offsets(self, device: Device) -> set[int]:
+        """Collect offsets of 16-bit registers, read as words like the cloud buffer."""
+        register_map = device.export_register_map() or {}
+        return {
+            int(reg["offset"])
+            for reg in register_map.values()
+            if isinstance(reg, dict) and "offset" in reg and reg.get("is_word")
+        }
+
     async def _fetch_device_information(self, device: Device) -> dict[int, int]:
         """Serialize reads sharing the firmware response event."""
         async with self._read_lock:
@@ -451,6 +460,7 @@ class LocalMqttAguaIOT:
         await self._await_stove_identity()
 
         target_offsets = self._collect_readable_offsets(device)
+        word_offsets = self._collect_word_offsets(device)
 
         self._response_event.clear()
         masks = [65535] * len(target_offsets)
@@ -463,6 +473,12 @@ class LocalMqttAguaIOT:
                 "Cmd": "RequestReading",
                 "Items": target_offsets,
                 "Masks": masks,
+                # Without BitData the module returns only the low byte, which
+                # drops enable bits above 0xFF (e.g. canalization_sx_enable).
+                "BitData": [
+                    16 if offset in word_offsets else 8 for offset in target_offsets
+                ],
+                "Endianess": ["L"] * len(target_offsets),
             },
         }
 
