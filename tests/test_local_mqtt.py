@@ -389,6 +389,55 @@ async def test_poll_never_reports_cached_readings_as_live(mqtt_api, connected):
 
 
 @pytest.mark.asyncio
+async def test_reading_requests_word_registers_as_16_bits(mqtt_api):
+    cached = make_dummy_cached_devices()
+    cached[0]["register_map"]["temp_smoke_get"]["is_word"] = True
+    # Enable bit above 0xFF: lost if the module returns only the low byte.
+    cached[0]["register_map"]["canalization_sx_enable"] = {
+        "offset": 107,
+        "mask": 1024,
+        "formula": "#/1024",
+        "reg_type": "ENABLE",
+        "is_word": True,
+    }
+    client = make_test_instance(cached_devices=cached)
+    await client.connect()
+    await client._message_received(
+        message({"mt": "R", "pl": {"Cmd": "Identity", "Result": 0}})
+    )
+    queries = []
+
+    async def live_reply(_hass, _topic, payload, **_kwargs):
+        query = json.loads(payload)
+        if query["pl"]["Cmd"] == "RequestReading":
+            queries.append(query["pl"])
+            items = query["pl"]["Items"]
+            await client._message_received(
+                message(
+                    {
+                        "mt": "R",
+                        "pl": {
+                            "Cmd": "RequestReading",
+                            "Items": items,
+                            "Values": [1159 if item == 107 else 0 for item in items],
+                        },
+                    }
+                )
+            )
+
+    mqtt_api.async_publish.side_effect = live_reply
+    try:
+        await client._fetch_device_information(client.devices[0])
+    finally:
+        await client.close()
+
+    pl = queries[0]
+    bit_data = dict(zip(pl["Items"], pl["BitData"]))
+    assert bit_data == {1: 8, 6: 16, 33: 8, 107: 16, 32893: 8}
+    assert pl["Endianess"] == ["L"] * len(pl["Items"])
+
+
+@pytest.mark.asyncio
 async def test_cloud_mac_uses_shared_ha_mqtt_without_other_integration(mqtt_api):
     cached = make_dummy_cached_devices()
     cached[0]["mac"] = "AA:BB:CC:DD:EE:FF"
