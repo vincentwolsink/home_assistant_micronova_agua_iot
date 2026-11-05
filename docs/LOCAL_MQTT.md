@@ -3,9 +3,11 @@
 Use an MQTT 3.1.1 broker or protocol-compatible endpoint reachable by both Home Assistant and the stove. Configure the endpoint before enabling local MQTT in Agua IOT.
 
 1. Connect Agua IOT through the cloud once to cache device metadata and register maps.
-2. Point the stove vendor hostname to your broker using your router or local DNS service.
-3. In Agua IOT options, select **Local MQTT** as connection mode. The shared MQTT connection settings appear next; the Wi-Fi MAC of each stove is read from the cloud, so it does not need to be entered. Leave the host empty to use the existing Home Assistant MQTT integration, or enter a host, port and credentials for a separate connection.
-4. Save the settings. The mode is accepted after fresh readings arrive from every stove in the account.
+2. Install a local MQTT app ([Mosquito](https://github.com/home-assistant/apps/blob/master/mosquitto/DOCS.md)) if needed.
+3. Create a user/password `navel`/`navel!!` in the MQTT broker configuration.
+4. Point the stove vendor hostname to your MQTT broker using your router or local DNS service.
+5. In Agua IOT options, select **Local MQTT** as connection mode. The shared MQTT connection settings appear next; Leave the host empty to use the existing Home Assistant MQTT integration, or enter a host, port and credentials for a separate connection.
+6. Save the settings. The mode is accepted after fresh readings arrive from every stove in the account.
 
 Each stove has separate topics, register cache and application session. Configure the broker ACLs for the stove topics below. Stove firmware credentials may be shared and MQTT traffic is unencrypted; use a trusted LAN.
 

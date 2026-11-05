@@ -46,7 +46,7 @@
       },
       "mqtt_settings": {
         "title": "MQTT-Verbindung",
-        "description": "Host leer lassen, um einen lokalen MQTT-Server/eine lokale MQTT-App zu nutzen.",
+        "description": "Bitte lesen Sie zuerst die Dokumentation, bevor Sie MQTT einrichten.",
         "data": {
           "hostname": "MQTT-Host",
           "port": "Port",
@@ -69,7 +69,7 @@
       "options": {
         "connection_cloud": "Cloud (Micronova API)",
         "connection_bluetooth": "Bluetooth (auto-detect)",
-        "connection_local_mqtt": "Lokales MQTT"
+        "connection_local_mqtt": "Lokales MQTT (erweitert)"
       }
     }
   }
