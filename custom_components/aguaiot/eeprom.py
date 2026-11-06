@@ -11,7 +11,7 @@ from homeassistant.helpers.storage import Store
 from .aguaiot import AguaIOTError
 
 # Default used when no limit has been configured.
-DEFAULT_DAILY_LIMIT = 10
+DEFAULT_DAILY_LIMIT = 20
 EEPROM_OFFSET_THRESHOLD = 32768
 
 
@@ -30,8 +30,13 @@ def legacy_mac_for(device, explicit=None):
     return clean_mac(explicit) or clean_mac(getattr(device, "product_serial", None))
 
 
+def local_day(stamp):
+    """Return the local calendar day of an epoch timestamp."""
+    return time.localtime(stamp)[:3]
+
+
 class EepromBudget:
-    """Track EEPROM write attempts in a rolling daily window."""
+    """Track EEPROM write attempts per local calendar day."""
 
     def __init__(self, hass, stove_id, legacy_id=None):
         self.hass = hass
@@ -66,28 +71,50 @@ class EepromBudget:
         ):
             raise ValueError("Invalid EEPROM history")
 
+    async def _ensure_history(self):
+        if self.history is not None:
+            return self.history
+        history = await self._load(self.store)
+        if history is None and self.legacy_id:
+            legacy = Store(
+                self.hass,
+                1,
+                f"aguaiot.mqtt.{self.legacy_id}.eeprom",
+                atomic_writes=True,
+            )
+            history = await self._load(legacy)
+        if history is None:
+            history = []
+        self._check_history(history)
+        self.history = history
+        return history
+
+    def _trim_history(self, now):
+        # The budget resets at local midnight. Keep future reservations if the
+        # system clock moves backwards so the limit still fails closed.
+        today = local_day(now)
+        self.history = [
+            stamp for stamp in self.history if stamp > now or local_day(stamp) == today
+        ]
+        return self.history
+
+    async def daily_count(self):
+        """Return the number of attempts on the current local day."""
+        async with self.lock:
+            try:
+                await self._ensure_history()
+                return len(self._trim_history(time.time()))
+            except (OSError, OverflowError, ValueError, TypeError) as err:
+                raise AguaIOTError("Cannot read the EEPROM write budget.") from err
+
     async def reserve(self, daily_limit=DEFAULT_DAILY_LIMIT):
         async with self.lock:
             try:
                 if type(daily_limit) is not int or daily_limit < 1:
                     raise ValueError("EEPROM limit must be a positive integer")
-                if self.history is None:
-                    history = await self._load(self.store)
-                    if history is None and self.legacy_id:
-                        legacy = Store(
-                            self.hass,
-                            1,
-                            f"aguaiot.mqtt.{self.legacy_id}.eeprom",
-                            atomic_writes=True,
-                        )
-                        history = await self._load(legacy)
-                    if history is None:
-                        history = []
-                    self._check_history(history)
-                    self.history = history
+                await self._ensure_history()
                 now = time.time()
-                # Keep future reservations if the system clock moves backwards.
-                self.history = [stamp for stamp in self.history if now - stamp < 86400]
+                self._trim_history(now)
                 if len(self.history) >= daily_limit:
                     raise AguaIOTError(
                         "EEPROM write limit reached for this stove. "
@@ -98,10 +125,21 @@ class EepromBudget:
                 await self.store.async_save(self.history)
                 await self.hass.async_add_executor_job(self._verify, self.history)
                 return now
-            except (OSError, ValueError, TypeError) as err:
+            except (OSError, OverflowError, ValueError, TypeError) as err:
                 raise AguaIOTError(
                     "Cannot verify the EEPROM write budget. No command was sent."
                 ) from err
+
+
+def _get_budget(hass, stove_id, legacy_id=None):
+    budgets = hass.data.setdefault("aguaiot", {}).setdefault("eeprom_budgets", {})
+    budget = budgets.get(stove_id)
+    if budget is None:
+        budget = EepromBudget(hass, stove_id, legacy_id=legacy_id)
+        budgets[stove_id] = budget
+    elif legacy_id and budget.legacy_id is None:
+        budget.legacy_id = clean_mac(legacy_id)
+    return budget
 
 
 async def reserve_eeprom_write(hass, stove_id, offsets, *, legacy_id=None, limits=None):
@@ -118,14 +156,26 @@ async def reserve_eeprom_write(hass, stove_id, offsets, *, legacy_id=None, limit
         raise AguaIOTError(
             "Cannot verify the EEPROM write budget. No command was sent."
         )
-    budgets = hass.data.setdefault("aguaiot", {}).setdefault("eeprom_budgets", {})
-    budget = budgets.get(stove_id)
-    if budget is None:
-        budget = EepromBudget(hass, stove_id, legacy_id=legacy_id)
-        budgets[stove_id] = budget
+    budget = _get_budget(hass, stove_id, legacy_id)
     limits = limits or {}
     return await budget.reserve(
         daily_limit=limits.get("max_eeprom_writes_per_day", DEFAULT_DAILY_LIMIT),
+    )
+
+
+async def eeprom_daily_writes(hass, stove_id, *, legacy_id=None):
+    """Return the number of EEPROM write attempts on the current local day."""
+    if hass is None or not stove_id:
+        return 0
+    return await _get_budget(hass, stove_id, legacy_id).daily_count()
+
+
+async def eeprom_daily_writes_for_device(hass, device, explicit_mac=None):
+    """Return the daily EEPROM write count for a stove."""
+    return await eeprom_daily_writes(
+        hass,
+        str(getattr(device, "id_device", "") or ""),
+        legacy_id=legacy_mac_for(device, explicit=explicit_mac),
     )
 
 
