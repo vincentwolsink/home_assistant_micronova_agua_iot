@@ -160,3 +160,41 @@ class TestPlatformsWithDeviceData:
         number_entity = entities[-1]
         assert number_entity.native_min_value == 15
         assert number_entity.native_max_value == 30
+
+
+def test_eeprom_writes_sensor_is_diagnostic(aguaiot_mock):
+    device = build_device_from_fixture(aguaiot_mock, "test", REGISTER_MAP)
+    coordinator = make_coordinator()
+    coordinator.eeprom_writes_per_day = {device.id_device: 4}
+    entity = sensor.AguaIOTEepromWritesSensor(coordinator, device)
+
+    assert entity.entity_category == const.EntityCategory.DIAGNOSTIC
+    assert entity.native_value == 4
+    assert entity.unique_id == f"{device.id_device}_eeprom_writes_per_day"
+    assert entity.name == "EEPROM Writes (today)"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "mode",
+    [
+        const.CONNECTION_MODE_CLOUD,
+        const.CONNECTION_MODE_BLUETOOTH,
+        const.CONNECTION_MODE_LOCAL_MQTT,
+    ],
+)
+async def test_eeprom_writes_sensor_is_added_for_every_transport(aguaiot_mock, mode):
+    device = build_device_from_fixture(aguaiot_mock, "test", REGISTER_MAP)
+    coordinator = make_coordinator()
+    coordinator.connection_mode = mode
+    coordinator.agua.devices = [device]
+    coordinator.eeprom_writes_per_day = {device.id_device: 2}
+    config_entry = MagicMock(runtime_data=coordinator)
+    add_entities = MagicMock()
+
+    await sensor.async_setup_entry(MagicMock(), config_entry, add_entities)
+
+    entities = add_entities.call_args.args[0]
+    assert any(
+        isinstance(entity, sensor.AguaIOTEepromWritesSensor) for entity in entities
+    )

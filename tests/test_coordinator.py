@@ -84,6 +84,22 @@ class TestUpdate:
         assert await coordinator._async_update_data() is None
         assert coordinator.last_update_success is True
 
+    @pytest.mark.asyncio
+    async def test_update_collects_eeprom_usage_for_every_transport(self, monkeypatch):
+        coordinator = make_coordinator()
+        coordinator.agua.update = AsyncMock()
+        coordinator.agua.devices = [
+            MagicMock(id_device="DEV_01", wifi_mac="AABBCCDDEEFF")
+        ]
+        coordinator._async_persist_ble_bootstrap_if_needed = AsyncMock()
+        usage = AsyncMock(return_value=7)
+        monkeypatch.setattr(coordinator_module, "eeprom_daily_writes_for_device", usage)
+
+        await coordinator._async_update_data()
+
+        assert coordinator.eeprom_writes_per_day == {"DEV_01": 7}
+        usage.assert_awaited_once()
+
 
 class TestFirstRefresh:
     @pytest.mark.asyncio

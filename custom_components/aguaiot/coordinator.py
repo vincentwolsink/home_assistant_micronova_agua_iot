@@ -42,6 +42,7 @@ from .const import (
     CONNECTION_MODE_LOCAL_MQTT,
     DOMAIN,
 )
+from .eeprom import eeprom_daily_writes_for_device
 from .fixture import create_fixture_client
 from .local_ble import DEFAULT_CHAR_UUID, DEFAULT_SERVICE_UUID, LocalBleAguaIOT
 from .local_mqtt import LocalMqttAguaIOT
@@ -117,6 +118,7 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         }
 
         self._cloud_cache_saved = False
+        self.eeprom_writes_per_day: dict[str, int | None] = {}
         mqtt_settings = config_entry.options.get(CONF_MQTT_SETTINGS, {})
 
         if (fixture_client := create_fixture_client(**client_kwargs)) is not None:
@@ -171,6 +173,7 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         try:
             await self.agua.update()
             await self._async_persist_ble_bootstrap_if_needed()
+            await self._async_update_eeprom_usage()
         except AguaIOTUpdateError as e:
             # Raising here marks the update as failed. During the first
             # refresh this makes Home Assistant retry the setup of this config
@@ -183,6 +186,18 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
             raise UpdateFailed(f"Agua IOT Connection error: {e}") from e
         except AguaIOTError as e:
             raise UpdateFailed(f"Agua IOT error: {e}") from e
+
+    async def _async_update_eeprom_usage(self) -> None:
+        """Collect the EEPROM write counts for every stove."""
+        usage: dict[str, int | None] = {}
+        for device in self.agua.devices:
+            try:
+                usage[str(device.id_device)] = await eeprom_daily_writes_for_device(
+                    self.hass, device, explicit_mac=device.wifi_mac
+                )
+            except AguaIOTError:
+                usage[str(device.id_device)] = None
+        self.eeprom_writes_per_day = usage
 
     async def _async_persist_ble_bootstrap_if_needed(self) -> None:
         """Persist bootstrap data when it is freshly learned from the cloud."""

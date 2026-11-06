@@ -59,9 +59,11 @@ Or folow these steps:
 2. Install the plugin via HACS (Micronova Agua IOT)
 3. Add the integration through the home assistant configuration flow
 
-## EEPROM writes
+## EEPROM protection
 
-EEPROM writes are enabled by default, with a configurable limit of 10 attempts per day for each stove. Cloud, Bluetooth and local MQTT share these counts across restarts. See [EEPROM protection](docs/LOCAL_MQTT.md#eeprom-protection) for settings and counting rules.
+Some stove settings are stored in EEPROM memory, which has a limited number of write cycles. Repeatedly writing those settings can eventually wear out the controller's memory. To reduce that risk, the integration limits how many EEPROM write commands it sends to each stove per day. This applies to cloud, Bluetooth, and local MQTT alike.
+
+The default limit is 20 attempts per day per stove and resets at local midnight. It can be changed in the integration options. A diagnostic sensor, **EEPROM Writes (today)**, shows the current count. See [EEPROM protection](docs/EEPROM.md) for what is counted, failure handling, and settings.
 
 ## Local Bluetooth mode
 

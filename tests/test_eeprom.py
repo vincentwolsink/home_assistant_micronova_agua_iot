@@ -1,5 +1,7 @@
 """EEPROM budgets survive restarts and fail closed on storage errors."""
 
+import datetime
+import time
 from types import SimpleNamespace
 
 import pytest
@@ -9,9 +11,23 @@ from tests.helpers import load_component_module
 eeprom = load_component_module("eeprom")
 
 
+def local_noon(year, month, day):
+    """Return local noon so tests stay safely inside one calendar day."""
+    return time.mktime((year, month, day, 12, 0, 0, 0, 0, -1))
+
+
+def next_local_day(now):
+    """Return noon on the local day after now."""
+    local = time.localtime(now)
+    following = datetime.date(local.tm_year, local.tm_mon, local.tm_mday) + (
+        datetime.timedelta(days=1)
+    )
+    return local_noon(following.year, following.month, following.day)
+
+
 @pytest.fixture
 def budget_env(monkeypatch, eeprom_hass):
-    now = [100000.0]
+    now = [local_noon(2026, 6, 15)]
     monkeypatch.setattr(eeprom.time, "time", lambda: now[0])
     return eeprom_hass, now
 
@@ -26,7 +42,7 @@ async def test_daily_limit_restart_and_stove_isolation(budget_env):
     with pytest.raises(eeprom.AguaIOTError, match="limit reached"):
         await restarted.reserve()
     await eeprom.EepromBudget(hass, "two").reserve()
-    now[0] += 86400
+    now[0] = next_local_day(now[0])
     await restarted.reserve()
 
 
@@ -36,7 +52,7 @@ async def test_daily_limit_and_clock_rollback(budget_env):
     guard = eeprom.EepromBudget(hass, "one")
     for _ in range(eeprom.DEFAULT_DAILY_LIMIT):
         await guard.reserve()
-        now[0] += 3600
+        now[0] += 60
     with pytest.raises(eeprom.AguaIOTError, match="limit reached"):
         await guard.reserve()
     now[0] -= 20000
@@ -61,6 +77,36 @@ async def test_silent_storage_failure_blocks_reservation(budget_env, monkeypatch
 
 
 @pytest.mark.asyncio
+async def test_daily_count_tracks_the_local_day(budget_env):
+    hass, now = budget_env
+    guard = eeprom.EepromBudget(hass, "one")
+    for _ in range(3):
+        await guard.reserve()
+        now[0] += 60
+    assert await guard.daily_count() == 3
+    now[0] = next_local_day(now[0])
+    assert await guard.daily_count() == 0
+
+
+@pytest.mark.asyncio
+async def test_budget_resets_at_local_midnight(budget_env):
+    hass, now = budget_env
+    guard = eeprom.EepromBudget(hass, "one")
+    await guard.reserve()
+
+    local = time.localtime(now[0])
+    now[0] = time.mktime(
+        (local.tm_year, local.tm_mon, local.tm_mday, 23, 59, 59, 0, 0, -1)
+    )
+    assert await guard.daily_count() == 1
+
+    now[0] += 1
+    assert await guard.daily_count() == 0
+    await guard.reserve()
+    assert await guard.daily_count() == 1
+
+
+@pytest.mark.asyncio
 async def test_ram_write_ignores_the_budget(budget_env):
     hass, _ = budget_env
     hass.data = {}
@@ -69,12 +115,12 @@ async def test_ram_write_ignores_the_budget(budget_env):
 
 
 @pytest.mark.asyncio
-async def test_cloud_and_mqtt_share_one_stove_budget(budget_env):
+async def test_transport_attempts_share_one_stove_budget(budget_env):
     hass, now = budget_env
     hass.data = {}
     for _ in range(eeprom.DEFAULT_DAILY_LIMIT):
         await eeprom.reserve_eeprom_write(hass, "DEV_01", [32768])
-        now[0] += 3600
+        now[0] += 60
     with pytest.raises(eeprom.AguaIOTError, match="limit reached"):
         await eeprom.reserve_eeprom_write(
             hass, "DEV_01", [32768], legacy_id="AABBCCDDEEFF"
@@ -118,10 +164,10 @@ async def test_configured_limits_can_be_raised_on_an_existing_budget(budget_env)
     with pytest.raises(eeprom.AguaIOTError, match="200 commands per day"):
         await eeprom.reserve_device_write(hass, device, [32893], limits=limits)
     # Lowering the limit immediately applies to the already stored history.
-    with pytest.raises(eeprom.AguaIOTError, match="10 commands per day"):
+    with pytest.raises(eeprom.AguaIOTError, match="20 commands per day"):
         await eeprom.reserve_device_write(hass, device, [32893])
-    # The daily window frees the budget again.
-    now[0] += 86400
+    # The next local day frees the budget again.
+    now[0] = next_local_day(now[0])
     await eeprom.reserve_device_write(hass, device, [32893])
 
 
