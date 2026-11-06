@@ -66,9 +66,11 @@ def compute_information_dict(register_map):
     info = {}
     for reg in register_map.values():
         offset = reg.get("offset")
-        value_raw = reg.get("value_raw", "0")
+        value_raw = reg.get("value_raw")
         mask = reg.get("mask", 65535)
-        if offset is not None:
+        # A null value_raw means the device did not return this register.
+        # Leave the offset out so the Device reports it as unread.
+        if offset is not None and value_raw is not None:
             raw_int = int(value_raw)
             existing = info.get(offset)
             # The raw value already has mask applied, so place it

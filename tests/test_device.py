@@ -29,6 +29,11 @@ class TestGetRegister:
                     f"{name}/{reg_key}: expected value_raw={expected['value_raw']}, "
                     f"got {reg['value_raw']}"
                 )
+                if expected["value"] is None:
+                    assert reg["value"] is None, (
+                        f"{name}/{reg_key}: expected value=None, got {reg['value']}"
+                    )
+                    continue
                 assert abs(float(reg["value"]) - float(expected["value"])) < 0.01, (
                     f"{name}/{reg_key}: expected value={expected['value']}, "
                     f"got {reg['value']}"

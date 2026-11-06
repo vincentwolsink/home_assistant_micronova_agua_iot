@@ -106,7 +106,12 @@ def _raw_data_from_register_map(register_map) -> dict[int, int]:
 
         offset = int(register["offset"])
         mask = int(register.get("mask", 0xFFFF))
-        value = int(register.get("value_raw") or 0)
+        value_raw = register.get("value_raw")
+        # A null value_raw means the register was not read from the device.
+        # Skip it so the Device reports it as unread instead of as zero.
+        if value_raw is None:
+            continue
+        value = int(value_raw)
         current = raw_data.get(offset, 0)
         raw_data[offset] = (current & ~mask) | (value & mask)
 

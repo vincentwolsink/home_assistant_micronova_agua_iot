@@ -162,3 +162,14 @@ def test_raw_data_combines_registers_sharing_an_offset():
     )
 
     assert raw_data == {1: 0x012A}
+
+
+def test_raw_data_skips_registers_without_a_value():
+    raw_data = fixture_module._raw_data_from_register_map(
+        {
+            "read": {"offset": 1, "mask": 255, "value_raw": "42"},
+            "unread": {"offset": 2, "mask": 255, "value_raw": None},
+        }
+    )
+
+    assert raw_data == {1: 42}
