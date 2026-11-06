@@ -55,9 +55,8 @@ Vendor apps **NOT** compatible (using a different platform or abstraction layer)
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=vincentwolsink&repository=home_assistant_micronova_agua_iot&category=integration)
 
 Or folow these steps:
-1. Install [HACS](https://hacs.xyz/) if you haven't already
-2. Install the plugin via HACS (Micronova Agua IOT)
-3. Add the integration through the home assistant configuration flow
+1. Install the plugin via Marketplace: Micronova Agua IOT
+2. Add the integration through the home assistant configuration flow
 
 ## EEPROM protection
 
