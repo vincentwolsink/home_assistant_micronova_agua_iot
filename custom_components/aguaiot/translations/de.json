@@ -38,8 +38,7 @@
           "device_fixes": {
             "name": "Gerätespezifische korrekturen",
             "data": {
-              "air_temp_fix": "[Jolly Mec] Inkorrekte Lufttemperatur bei Verwendung eines externen Thermostats ignorieren.",
-              "reading_error_fix": "[Bronpi] Inkorrekte Messwerte filtern (wenn der Ofen ohne Strom ist)."
+              "air_temp_fix": "[Jolly Mec] Inkorrekte Lufttemperatur bei Verwendung eines externen Thermostats ignorieren."
             }
           }
         }

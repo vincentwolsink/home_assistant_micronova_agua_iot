@@ -59,7 +59,6 @@ class LocalMqttAguaIOT:
         application_version: str = "1.9.7",
         async_client=None,
         air_temp_fix: bool = False,
-        reading_error_fix: bool = False,
         language: str | None = "ENG",
         http_timeout: int = 30,
         buffer_read_timeout: int = 30,
@@ -79,7 +78,6 @@ class LocalMqttAguaIOT:
         self.application_version = application_version
         self.async_client = async_client
         self.air_temp_fix = air_temp_fix
-        self.reading_error_fix = reading_error_fix
         self.language = language
         self.http_timeout = http_timeout
         self.buffer_read_timeout = buffer_read_timeout
@@ -191,7 +189,6 @@ class LocalMqttAguaIOT:
             application_version=self.application_version,
             async_client=self.async_client,
             air_temp_fix=self.air_temp_fix,
-            reading_error_fix=self.reading_error_fix,
             language=self.language,
             http_timeout=self.http_timeout,
             buffer_read_timeout=self.buffer_read_timeout,
@@ -294,7 +291,6 @@ class LocalMqttAguaIOT:
                     application_version=self.application_version,
                     async_client=self.async_client,
                     air_temp_fix=self.air_temp_fix,
-                    reading_error_fix=self.reading_error_fix,
                     language=self.language,
                     http_timeout=self.http_timeout,
                     buffer_read_timeout=self.buffer_read_timeout,

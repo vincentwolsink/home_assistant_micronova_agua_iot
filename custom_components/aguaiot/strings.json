@@ -45,8 +45,7 @@
           "device_fixes": {
             "name": "Device specific fixes",
             "data": {
-              "air_temp_fix": "[Jolly Mec] Ignore incorrect air temperature when using external themostat.",
-              "reading_error_fix": "[Bronpi] Filter incorrect readings (when stove is without power)."
+              "air_temp_fix": "[Jolly Mec] Ignore incorrect air temperature when using external themostat."
             }
           }
         }

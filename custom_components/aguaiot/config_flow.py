@@ -39,7 +39,6 @@ from .const import (
     CONF_LANGUAGE,
     CONF_LOGIN_API_URL,
     CONF_MQTT_SETTINGS,
-    CONF_READING_ERROR_FIX,
     CONF_UPDATE_INTERVAL,
     CONF_UUID,
     CONNECTION_MODE_BLUETOOTH,
@@ -179,9 +178,6 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
             "air_temp_fix": device_fixes.get(
                 CONF_AIR_TEMP_FIX, options.get(CONF_AIR_TEMP_FIX, False)
             ),
-            "reading_error_fix": device_fixes.get(
-                CONF_READING_ERROR_FIX, options.get(CONF_READING_ERROR_FIX, False)
-            ),
             "eeprom_limits": {
                 key: options[key]
                 for key in ("max_eeprom_writes_per_day",)
@@ -250,13 +246,6 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                 self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
             ),
         )
-        reading_error_fix_default = submitted_fixes.get(
-            CONF_READING_ERROR_FIX,
-            stored_fixes.get(
-                CONF_READING_ERROR_FIX,
-                self.config_entry.options.get(CONF_READING_ERROR_FIX, False),
-            ),
-        )
         schema = {
             vol.Optional(
                 CONF_CONNECTION_MODE,
@@ -320,10 +309,6 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                         vol.Optional(
                             CONF_AIR_TEMP_FIX,
                             default=air_temp_fix_default,
-                        ): bool,
-                        vol.Optional(
-                            CONF_READING_ERROR_FIX,
-                            default=reading_error_fix_default,
                         ): bool,
                     }
                 )

@@ -34,7 +34,6 @@ from .const import (
     CONF_LANGUAGE,
     CONF_LOGIN_API_URL,
     CONF_MQTT_SETTINGS,
-    CONF_READING_ERROR_FIX,
     CONF_UPDATE_INTERVAL,
     CONF_UUID,
     CONNECTION_MODE_BLUETOOTH,
@@ -84,10 +83,6 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         air_temp_fix = device_fixes.get(
             CONF_AIR_TEMP_FIX, config_entry.options.get(CONF_AIR_TEMP_FIX, False)
         )
-        reading_error_fix = device_fixes.get(
-            CONF_READING_ERROR_FIX,
-            config_entry.options.get(CONF_READING_ERROR_FIX, False),
-        )
         language = config_entry.options.get(CONF_LANGUAGE)
         http_timeout = config_entry.options.get(CONF_HTTP_TIMEOUT, 30)
         buffer_read_timeout = config_entry.options.get(CONF_BUFFER_READ_TIMEOUT, 30)
@@ -106,7 +101,6 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
             "brand": brand,
             "async_client": get_async_client(hass),
             "air_temp_fix": air_temp_fix,
-            "reading_error_fix": reading_error_fix,
             "language": language,
             "http_timeout": http_timeout,
             "buffer_read_timeout": buffer_read_timeout,

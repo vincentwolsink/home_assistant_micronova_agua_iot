@@ -41,8 +41,7 @@
           "device_fixes": {
             "name": "Correctifs spécifiques aux appareils",
             "data": {
-              "air_temp_fix": "[Jolly Mec] Ignorer la température de l'air incorrecte lors de l'utilisation d'un thermostat externe.",
-              "reading_error_fix": "[Bronpi] Filtrer les lectures incorrectes (lorsque le poêle est sans alimentation)."
+              "air_temp_fix": "[Jolly Mec] Ignorer la température de l'air incorrecte lors de l'utilisation d'un thermostat externe."
             }
           }
         }

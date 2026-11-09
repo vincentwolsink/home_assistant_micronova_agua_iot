@@ -38,8 +38,7 @@
           "device_fixes": {
             "name": "Poprawki specyficzne dla urządzeń",
             "data": {
-              "air_temp_fix": "[Jolly Mec] Ignorar temperatura do ar incorreta ao usar termostato externo.",
-              "reading_error_fix": "[Bronpi] Filtrar leituras incorretas (quando o forno está sem energia)."
+              "air_temp_fix": "[Jolly Mec] Ignorar temperatura do ar incorreta ao usar termostato externo."
             }
           }
         }

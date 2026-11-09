@@ -45,7 +45,6 @@ class aguaiot:
         application_version="1.9.7",
         async_client=None,
         air_temp_fix=False,
-        reading_error_fix=False,
         language="ENG",
         http_timeout=30,
         buffer_read_timeout=30,
@@ -72,7 +71,6 @@ class aguaiot:
 
         # Vendor specific fixes
         self.air_temp_fix = air_temp_fix
-        self.reading_error_fix = reading_error_fix
         self.language = language
         self.hass = hass
         self.eeprom_limits = eeprom_limits or {}
@@ -546,13 +544,8 @@ class Device:
                 raw_value = raw_data[offset]
                 # Fix for reading errors from wifi module. Check the raw word,
                 # as masks and formulas hide the failed read value.
-                if (
-                    self.__aguaiot.reading_error_fix
-                    and int(raw_value) == READING_ERROR_VALUE
-                ):
-                    _LOGGER.debug(
-                        f"Applied reading_error_fix. Dropped value for register {key}"
-                    )
+                if int(raw_value) == READING_ERROR_VALUE:
+                    _LOGGER.debug(f"Dropped reading error value for register {key}")
                     register_dict[key]["value_raw"] = None
                     register_dict[key]["value"] = None
                     continue
