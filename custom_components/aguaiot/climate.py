@@ -38,6 +38,24 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
+def _fan_mode_description(device, key):
+    """Return the current fan mode of a register.
+
+    Register formulas may produce a float (for example ``5.0``), while the
+    fan modes list is built from integers. Normalize the value to an int so
+    the current fan mode matches one of the entries in that list.
+    """
+    value = device.get_register_value(key)
+    if value is None:
+        return None
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        pass
+    options = device.get_register_value_options(key)
+    return str(options.get(value, value))
+
+
 async def async_setup_entry(hass, config_entry, async_add_entities):
     coordinator = config_entry.runtime_data
     agua = coordinator.agua
@@ -269,10 +287,7 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
         power_register = (
             "power_wood_set" if self.hybrid_mode == MODE_WOOD else "power_set"
         )
-        description = self._device.get_register_value_description(power_register)
-        if description is None:
-            return None
-        return str(description)
+        return _fan_mode_description(self._device, power_register)
 
     @property
     def fan_modes(self):
@@ -579,10 +594,7 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     @property
     def fan_mode(self):
         """Return fan mode."""
-        description = self._device.get_register_value_description(self._fan_register)
-        if description is None:
-            return None
-        return str(description)
+        return _fan_mode_description(self._device, self._fan_register)
 
     @property
     def fan_modes(self):
