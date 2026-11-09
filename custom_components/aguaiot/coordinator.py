@@ -30,6 +30,7 @@ from .const import (
     CONF_CONNECTION_MODE,
     CONF_CUSTOMER_CODE,
     CONF_DEVICE_FIXES,
+    CONF_FAILURE_THRESHOLD,
     CONF_HTTP_TIMEOUT,
     CONF_LANGUAGE,
     CONF_LOGIN_API_URL,
@@ -39,6 +40,7 @@ from .const import (
     CONNECTION_MODE_BLUETOOTH,
     CONNECTION_MODE_CLOUD,
     CONNECTION_MODE_LOCAL_MQTT,
+    DEFAULT_FAILURE_THRESHOLD,
     DOMAIN,
 )
 from .eeprom import eeprom_daily_writes_for_device
@@ -59,6 +61,16 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
     ) -> None:
         """Initialize."""
         update_interval = config_entry.options.get(CONF_UPDATE_INTERVAL, 60)
+        failure_threshold = config_entry.options.get(
+            CONF_FAILURE_THRESHOLD, DEFAULT_FAILURE_THRESHOLD
+        )
+        try:
+            failure_threshold = int(failure_threshold)
+        except (TypeError, ValueError):
+            failure_threshold = DEFAULT_FAILURE_THRESHOLD
+        self._failure_threshold = max(1, failure_threshold)
+        self._consecutive_update_failures = 0
+        self._initial_update_completed = False
 
         super().__init__(
             hass=hass,
@@ -166,20 +178,45 @@ class AguaIOTDataUpdateCoordinator(DataUpdateCoordinator):
         """Get the latest data."""
         try:
             await self.agua.update()
-            await self._async_persist_ble_bootstrap_if_needed()
-            await self._async_update_eeprom_usage()
         except AguaIOTUpdateError as e:
-            # Raising here marks the update as failed. During the first
-            # refresh this makes Home Assistant retry the setup of this config
-            # entry, so the entities are only added once the devices have been
-            # read successfully.
-            raise UpdateFailed(f"Agua IOT Update error: {e}") from e
+            self._handle_update_failure(f"Agua IOT Update error: {e}", e)
+            return
         except AguaIOTUnauthorized as e:
-            raise UpdateFailed(f"Agua IOT Unauthorized: {e}") from e
+            self._handle_update_failure(f"Agua IOT Unauthorized: {e}", e)
+            return
         except AguaIOTConnectionError as e:
-            raise UpdateFailed(f"Agua IOT Connection error: {e}") from e
+            self._handle_update_failure(f"Agua IOT Connection error: {e}", e)
+            return
         except AguaIOTError as e:
-            raise UpdateFailed(f"Agua IOT error: {e}") from e
+            self._handle_update_failure(f"Agua IOT error: {e}", e)
+            return
+
+        self._consecutive_update_failures = 0
+        self._initial_update_completed = True
+        await self._async_persist_ble_bootstrap_if_needed()
+        await self._async_update_eeprom_usage()
+
+    def _handle_update_failure(self, message: str, error: AguaIOTError) -> None:
+        """Keep the last known values until too many consecutive reads fail.
+
+        During the first refresh the failure is always raised, so Home Assistant
+        retries the setup of this config entry and entities are only added once
+        the devices have been read successfully.
+        """
+        self._consecutive_update_failures += 1
+        if (
+            not self._initial_update_completed
+            or self._consecutive_update_failures >= self._failure_threshold
+        ):
+            raise UpdateFailed(message) from error
+
+        _LOGGER.warning(
+            "Failed to update %s (%s/%s consecutive failures); "
+            "keeping the last known values.",
+            self.name,
+            self._consecutive_update_failures,
+            self._failure_threshold,
+        )
 
     async def _async_update_eeprom_usage(self) -> None:
         """Collect the EEPROM write counts for every stove."""

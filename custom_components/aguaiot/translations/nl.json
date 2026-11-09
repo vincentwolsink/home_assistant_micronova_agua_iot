@@ -33,6 +33,7 @@
           "description": "Selecteer `Bluetooth (auto-detect)` zodat Home Assistant automatisch een Micronova BLE-module in de buurt detecteert en valideert bij verzenden van het formulier (experimenteel).",
           "http_timeout": "Timeout voor API verzoeken (seconden).",
           "buffer_read_timeout": "Timeout voor kachel buffer uitlezen (seconden).",
+          "failure_threshold": "Opeenvolgende mislukte updates voordat entiteiten onbeschikbaar worden.",
           "language": "Taal voor beschrijvingen.",
           "update_interval": "Tijd tussen updates (seconden).",
           "connection_mode": "Connectie modus:",
