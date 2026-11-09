@@ -117,7 +117,7 @@ class AguaIOTClimateDevice(CoordinatorEntity, ClimateEntity):
         )
 
     @property
-    def temperature_unit(self):
+    def native_temperature_unit(self):
         """Return the unit of measurement."""
         return UnitOfTemperature.CELSIUS
 
@@ -352,7 +352,7 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
         return self._max_temperature(self._temperature_set_key)
 
     @property
-    def current_temperature(self):
+    def native_current_temperature(self):
         """Return the current temperature."""
         if self._temperature_get_key:
             value = self._device.get_register_value_description(
@@ -362,9 +362,9 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
                 return value
 
     @property
-    def target_temperature(self):
+    def native_target_temperature(self):
         """Return the temperature we try to reach."""
-        if self.current_temperature:
+        if self.native_current_temperature:
             return self._device.get_register_value(self._temperature_set_key)
 
     async def async_set_temperature(self, **kwargs):
@@ -497,7 +497,7 @@ class AguaIOTWaterDevice(AguaIOTClimateDevice):
         return self._max_temperature(self._temperature_set_key)
 
     @property
-    def current_temperature(self):
+    def native_current_temperature(self):
         """Return the current temperature."""
         if self._temperature_get_key:
             value = self._device.get_register_value_description(
@@ -507,9 +507,9 @@ class AguaIOTWaterDevice(AguaIOTClimateDevice):
                 return value
 
     @property
-    def target_temperature(self):
+    def native_target_temperature(self):
         """Return the temperature we try to reach."""
-        if self.current_temperature:
+        if self.native_current_temperature:
             return self._device.get_register_value(self._temperature_set_key)
 
     async def async_set_temperature(self, **kwargs):
@@ -671,16 +671,16 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
         return None
 
     @property
-    def target_temperature(self):
+    def native_target_temperature(self):
         """Return the temperature we try to reach."""
         if (
             self.entity_description.key_temp_set in self._device.registers
-            and self.current_temperature
+            and self.native_current_temperature
         ):
             return self._device.get_register_value(self.entity_description.key_temp_set)
 
     @property
-    def current_temperature(self):
+    def native_current_temperature(self):
         """Return the current temperature."""
         if (
             self.entity_description.key_temp_get in self._device.registers

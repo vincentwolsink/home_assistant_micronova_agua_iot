@@ -174,8 +174,8 @@ class TestClimateWithoutDeviceData:
         assert entity.max_temp is None
 
     def test_temperatures_are_unknown(self, entity):
-        assert entity.current_temperature is None
-        assert entity.target_temperature is None
+        assert entity.native_current_temperature is None
+        assert entity.native_target_temperature is None
 
     def test_target_temperature_step(self, entity):
         assert entity.target_temperature_step == 1
@@ -235,8 +235,8 @@ class TestClimateWithDeviceData:
         assert entity.max_temp == 30
 
     def test_temperatures(self, entity):
-        assert entity.current_temperature == 20
-        assert entity.target_temperature == 22
+        assert entity.native_current_temperature == 20
+        assert entity.native_target_temperature == 22
 
 
 class TestClimateEntitiesCanBeAdded:

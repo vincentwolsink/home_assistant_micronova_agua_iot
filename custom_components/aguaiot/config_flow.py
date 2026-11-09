@@ -5,7 +5,6 @@ import uuid
 
 import voluptuous as vol
 from homeassistant.config_entries import (
-    CONN_CLASS_CLOUD_POLL,
     ConfigEntry,
     ConfigFlow,
     OptionsFlowWithReload,
@@ -68,7 +67,6 @@ class AguaIOTConfigFlow(ConfigFlow, domain=DOMAIN):
     """Agua IOT Config Flow handler."""
 
     VERSION = 1
-    CONNECTION_CLASS = CONN_CLASS_CLOUD_POLL
 
     def _entry_in_configuration_exists(self, user_input) -> bool:
         """Return True if config already exists in configuration."""
