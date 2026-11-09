@@ -96,6 +96,22 @@ CANALIZATION_REGISTER_MAP = {
     },
 }
 
+# Some canalization registers scale the raw value with their formula, so the
+# resulting value is a float (80 / 16 = 5.0).
+FLOAT_CANALIZATION_REGISTER_MAP = {
+    "canalization_1_set": {
+        "reg_key": "canalization_1_set",
+        "offset": 5,
+        "mask": 255,
+        "formula": "#/16",
+        "formula_inverse": "#*16",
+        "set_min": 0,
+        "set_max": 6,
+        "value_raw": "80",
+        "value": 5.0,
+    },
+}
+
 WATER_REGISTER_MAP = {
     "temp_water_get": {
         "reg_key": "temp_water_get",
@@ -214,6 +230,26 @@ class TestCanalizationWithoutDeviceData:
         entity.hass = FakeHass()
         attributes = entity.capability_attributes
         assert attributes["fan_modes"] == []
+
+
+class TestCanalizationWithFloatFanMode:
+    """A canalization register whose formula yields a float value."""
+
+    @pytest.fixture
+    def entity(self, aguaiot_mock):
+        device = build_device_from_fixture(
+            aguaiot_mock, "canalization", FLOAT_CANALIZATION_REGISTER_MAP
+        )
+        return climate.AguaIOTCanalizationDevice(
+            make_coordinator(), device, make_canalization_description(), MagicMock()
+        )
+
+    def test_fan_modes(self, entity):
+        assert entity.fan_modes == ["0", "1", "2", "3", "4", "5", "6"]
+
+    def test_fan_mode_matches_fan_modes(self, entity):
+        assert entity.fan_mode == "5"
+        assert entity.fan_mode in entity.fan_modes
 
 
 class TestClimateWithDeviceData:
