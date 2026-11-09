@@ -61,8 +61,8 @@ class LocalMqttAguaIOT:
         air_temp_fix: bool = False,
         reading_error_fix: bool = False,
         language: str | None = "ENG",
-        http_timeout: int | None = 30,
-        buffer_read_timeout: int | None = 30,
+        http_timeout: int = 30,
+        buffer_read_timeout: int = 30,
         mqtt_settings: dict | None = None,
         eeprom_limits: dict | None = None,
         cached_devices: list[dict[str, Any]] | None = None,
@@ -81,8 +81,8 @@ class LocalMqttAguaIOT:
         self.air_temp_fix = air_temp_fix
         self.reading_error_fix = reading_error_fix
         self.language = language
-        self.http_timeout = http_timeout or 30
-        self.buffer_read_timeout = buffer_read_timeout or 30
+        self.http_timeout = http_timeout
+        self.buffer_read_timeout = buffer_read_timeout
         self.devices: list[Device] = []
 
         self._session_uuid = str(uuid.uuid4()).upper()
@@ -487,7 +487,7 @@ class LocalMqttAguaIOT:
             await self._send_mqtt_publish(f"navel/{target_mac}", query)
             await asyncio.wait_for(
                 self._response_event.wait(),
-                timeout=min(float(self.buffer_read_timeout), 5.0),
+                timeout=self.buffer_read_timeout,
             )
         except TimeoutError as err:
             raise AguaIOTConnectionError(
@@ -576,7 +576,7 @@ class LocalMqttAguaIOT:
                 await self._authenticate()
             await asyncio.wait_for(
                 self._identity_ready.wait(),
-                timeout=min(float(self.buffer_read_timeout), 5.0),
+                timeout=self.buffer_read_timeout,
             )
         except TimeoutError as err:
             self._identity_pending = False
