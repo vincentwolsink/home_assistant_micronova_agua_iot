@@ -66,13 +66,13 @@ The default limit is 20 attempts per day per stove and resets at local midnight.
 
 ## Local Bluetooth mode
 
-This integration now includes an experimental `Bluetooth` connection mode for Micronova stoves equipped with a local BLE module (for example the Micronova / Navel `T009_*` module seen by Home Assistant).
+This integration includes an experimental `Bluetooth` connection mode for Micronova stoves equipped with a local BLE module (for example the Micronova / Navel `T009_*` module seen by Home Assistant).
 
 You can enable this mode via the integration options after setup.
 
 For more information see [BLUETOOTH](docs/BLUETOOTH.md).
 
-## Local Wi-Fi MQTT mode
+## Local Wi-Fi MQTT mode (advanced)
 
 This integration supports local control for Micronova stoves equipped with a Navel 2.0 Wi-Fi module.
 
