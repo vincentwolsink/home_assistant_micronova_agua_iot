@@ -31,6 +31,7 @@
         "title": "Opções Micronova Agua IOT",
         "data": {
           "language": "Idioma para descrições",
+          "failure_threshold": "Atualizações falhadas consecutivas antes de as entidades ficarem indisponíveis.",
           "connection_mode": "Tryb połączenia:",
           "max_eeprom_writes_per_day": "Máximo de tentativas de escrita EEPROM por dia e salamandra"
         },

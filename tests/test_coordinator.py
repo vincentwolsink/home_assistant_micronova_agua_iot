@@ -18,6 +18,9 @@ except ImportError:  # pragma: no cover
 class StubLocalBleAguaIOT:
     """Placeholder for the Bluetooth transport, which is not tested here."""
 
+    def __init__(self, *args, **kwargs):
+        pass
+
 
 coordinator_module = load_component_module(
     "coordinator",
@@ -142,6 +145,77 @@ class TestFirstRefresh:
         await coordinator.async_config_entry_first_refresh()
 
         assert coordinator.last_update_success is True
+
+
+def make_transport_mock():
+    """Return a transport stub that can be refreshed by the coordinator."""
+    agua = MagicMock()
+    agua.devices = []
+    agua.cache_dirty = False
+    agua.connect = AsyncMock()
+    agua.update = AsyncMock()
+    return agua
+
+
+class TestFailureThreshold:
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "mode",
+        [
+            const.CONNECTION_MODE_CLOUD,
+            const.CONNECTION_MODE_BLUETOOTH,
+            const.CONNECTION_MODE_LOCAL_MQTT,
+        ],
+    )
+    async def test_transient_failures_keep_entities_available(self, mode):
+        coordinator = make_coordinator(mode)
+        coordinator.agua = make_transport_mock()
+        await coordinator.async_config_entry_first_refresh()
+        assert coordinator.last_update_success is True
+
+        coordinator.agua.update.side_effect = AguaIOTUpdateError("terminated")
+        for _ in range(const.DEFAULT_FAILURE_THRESHOLD - 1):
+            await coordinator.async_refresh()
+            assert coordinator.last_update_success is True
+
+        await coordinator.async_refresh()
+        assert coordinator.last_update_success is False
+
+    @pytest.mark.asyncio
+    async def test_success_resets_the_failure_counter(self):
+        coordinator = make_coordinator()
+        coordinator.agua = make_transport_mock()
+        await coordinator.async_config_entry_first_refresh()
+
+        coordinator.agua.update.side_effect = AguaIOTUpdateError("terminated")
+        await coordinator.async_refresh()
+        await coordinator.async_refresh()
+        assert coordinator.last_update_success is True
+
+        coordinator.agua.update.side_effect = None
+        await coordinator.async_refresh()
+        assert coordinator.last_update_success is True
+
+        coordinator.agua.update.side_effect = AguaIOTUpdateError("terminated")
+        await coordinator.async_refresh()
+        await coordinator.async_refresh()
+        assert coordinator.last_update_success is True
+
+        await coordinator.async_refresh()
+        assert coordinator.last_update_success is False
+
+    @pytest.mark.asyncio
+    async def test_configured_failure_threshold_is_used(self):
+        entry = make_config_entry()
+        entry.options[const.CONF_FAILURE_THRESHOLD] = 1
+        coordinator = AguaIOTDataUpdateCoordinator(hass=MagicMock(), config_entry=entry)
+        coordinator.agua = make_transport_mock()
+        await coordinator.async_config_entry_first_refresh()
+
+        coordinator.agua.update.side_effect = AguaIOTUpdateError("terminated")
+        await coordinator.async_refresh()
+
+        assert coordinator.last_update_success is False
 
 
 class TestConnectionModes:

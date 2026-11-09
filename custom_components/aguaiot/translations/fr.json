@@ -32,6 +32,7 @@
         "data": {
           "http_timeout": "Délai d'attente des appels API (secondes).",
           "buffer_read_timeout": "Délai d'attente des lectures du poêle (secondes).",
+          "failure_threshold": "Mises à jour consécutives échouées avant que les entités deviennent indisponibles.",
           "language": "Langue pour les descriptions",
           "update_interval": "Temps entre les mises à jour (secondes).",
           "connection_mode": "Mode de connexion:",

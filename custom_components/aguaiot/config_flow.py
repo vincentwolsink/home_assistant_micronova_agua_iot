@@ -34,6 +34,7 @@ from .const import (
     CONF_CUSTOMER_CODE,
     CONF_DEVICE_FIXES,
     CONF_ENDPOINT,
+    CONF_FAILURE_THRESHOLD,
     CONF_HTTP_TIMEOUT,
     CONF_LANGUAGE,
     CONF_LOGIN_API_URL,
@@ -43,6 +44,7 @@ from .const import (
     CONNECTION_MODE_BLUETOOTH,
     CONNECTION_MODE_CLOUD,
     CONNECTION_MODE_LOCAL_MQTT,
+    DEFAULT_FAILURE_THRESHOLD,
     DOMAIN,
     ENDPOINTS,
 )
@@ -285,6 +287,15 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                     self.config_entry.options.get(CONF_BUFFER_READ_TIMEOUT, 30),
                 ),
             ): vol.All(vol.Coerce(int), vol.Range(max=60)),
+            vol.Optional(
+                CONF_FAILURE_THRESHOLD,
+                default=user_input.get(
+                    CONF_FAILURE_THRESHOLD,
+                    self.config_entry.options.get(
+                        CONF_FAILURE_THRESHOLD, DEFAULT_FAILURE_THRESHOLD
+                    ),
+                ),
+            ): vol.All(vol.Coerce(int), vol.Range(min=1)),
             vol.Optional(
                 "max_eeprom_writes_per_day",
                 default=user_input.get(

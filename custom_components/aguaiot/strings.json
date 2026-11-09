@@ -36,6 +36,7 @@
         "data": {
           "http_timeout": "Timeout for API calls (seconds).",
           "buffer_read_timeout": "Timeout for stove buffer reading (seconds).",
+          "failure_threshold": "Consecutive failed updates before entities become unavailable.",
           "language": "Language for descriptions.",
           "update_interval": "Time between updates (seconds).",
           "connection_mode": "Connection mode:",

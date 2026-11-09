@@ -32,9 +32,22 @@ def test_existing_options_get_configurable_eeprom_defaults(monkeypatch):
     )
     stored = validated
     assert stored["http_timeout"] == 20
+    assert stored["failure_threshold"] == 3
     assert "allow_eeprom_writes" not in stored
     assert "max_eeprom_writes_per_hour" not in stored
     assert stored["max_eeprom_writes_per_day"] == 20
+
+
+def test_failure_threshold_must_be_at_least_one(monkeypatch):
+    options = flow.AguaIOTOptionsFlowHandler()
+    entry = MagicMock(options={}, runtime_data=MagicMock())
+    monkeypatch.setattr(type(options), "config_entry", property(lambda _self: entry))
+    monkeypatch.setattr(options, "_languages", lambda: ["ENG"])
+    schema = options._build_schema()
+
+    assert schema({"device_fixes": {}})["failure_threshold"] == 3
+    with pytest.raises(flow.vol.Invalid):
+        schema({"device_fixes": {}, "failure_threshold": 0})
 
 
 def test_options_work_before_runtime_setup(monkeypatch):
