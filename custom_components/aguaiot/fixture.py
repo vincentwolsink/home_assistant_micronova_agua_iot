@@ -87,7 +87,6 @@ def create_fixture_client(**kwargs) -> FixtureAguaIOT | None:
     return FixtureAguaIOT(
         source,
         air_temp_fix=kwargs.get("air_temp_fix", False),
-        reading_error_fix=kwargs.get("reading_error_fix", False),
         language=kwargs.get("language") or "ENG",
     )
 
@@ -130,7 +129,6 @@ class FixtureAguaIOT:
         self,
         fixture_path=None,
         air_temp_fix=False,
-        reading_error_fix=False,
         language="ENG",
         **kwargs,
     ):
@@ -142,7 +140,6 @@ class FixtureAguaIOT:
             else _resolve_fixture_path(str(fixture_path))
         )
         self.air_temp_fix = air_temp_fix
-        self.reading_error_fix = reading_error_fix
         self.language = language
         self.devices: list[Device] = []
         self._raw_data: dict[str, dict[int, int]] = {}

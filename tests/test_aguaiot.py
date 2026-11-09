@@ -80,7 +80,6 @@ class TestInit:
         assert inst.token is None
         assert inst.devices == []
         assert inst.air_temp_fix is False
-        assert inst.reading_error_fix is False
         assert inst.language == "ENG"
         assert inst.http_timeout == 30
         assert inst.buffer_read_timeout == 30
@@ -93,14 +92,12 @@ class TestInit:
             password="pass",
             unique_id="id",
             air_temp_fix=True,
-            reading_error_fix=True,
             language="ITA",
             http_timeout=60,
             buffer_read_timeout=45,
         )
         assert inst.api_url == "https://custom.com"
         assert inst.air_temp_fix is True
-        assert inst.reading_error_fix is True
         assert inst.language == "ITA"
         assert inst.http_timeout == 60
         assert inst.buffer_read_timeout == 45
