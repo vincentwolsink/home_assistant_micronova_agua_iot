@@ -618,3 +618,55 @@ def test_cached_bit_fields_preserve_all_bits_at_a_shared_offset():
         }
     )
     assert client._register_values[32768] == 3
+
+
+class TestLocalMqttReadRetries:
+    """A reading lost at QoS 0 is asked again within the configured timeout."""
+
+    async def _identified_client(self, mqtt_api, answer_reading):
+        client = make_test_instance(cached_devices=make_dummy_cached_devices())
+        client.buffer_read_timeout = 0.3
+        await client.connect()
+        client._identity_ready.set()
+        readings = []
+
+        async def publish(_hass, _topic, payload, **_kwargs):
+            query = json.loads(payload)
+            if query["pl"]["Cmd"] != "RequestReading":
+                return
+            readings.append(query["mi"])
+            if answer_reading(len(readings)):
+                await client._message_received(
+                    message(
+                        {
+                            "mt": "R",
+                            "pl": {
+                                "Cmd": "RequestReading",
+                                "Items": [1],
+                                "Values": [227],
+                            },
+                        }
+                    )
+                )
+
+        mqtt_api.async_publish.side_effect = publish
+        return client, readings
+
+    @pytest.mark.asyncio
+    async def test_lost_reading_is_retried(self, mqtt_api):
+        client, readings = await self._identified_client(
+            mqtt_api, lambda attempt: attempt == 2
+        )
+        values = await client._fetch_device_information(client.devices[0])
+        assert values[1] == 227
+        assert len(readings) == 2
+        assert readings[0] != readings[1]
+
+    @pytest.mark.asyncio
+    async def test_reading_fails_after_all_attempts(self, mqtt_api):
+        client, readings = await self._identified_client(mqtt_api, lambda _: False)
+        with pytest.raises(
+            local_mqtt_module.AguaIOTConnectionError, match="No live reading"
+        ):
+            await client._fetch_device_information(client.devices[0])
+        assert len(readings) == local_mqtt_module.LOCAL_READ_ATTEMPTS

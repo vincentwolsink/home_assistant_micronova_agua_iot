@@ -31,6 +31,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 ACTIVE_EEPROM_PREFIXES = ("chrono_p",)
+# Queries and answers travel at QoS 0 over the stove's Wi-Fi module: an occasional
+# lost message must not make every entity unavailable until the next poll.
+LOCAL_READ_ATTEMPTS = 3
 
 
 class LocalMqttSetupError(AguaIOTConnectionError):
@@ -458,39 +461,51 @@ class LocalMqttAguaIOT:
         target_offsets = self._collect_readable_offsets(device)
         word_offsets = self._collect_word_offsets(device)
 
-        self._response_event.clear()
         masks = [65535] * len(target_offsets)
-        query = {
-            "mi": str(uuid.uuid4()),
-            "mt": "Q",
-            "r": {"rj": "Navel"},
-            "s": {"ss": "Apk", "sj": self._session_uuid},
-            "pl": {
-                "Cmd": "RequestReading",
-                "Items": target_offsets,
-                "Masks": masks,
-                # Without BitData the module returns only the low byte, which
-                # drops enable bits above 0xFF (e.g. canalization_sx_enable).
-                "BitData": [
-                    16 if offset in word_offsets else 8 for offset in target_offsets
-                ],
-                "Endianess": ["L"] * len(target_offsets),
-            },
+        payload = {
+            "Cmd": "RequestReading",
+            "Items": target_offsets,
+            "Masks": masks,
+            # Without BitData the module returns only the low byte, which
+            # drops enable bits above 0xFF (e.g. canalization_sx_enable).
+            "BitData": [
+                16 if offset in word_offsets else 8 for offset in target_offsets
+            ],
+            "Endianess": ["L"] * len(target_offsets),
         }
 
         target_mac = self._device_mac
-        try:
-            await self._send_mqtt_publish(f"navel/{target_mac}", query)
-            await asyncio.wait_for(
-                self._response_event.wait(),
-                timeout=self.buffer_read_timeout,
-            )
-        except TimeoutError as err:
-            raise AguaIOTConnectionError(
-                "No live reading received from the stove."
-            ) from err
-        except (OSError, RuntimeError, AguaIOTError) as err:
-            raise AguaIOTConnectionError("Could not read stove registers.") from err
+        # The configured read timeout is the budget for the whole reading, shared
+        # between the attempts.
+        attempt_timeout = self.buffer_read_timeout / LOCAL_READ_ATTEMPTS
+        for attempt in range(1, LOCAL_READ_ATTEMPTS + 1):
+            self._response_event.clear()
+            query = {
+                "mi": str(uuid.uuid4()),
+                "mt": "Q",
+                "r": {"rj": "Navel"},
+                "s": {"ss": "Apk", "sj": self._session_uuid},
+                "pl": payload,
+            }
+            try:
+                await self._send_mqtt_publish(f"navel/{target_mac}", query)
+                await asyncio.wait_for(
+                    self._response_event.wait(), timeout=attempt_timeout
+                )
+                break
+            except TimeoutError as err:
+                if attempt == LOCAL_READ_ATTEMPTS:
+                    raise AguaIOTConnectionError(
+                        "No live reading received from the stove."
+                    ) from err
+                _LOGGER.debug(
+                    "No reading from the stove after %ss, retrying (%s/%s)",
+                    attempt_timeout,
+                    attempt,
+                    LOCAL_READ_ATTEMPTS,
+                )
+            except (OSError, RuntimeError, AguaIOTError) as err:
+                raise AguaIOTConnectionError("Could not read stove registers.") from err
 
         return copy.deepcopy(self._register_values)
 
