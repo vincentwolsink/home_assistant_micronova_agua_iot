@@ -98,7 +98,7 @@ WATER_VARIANTS = ["water", "water_boiler", "water_puffer", "h2o", "h2o_mandata"]
 MODE_WOOD = "Wood"
 MODE_PELLETS = "Pellet"
 
-STATUS_OFF = ["OFF", "FINAL CLEANING", "STOP", "SHUT OFF", "0", "6"]
+STATUS_OFF = ["OFF", "FINAL CLEANING", "CLEANING FINAL", "STOP", "SHUT OFF", "0", "6"]
 STATUS_IDLE = [
     "ECO STOP",
     "STANDBY",
