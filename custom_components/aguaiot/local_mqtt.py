@@ -26,6 +26,7 @@ from .eeprom import (
     reserve_device_write,
 )
 from .mqtt_endpoint import MqttEndpoint
+from .register_overrides import apply_register_overrides
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -148,7 +149,10 @@ class LocalMqttAguaIOT:
         """Restore devices from persisted bootstrap cache."""
         self.devices = []
         for entry in cached_devices:
-            reg_map = entry.get("register_map") or entry.get("registers")
+            reg_map = apply_register_overrides(
+                entry["id_registers_map"],
+                entry.get("register_map") or entry.get("registers"),
+            )
             self._seed_register_cache_from_map(reg_map)
             dev = Device(
                 entry["id"],
@@ -197,7 +201,9 @@ class LocalMqttAguaIOT:
 
         self.devices = []
         for dev in cloud.devices:
-            reg_map = dev.export_register_map()
+            reg_map = apply_register_overrides(
+                dev.id_registers_map, dev.export_register_map()
+            )
             self._seed_register_cache_from_map(reg_map)
             self.devices.append(
                 Device(

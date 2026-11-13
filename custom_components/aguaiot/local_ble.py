@@ -28,6 +28,7 @@ from .aguaiot import (
     aguaiot,
     update_devices,
 )
+from .register_overrides import apply_register_overrides
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -308,7 +309,9 @@ class LocalBleAguaIOT:
                 dev.id_registers_map,
                 self,
                 device_info=dev.device_info_data,
-                register_map=dev.export_register_map(),
+                register_map=apply_register_overrides(
+                    dev.id_registers_map, dev.export_register_map()
+                ),
                 mac=dev.wifi_mac,
             )
             for dev in cloud.devices
@@ -329,7 +332,9 @@ class LocalBleAguaIOT:
                 entry["id_registers_map"],
                 self,
                 device_info=entry.get("device_info"),
-                register_map=entry.get("register_map"),
+                register_map=apply_register_overrides(
+                    entry["id_registers_map"], entry.get("register_map")
+                ),
                 mac=entry.get("mac"),
             )
             for entry in cached_devices
