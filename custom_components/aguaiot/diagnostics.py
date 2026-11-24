@@ -7,10 +7,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 
-
 TO_REDACT = {
     CONF_PASSWORD,
     CONF_EMAIL,
+    "mqtt_settings",
+    "reg_code",
+    "security_code",
+    "assistance_code",
 }
 
 

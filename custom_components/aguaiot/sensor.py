@@ -1,10 +1,17 @@
 import numbers
+
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
+from homeassistant.const import EntityCategory
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
-from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
-from homeassistant.helpers.entity import DeviceInfo
-from .const import SENSORS, DOMAIN
+
+from .const import DOMAIN, SENSORS
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -26,6 +33,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 )
             ):
                 sensors.append(AguaIOTHeatingSensor(coordinator, device, sensor))
+
+        sensors.append(AguaIOTEepromWritesSensor(coordinator, device))
 
     async_add_entities(sensors, True)
 
@@ -93,18 +102,51 @@ class AguaIOTHeatingSensor(CoordinatorEntity, SensorEntity):
     def options(self):
         if self.entity_description.device_class == SensorDeviceClass.ENUM:
             options = sorted(
-                list(
-                    set(
-                        self._device.get_register_value_options(
-                            self.entity_description.key
-                        ).values()
-                    )
+                set(
+                    self._device.get_register_value_options(
+                        self.entity_description.key
+                    ).values()
                 )
             )
             cur_value = self._device.get_register_value_description(
                 self.entity_description.key
             )
-            if cur_value not in options:
+            if cur_value is not None and cur_value not in options:
                 options.append(cur_value)
 
             return options
+
+
+class AguaIOTEepromWritesSensor(CoordinatorEntity, SensorEntity):
+    """Diagnostic sensor for EEPROM writes on the current local day."""
+
+    _attr_has_entity_name = True
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:memory"
+    _attr_native_unit_of_measurement = "writes"
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(self, coordinator, device):
+        super().__init__(coordinator)
+        self._device = device
+
+    @property
+    def unique_id(self):
+        return f"{self._device.id_device}_eeprom_writes_per_day"
+
+    @property
+    def name(self):
+        return "EEPROM Writes (today)"
+
+    @property
+    def device_info(self):
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._device.id_device)},
+            name=self._device.name,
+            manufacturer="Micronova",
+            model=self._device.name_product,
+        )
+
+    @property
+    def native_value(self):
+        return self.coordinator.eeprom_writes_per_day.get(str(self._device.id_device))

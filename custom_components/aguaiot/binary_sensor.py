@@ -1,8 +1,9 @@
+from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
-from homeassistant.components.binary_sensor import BinarySensorEntity
-from homeassistant.helpers.entity import DeviceInfo
+
 from .const import BINARY_SENSORS, DOMAIN
 
 

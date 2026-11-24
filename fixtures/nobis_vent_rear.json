@@ -13898,7 +13898,7 @@
                 "description": "ON"
             }
         ],
-        "value_raw": "1",
+        "value_raw": "128",
         "value": 1
     },
     "thermostat_contact_rear_enable": {

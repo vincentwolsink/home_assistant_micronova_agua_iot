@@ -8,9 +8,14 @@ import logging
 import re
 import struct
 import uuid
-from typing import Any
+from typing import Any, Self
 
 from bleak import BleakClient, BleakError
+
+try:
+    from bleak.exc import BleakGATTProtocolError
+except ImportError:  # bleak < 3.0
+    BleakGATTProtocolError = BleakError
 from bleak_retry_connector import BleakClientWithServiceCache, establish_connection
 from homeassistant.components import bluetooth
 from homeassistant.core import HomeAssistant
@@ -21,15 +26,65 @@ from .aguaiot import (
     AguaIOTUpdateError,
     Device,
     aguaiot,
+    update_devices,
 )
+from .register_overrides import apply_register_overrides
 
 _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
 DEFAULT_CHAR_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
-DEFAULT_NAME_PREFIX = "T009_"
+LOCAL_NAME_PREFIXES = ("T009_", "NAVEL_")
 BLE_DISCOVERY_RETRY_INTERVAL = 1
 BLE_DISCOVERY_MAX_WAIT = 30
+BLE_DEFAULT_PAYLOAD_SIZE = 20
+# BlueZ may not release the notification slot instantly between peripheral sessions.
+# With two (or more) stoves, keep a generous gap so the second device is not always
+# forced through a StartNotify retry (see BlueZ NotPermitted / "Notify acquired").
+BLE_INTER_DEVICE_UPDATE_DELAY_SINGLE = 1.5
+BLE_INTER_DEVICE_UPDATE_DELAY_MULTI = 3.0
+BLE_NOTIFY_ACQUIRED_RETRY_DELAY = 3.0
+# BlueZ may drop the peripheral from its connect cache when scanning pauses; bleak_retry
+# then fails even though HA briefly saw the device. Extra rounds re-run HA discovery.
+BLE_ESTABLISH_MAX_ATTEMPTS = 7
+BLE_STALE_CONNECT_RESCAN_ROUNDS = 3
+BLE_STALE_CONNECT_RETRY_PAUSE = 2.5
+
+
+def _is_ble_connect_stale_cache_error(err: Exception) -> bool:
+    """True when the stack lost the device between HA discovery and connect (BlueZ cache)."""
+    msg = str(err).lower()
+    return (
+        ("not found" in msg and "address" in msg)
+        or "removed from bluez" in msg
+        or "disappeared" in msg
+        or "scanning stopped" in msg
+    )
+
+
+def _is_bluez_notify_acquired_error(err: Exception) -> bool:
+    """Return True when BlueZ refuses StartNotify because the notify path is still acquired."""
+    lowered = str(err).lower()
+    return "notify acquired" in lowered
+
+
+async def _start_notify_micronova(
+    client: BleakClient, characteristic_uuid: str, callback: Any
+) -> None:
+    """Subscribe to GATT notifications using StartNotify when Bleak supports it.
+
+    Bleak 2.x defaults to AcquireNotify when the characteristic reports
+    NotifyAcquired; older BlueZ stacks do not implement that D-Bus method and
+    raise UnknownObject. Forcing StartNotify keeps compatibility with those hosts.
+    """
+    try:
+        await client.start_notify(
+            characteristic_uuid,
+            callback,
+            bluez={"use_start_notify": True},
+        )
+    except TypeError:
+        await client.start_notify(characteristic_uuid, callback)
 
 
 def _is_ble_authorization_error(err: Exception) -> bool:
@@ -38,6 +93,44 @@ def _is_ble_authorization_error(err: Exception) -> bool:
     return "insufficient authorization" in message or (
         "authorization" in message and "(8)" in message
     )
+
+
+_ATT_UNLIKELY_ERROR = 0x85
+
+_STALE_GATT_MSGS = (
+    "Service Discovery has not been performed",
+    "was not found",
+)
+
+
+def _is_stale_gatt_state(err: Exception) -> bool:
+    """Return True when the GATT cache no longer reflects the live connection.
+
+    This happens when the OS/BLE-proxy transport transparently drops and re-establishes
+    the link mid-session, invalidating the services/characteristics cached during the
+    earlier (successful) discovery. Any subsequent GATT op then fails because bleak
+    reports that discovery has not been performed, or that a previously-known
+    characteristic is missing. The only recovery is a fresh connection + service
+    discovery, so callers escalate to a connection-level error that triggers one.
+    """
+    message = str(err)
+    return any(msg in message for msg in _STALE_GATT_MSGS)
+
+
+def _is_transient_gatt_read_error(err: Exception) -> bool:
+    """Return True for transient GATT read errors that are worth retrying.
+
+    The bleak_esphome backend surfaces BlueZ's Unlikely Error (0x0E) and its
+    re-mapped ATT code (0x85/133) as a plain BleakError whose message embeds the
+    error code, e.g. "error=133". These happen when a read races with the
+    'response length ready' notification and typically succeed on retry.
+    """
+    if isinstance(err, BleakGATTProtocolError):
+        return True
+    match = re.search(r"(?:error|code)=(\d+)", str(err), re.IGNORECASE)
+    if not match:
+        return False
+    return int(match.group(1)) == _ATT_UNLIKELY_ERROR
 
 
 def _normalize_ble_address(value: str | None) -> str | None:
@@ -94,13 +187,13 @@ class LocalBleAguaIOT:
         application_version: str = "1.9.7",
         async_client=None,
         air_temp_fix: bool = False,
-        reading_error_fix: bool = False,
         language: str | None = "ENG",
         http_timeout: int | None = 30,
         buffer_read_timeout: int | None = 30,
         service_uuid: str = DEFAULT_SERVICE_UUID,
         char_uuid: str = DEFAULT_CHAR_UUID,
         cached_devices: list[dict[str, Any]] | None = None,
+        eeprom_limits: dict | None = None,
     ) -> None:
         self.hass = hass
         self.api_url = api_url.rstrip("/")
@@ -114,7 +207,6 @@ class LocalBleAguaIOT:
         self.application_version = application_version
         self.async_client = async_client
         self.air_temp_fix = air_temp_fix
-        self.reading_error_fix = reading_error_fix
         self.language = language
         self.http_timeout = http_timeout or 30
         self.buffer_read_timeout = buffer_read_timeout or 30
@@ -124,6 +216,7 @@ class LocalBleAguaIOT:
 
         self._session_uuid = str(uuid.uuid4()).upper()
         self._cached_devices = cached_devices or []
+        self.eeprom_limits = eeprom_limits or {}
         self._cache_dirty = False
         self._command_lock = asyncio.Lock()
 
@@ -155,8 +248,12 @@ class LocalBleAguaIOT:
 
     async def update(self) -> None:
         """Refresh all devices using BLE."""
-        for dev in self.devices:
-            await dev.update()
+        inter_device_delay = (
+            BLE_INTER_DEVICE_UPDATE_DELAY_MULTI
+            if len(self.devices) > 1
+            else BLE_INTER_DEVICE_UPDATE_DELAY_SINGLE
+        )
+        await update_devices(self.devices, delay=inter_device_delay)
 
     async def validate_local_connection(self) -> dict[str, Any]:
         """Detect and validate the local BLE module for the first configured stove."""
@@ -194,7 +291,6 @@ class LocalBleAguaIOT:
             application_version=self.application_version,
             async_client=self.async_client,
             air_temp_fix=self.air_temp_fix,
-            reading_error_fix=self.reading_error_fix,
             language=self.language,
             http_timeout=self.http_timeout,
             buffer_read_timeout=self.buffer_read_timeout,
@@ -213,7 +309,10 @@ class LocalBleAguaIOT:
                 dev.id_registers_map,
                 self,
                 device_info=dev.device_info_data,
-                register_map=dev.export_register_map(),
+                register_map=apply_register_overrides(
+                    dev.id_registers_map, dev.export_register_map()
+                ),
+                mac=dev.wifi_mac,
             )
             for dev in cloud.devices
         ]
@@ -233,7 +332,10 @@ class LocalBleAguaIOT:
                 entry["id_registers_map"],
                 self,
                 device_info=entry.get("device_info"),
-                register_map=entry.get("register_map"),
+                register_map=apply_register_overrides(
+                    entry["id_registers_map"], entry.get("register_map")
+                ),
+                mac=entry.get("mac"),
             )
             for entry in cached_devices
         ]
@@ -268,8 +370,17 @@ class LocalBleAguaIOT:
             mask = int(register["mask"])
             item_offsets.append(int(register["offset"]))
             masks.append(mask)
-            bit_data.append(16 if mask > 0xFF else 8)
+            bit_data.append(8)
             values.append(value)
+
+        from .eeprom import reserve_device_write
+
+        await reserve_device_write(
+            self.hass,
+            device,
+            item_offsets,
+            limits=self.eeprom_limits,
+        )
 
         payload = {
             "Cmd": "RequestWriting",
@@ -285,10 +396,11 @@ class LocalBleAguaIOT:
             device,
             "writing stove registers",
             lambda session: self._request_writing_session(session, payload),
+            retry=False,
         )
 
     async def _validate_local_connection_session(
-        self, session: "_BleMicronovaSession"
+        self, session: _BleMicronovaSession
     ) -> dict[str, Any]:
         """Validate the BLE tunnel through an authenticated session."""
         buffer_ids = await session.get_buffer_ids()
@@ -303,12 +415,12 @@ class LocalBleAguaIOT:
             "module_address": session.connected_address
             or self._device_ble_address(session._device),
             "module_name": session.connected_name
-            or self._expected_local_name(session._device),
+            or next(iter(self._expected_local_name(session._device) or []), None),
             "buffer_ids": buffer_ids,
         }
 
     async def _fetch_device_information_session(
-        self, session: "_BleMicronovaSession"
+        self, session: _BleMicronovaSession
     ) -> dict[int, int]:
         """Read all current buffer values through an authenticated session."""
         buffer_ids = await session.get_buffer_ids()
@@ -336,7 +448,7 @@ class LocalBleAguaIOT:
         return info
 
     async def _request_writing_session(
-        self, session: "_BleMicronovaSession", payload: dict[str, Any]
+        self, session: _BleMicronovaSession, payload: dict[str, Any]
     ) -> None:
         """Write raw register values through an authenticated session."""
         buffer_ids = await session.get_buffer_ids()
@@ -356,29 +468,35 @@ class LocalBleAguaIOT:
         device: Device,
         action: str,
         operation,
+        *,
+        retry: bool = True,
     ) -> Any:
-        """Run one BLE action with a single retry on lost authorization."""
-        for attempt in range(2):
+        """Run a BLE action, optionally retrying a failed connection once."""
+        for attempt in range(2 if retry else 1):
             try:
                 async with self._device_session(device) as session:
                     await session.identity()
                     return await operation(session)
             except (BleakError, AguaIOTConnectionError) as err:
-                if not _is_ble_authorization_error(err):
+                retryable = isinstance(
+                    err, AguaIOTConnectionError
+                ) or _is_ble_authorization_error(err)
+                if not retryable:
                     raise
 
-                if attempt == 0:
+                if retry and attempt == 0:
                     _LOGGER.warning(
-                        "Micronova BLE link for '%s' lost authorization while %s; retrying once with a fresh connection.",
+                        "Micronova BLE link for '%s' failed while %s (%s); retrying once with a fresh connection.",
                         device.name,
                         action,
+                        err,
                     )
                     await asyncio.sleep(0.5)
                     continue
 
                 raise AguaIOTConnectionError(
-                    f"Bluetooth connection to '{device.name}' lost authorization while {action}. "
-                    "The Navel/T009 module or Bluetooth proxy dropped its authorized GATT state; "
+                    f"Bluetooth connection to '{device.name}' failed while {action}. "
+                    "The Navel/T009 module or Bluetooth proxy dropped its connection state; "
                     "reloading the integration or resetting the BLE module may be required."
                 ) from err
 
@@ -411,13 +529,13 @@ class LocalBleAguaIOT:
             )
         return str(value)
 
-    def _expected_local_name(self, device: Device) -> str | None:
-        """Return the expected T009 local name for the stove."""
+    def _expected_local_name(self, device: Device) -> list[str] | None:
+        """Return the expected local names for the stove."""
         identity = _normalize_identity_id(device.ble_mac)
         if not identity or len(identity) < 6:
             return None
 
-        return f"{DEFAULT_NAME_PREFIX}{identity[-6:]}"
+        return [f"{prefix}{identity[-6:]}" for prefix in LOCAL_NAME_PREFIXES]
 
     def _candidate_ble_addresses(self, device: Device) -> list[str]:
         """Return likely BLE addresses for the T009 module.
@@ -458,14 +576,16 @@ class LocalBleAguaIOT:
         """Find the target BLEDevice in Home Assistant's shared scanner."""
         address = self._device_ble_address(device)
         candidate_addresses = self._candidate_ble_addresses(device)
-        expected_name = self._expected_local_name(device)
+        expected_names = self._expected_local_name(device)
         scanner_count = bluetooth.async_scanner_count(self.hass, connectable=True)
 
         if scanner_count == 0:
             return (
                 None,
-                "No connectable Bluetooth adapters or ESPHome Bluetooth proxies are "
-                f"available in Home Assistant for '{device.name}'",
+                (
+                    "No connectable Bluetooth adapters or ESPHome Bluetooth proxies are "
+                    f"available in Home Assistant for '{device.name}'"
+                ),
             )
 
         for connectable in (True, False):
@@ -507,18 +627,20 @@ class LocalBleAguaIOT:
                     )
                     return service_info.device, ""
 
-                if expected_name and service_name == expected_name:
+                if expected_names and service_name in expected_names:
                     _LOGGER.debug(
                         "Matched BLE service info for '%s' by exact name %s (address=%s, connectable=%s)",
                         device.name,
-                        expected_name,
+                        service_name,
                         service_address,
                         connectable,
                     )
                     return service_info.device, ""
 
-                if fallback_prefix_device is None and service_name.startswith(
-                    DEFAULT_NAME_PREFIX
+                if (
+                    fallback_prefix_device is None
+                    and service_name.startswith(LOCAL_NAME_PREFIXES)
+                    and service_address in candidate_addresses
                 ):
                     fallback_prefix_device = service_info.device
 
@@ -533,9 +655,11 @@ class LocalBleAguaIOT:
 
         return (
             None,
-            f"Micronova BLE device for '{device.name}' was not discovered by Home "
-            f"Assistant yet (address={address}, candidates={candidate_addresses}, "
-            f"expected_name={expected_name})",
+            (
+                f"Micronova BLE device for '{device.name}' was not discovered by Home "
+                f"Assistant yet (address={address}, candidates={candidate_addresses}, "
+                f"expected_names={expected_names})"
+            ),
         )
 
     async def _async_get_ble_device(self, device: Device) -> Any:
@@ -568,7 +692,7 @@ class LocalBleAguaIOT:
 
             await asyncio.sleep(min(BLE_DISCOVERY_RETRY_INTERVAL, remaining))
 
-    def _device_session(self, device: Device) -> "_BleMicronovaSession":
+    def _device_session(self, device: Device) -> _BleMicronovaSession:
         """Create a BLE session wrapper for one device."""
         return _BleMicronovaSession(self, device)
 
@@ -585,21 +709,88 @@ class _BleMicronovaSession:
         self._notif_len: int | None = None
         self._resolved_target: Any = None
 
-    async def __aenter__(self) -> "_BleMicronovaSession":
+    async def _establish_connection_with_rediscover(
+        self, client_cls: type[BleakClient], ble_device: Any
+    ) -> BleakClient:
+        """Connect, re-resolving the BLEDevice if BlueZ no longer has the address."""
+        last_err: BleakError | None = None
+        for attempt in range(BLE_STALE_CONNECT_RESCAN_ROUNDS):
+            if attempt:
+                await asyncio.sleep(BLE_STALE_CONNECT_RETRY_PAUSE)
+                ble_device = await self._transport._async_get_ble_device(self._device)
+                self._resolved_target = ble_device
+            try:
+                return await establish_connection(
+                    client_cls,
+                    ble_device,
+                    self._device.name,
+                    max_attempts=BLE_ESTABLISH_MAX_ATTEMPTS,
+                )
+            except BleakError as err:
+                last_err = err
+                if not _is_ble_connect_stale_cache_error(err):
+                    raise
+                if attempt == BLE_STALE_CONNECT_RESCAN_ROUNDS - 1:
+                    raise
+                _LOGGER.debug(
+                    "BLE connect cache miss for '%s' (%s); re-scanning.",
+                    self._device.name,
+                    err,
+                )
+        assert last_err is not None  # pragma: no cover
+        raise last_err
+
+    async def __aenter__(self) -> Self:
         await self._transport._command_lock.acquire()
 
         try:
             ble_device = await self._transport._async_get_ble_device(self._device)
             self._resolved_target = ble_device
-            self._client = await establish_connection(
-                BleakClientWithServiceCache,
-                ble_device,
-                self._device.name,
-                max_attempts=3,
+            # With more than one stove, GATT service caching has been observed to leave
+            # BlueZ in a state where StartNotify returns NotPermitted ("Notify acquired")
+            # on the next peripheral. A plain client avoids that at the cost of a full
+            # service discovery each session.
+            client_cls = (
+                BleakClient
+                if len(self._transport.devices) > 1
+                else BleakClientWithServiceCache
+            )
+            self._client = await self._establish_connection_with_rediscover(
+                client_cls, ble_device
             )
             characteristic_uuid = self._resolve_characteristic_uuid()
             self._characteristic_uuid = characteristic_uuid
-            await self._client.start_notify(characteristic_uuid, self._handle_notify)
+            try:
+                await _start_notify_micronova(
+                    self._client, characteristic_uuid, self._handle_notify
+                )
+            except BleakError as err:
+                if not _is_bluez_notify_acquired_error(err):
+                    raise
+                _LOGGER.debug(
+                    "BlueZ notify not available yet for '%s' (%s); "
+                    "disconnecting and retrying once after %ss (fresh client, no GATT cache).",
+                    self._device.name,
+                    err,
+                    BLE_NOTIFY_ACQUIRED_RETRY_DELAY,
+                )
+                try:
+                    await self._client.disconnect()
+                finally:
+                    self._client = None
+                await asyncio.sleep(BLE_NOTIFY_ACQUIRED_RETRY_DELAY)
+                # Plain BleakClient avoids a stale service/notify view in BlueZ that
+                # can trigger repeated NotPermitted after the previous peripheral session.
+                ble_device = await self._transport._async_get_ble_device(self._device)
+                self._resolved_target = ble_device
+                self._client = await self._establish_connection_with_rediscover(
+                    BleakClient, ble_device
+                )
+                characteristic_uuid = self._resolve_characteristic_uuid()
+                self._characteristic_uuid = characteristic_uuid
+                await _start_notify_micronova(
+                    self._client, characteristic_uuid, self._handle_notify
+                )
         except AguaIOTConnectionError:
             await self._cleanup_failed_enter()
             raise
@@ -608,7 +799,7 @@ class _BleMicronovaSession:
             raise AguaIOTConnectionError(
                 f"Bluetooth connection to '{self._device.name}' failed: {err}"
             ) from err
-        except Exception as err:  # noqa: BLE001
+        except Exception as err:
             await self._cleanup_failed_enter()
             raise AguaIOTConnectionError(
                 f"Bluetooth connection to '{self._device.name}' failed: {err}"
@@ -634,6 +825,8 @@ class _BleMicronovaSession:
             try:
                 if self._client:
                     await self._client.disconnect()
+            except (EOFError, BleakError):
+                pass  # connection already closed/dropped by the transport
             finally:
                 self._transport._command_lock.release()
 
@@ -746,17 +939,11 @@ class _BleMicronovaSession:
                 timeout=notify_timeout,
             )
             expected_len = self._notif_len
-        except asyncio.TimeoutError as err:
-            _LOGGER.debug(
-                "No BLE notification received for '%s' command '%s'; "
-                "falling back to direct characteristic read.",
-                self._device.name,
-                cmd_name,
-            )
-            if cmd_name != "RequestWriting":
-                raise AguaIOTUpdateError(
-                    f"Bluetooth response timeout while talking to '{self._device.name}'."
-                ) from err
+        except TimeoutError as err:
+            raise AguaIOTUpdateError(
+                f"Bluetooth response timeout while talking to '{self._device.name}' "
+                f"(command '{cmd_name}')."
+            ) from err
 
         response = await self._read_json_response(expected_len)
         self._response_ready.clear()
@@ -776,34 +963,90 @@ class _BleMicronovaSession:
         self._response_ready.clear()
         self._notif_len = None
 
-        await self._client.write_gatt_char(
-            self._characteristic_uuid, header, response=True
-        )
+        await self._write_gatt_char(header)
 
-        mtu = getattr(self._client, "mtu_size", 23) or 23
-        chunk_size = max(20, mtu - 3)
-        for index in range(0, len(body), chunk_size):
-            chunk = body[index : index + chunk_size]
+        # Use the ATT payload size guaranteed by the default BLE MTU.
+        # Reading BleakClient.mtu_size on BlueZ emits a warning unless BlueZ-specific
+        # MTU acquisition was performed, and the warning can hide the real error in
+        # Home Assistant logs. The Micronova tunnel works with safe 20-byte chunks.
+        for index in range(0, len(body), BLE_DEFAULT_PAYLOAD_SIZE):
+            chunk = body[index : index + BLE_DEFAULT_PAYLOAD_SIZE]
+            await self._write_gatt_char(chunk)
+
+    async def _write_gatt_char(self, data: bytes) -> None:
+        """Write one chunk, escalating stale GATT state to a connection error."""
+        assert self._client is not None
+        assert self._characteristic_uuid is not None
+        try:
             await self._client.write_gatt_char(
-                self._characteristic_uuid,
-                chunk,
-                response=True,
+                self._characteristic_uuid, data, response=True
             )
+        except (BleakGATTProtocolError, BleakError) as err:
+            if _is_stale_gatt_state(err):
+                raise AguaIOTConnectionError(
+                    f"BLE GATT services lost for '{self._device.name}'; "
+                    "the connection was reset and needs a fresh session."
+                ) from err
+            raise
+
+    async def _read_gatt_char_with_retry(self) -> bytes:
+        """Read a characteristic chunk, retrying transient GATT protocol errors.
+
+        BlueZ intermittently returns Unlikely Error (0x0E) when a read races with
+        the 'response length ready' notification arriving before the response body
+        has been fully written to the characteristic. A short backoff with a few
+        retries smooths over that variation instead of failing the whole update.
+
+        The bleak_esphome backend reports the same condition as a plain BleakError
+        carrying the ATT Unlikely Error (0x85/133) code in its message; both are
+        treated as transient and retried.
+        """
+        attempts = 3
+        delay = 0.2
+        for attempt in range(attempts):
+            try:
+                assert self._client is not None
+                assert self._characteristic_uuid is not None
+                return bytes(
+                    await self._client.read_gatt_char(self._characteristic_uuid)
+                )
+            except (BleakGATTProtocolError, BleakError) as err:
+                if _is_stale_gatt_state(err):
+                    raise AguaIOTConnectionError(
+                        f"BLE GATT services lost for '{self._device.name}'; "
+                        "the connection was reset and needs a fresh session."
+                    ) from err
+                if not _is_transient_gatt_read_error(err) or attempt == attempts - 1:
+                    raise
+                _LOGGER.debug(
+                    "Transient GATT error reading '%s' (attempt %s/%s): %s",
+                    self._device.name,
+                    attempt + 1,
+                    attempts,
+                    err,
+                )
+                await asyncio.sleep(delay)
+        raise AssertionError("unreachable")  # pragma: no cover
 
     async def _read_json_response(self, expected_len: int | None) -> dict[str, Any]:
         """Read one or more chunks from the characteristic until the JSON body is complete."""
         assert self._client is not None
         assert self._characteristic_uuid is not None
 
-        if not expected_len or expected_len <= 0:
-            raw = await self._client.read_gatt_char(self._characteristic_uuid)
-            return _parse_json_response(bytes(raw))
+        if expected_len is None:
+            raw = await self._read_gatt_char_with_retry()
+            return _parse_json_response(raw)
+
+        if expected_len <= 0:
+            raise AguaIOTUpdateError(
+                f"Bluetooth notification reported an invalid response length for '{self._device.name}'."
+            )
 
         data = bytearray()
         last_chunk: bytes | None = None
 
         for _ in range(32):
-            chunk = bytes(await self._client.read_gatt_char(self._characteristic_uuid))
+            chunk = await self._read_gatt_char_with_retry()
             if not chunk:
                 break
             if chunk == last_chunk:
@@ -825,6 +1068,11 @@ def _parse_json_response(raw: bytes) -> dict[str, Any]:
     """Parse a BLE response that may optionally include the Micronova JSON header."""
     if raw.startswith(b"JSON") and len(raw) >= 8:
         body_len = struct.unpack_from("<H", raw, 4)[0]
+        if len(raw) < 8 + body_len:
+            raise AguaIOTUpdateError(
+                f"Truncated Micronova BLE response: header declares {body_len} bytes "
+                f"but only {len(raw) - 8} were received."
+            )
         raw = raw[8 : 8 + body_len]
 
     first_json = raw.find(b"{")

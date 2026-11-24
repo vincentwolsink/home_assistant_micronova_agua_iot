@@ -1,11 +1,13 @@
 import logging
+
+from homeassistant.components.switch import SwitchEntity
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
-from homeassistant.components.switch import SwitchEntity
-from homeassistant.helpers.entity import DeviceInfo
-from .const import SWITCHES, DOMAIN
+
 from .aguaiot import AguaIOTError
+from .const import DOMAIN, SWITCHES
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,7 +46,7 @@ class AguaIOTHeatingSwitch(CoordinatorEntity, SwitchEntity):
     @property
     def name(self):
         """Return the name of the device, if any."""
-        return f"{self._device.name} {self.entity_description.name}"
+        return self.entity_description.name
 
     @property
     def device_info(self):

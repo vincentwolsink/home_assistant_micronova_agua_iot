@@ -55,17 +55,28 @@ Vendor apps **NOT** compatible (using a different platform or abstraction layer)
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=vincentwolsink&repository=home_assistant_micronova_agua_iot&category=integration)
 
 Or folow these steps:
-1. Install [HACS](https://hacs.xyz/) if you haven't already
-2. Install the plugin via HACS (Micronova Agua IOT)
-3. Add the integration through the home assistant configuration flow
+1. Install the plugin via Marketplace: Micronova Agua IOT
+2. Add the integration through the home assistant configuration flow
+
+## EEPROM protection
+
+Some stove settings are stored in EEPROM memory, which has a limited number of write cycles. Repeatedly writing those settings can eventually wear out the controller's memory. To reduce that risk, the integration limits how many EEPROM write commands it sends to each stove per day. This applies to cloud, Bluetooth, and local MQTT alike.
+
+The default limit is 20 attempts per day per stove and resets at local midnight. It can be changed in the integration options. A diagnostic sensor, **EEPROM Writes (today)**, shows the current count. See [EEPROM protection](docs/EEPROM.md) for what is counted, failure handling, and settings.
 
 ## Local Bluetooth mode
 
-This integration now includes an experimental `Bluetooth` connection mode for Micronova stoves equipped with a local BLE module (for example the Micronova / Navel `T009_*` module seen by Home Assistant).
+This integration includes an experimental `Bluetooth` connection mode for Micronova stoves equipped with a local BLE module (for example the Micronova / Navel `T009_*` module seen by Home Assistant).
 
 You can enable this mode via the integration options after setup.
 
 For more information see [BLUETOOTH](docs/BLUETOOTH.md).
+
+## Local Wi-Fi MQTT mode (advanced)
+
+This integration supports local control for Micronova stoves equipped with a Navel 2.0 Wi-Fi module.
+
+Connect through Home Assistant MQTT or configure one shared MQTT endpoint for all stoves. See [local MQTT setup](docs/LOCAL_MQTT.md) for connection and DNS settings.
 
 ## Credits
 
@@ -78,6 +89,7 @@ For local stove control with custom hardware on the stove bus, take a look at on
 * https://github.com/eni23/micronova-controller
 * https://github.com/fabrizioromanelli/Pellet-Stove-Control
 * https://github.com/philibertc/micronova_controller
+* https://github.com/Shad107/OpenXtraflame
 
 [releases-shield]: https://img.shields.io/github/v/release/vincentwolsink/home_assistant_micronova_agua_iot.svg?style=for-the-badge
 [releases]: https://github.com/vincentwolsink/home_assistant_micronova_agua_iot/releases

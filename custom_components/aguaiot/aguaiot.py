@@ -4,10 +4,11 @@ the IOT Agua platform of Micronova
 
 import asyncio
 import copy
-import jwt
 import logging
 import time
+
 import httpx
+import jwt
 from simpleeval import simple_eval
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,8 +27,11 @@ HEADER_ACCEPT = "application/json, text/javascript, */*; q=0.01"
 HEADER_CONTENT_TYPE = "application/json"
 HEADER = {"Accept": HEADER_ACCEPT, "Content-Type": HEADER_CONTENT_TYPE}
 
+# Raw value returned by the wifi module when a register read fails
+READING_ERROR_VALUE = 0x8000
 
-class aguaiot(object):
+
+class aguaiot:
     def __init__(
         self,
         api_url,
@@ -41,10 +45,12 @@ class aguaiot(object):
         application_version="1.9.7",
         async_client=None,
         air_temp_fix=False,
-        reading_error_fix=False,
         language="ENG",
         http_timeout=30,
         buffer_read_timeout=30,
+        *,
+        hass=None,
+        eeprom_limits=None,
     ):
         self.api_url = api_url.rstrip("/")
         self.customer_code = customer_code
@@ -58,15 +64,16 @@ class aguaiot(object):
         self.token = None
         self.token_expires = None
         self.refresh_token = None
-        self.devices = list()
+        self.devices = []
         self.async_client = async_client
         self.http_timeout = http_timeout
         self.buffer_read_timeout = buffer_read_timeout
 
         # Vendor specific fixes
         self.air_temp_fix = air_temp_fix
-        self.reading_error_fix = reading_error_fix
         self.language = language
+        self.hass = hass
+        self.eeprom_limits = eeprom_limits or {}
 
         if not self.async_client:
             self.async_client = httpx.AsyncClient()
@@ -267,6 +274,7 @@ class aguaiot(object):
                     res2["device_info"][0]["id_registers_map"],
                     self,
                     device_info=res2["device_info"][0],
+                    mac=dev.get("mac"),
                 )
             )
 
@@ -276,8 +284,8 @@ class aguaiot(object):
             await dev.update_mapping()
 
     async def update(self):
-        for dev in self.devices:
-            await dev.update()
+        """Update the register values of all devices."""
+        await update_devices(self.devices)
 
     async def handle_webcall(self, method, url, payload):
         if time.time() > self.token_expires:
@@ -333,7 +341,7 @@ class aguaiot(object):
     async def _fetch_device_registers_mapping(self, device):
         """Fetch registers map for a device."""
         url = self.api_url + API_PATH_DEVICE_REGISTERS_MAP
-        registers = dict()
+        registers = {}
 
         payload = {
             "id_device": device.id_device,
@@ -372,31 +380,28 @@ class aguaiot(object):
             sleep_secs = 1
             attempts = 1
 
-            try:
-                while True:
-                    await asyncio.sleep(sleep_secs)
+            while True:
+                await asyncio.sleep(sleep_secs)
 
-                    _LOGGER.debug("BUFFER READ (%s) ATTEMPT %s", id_request, attempts)
-                    res_get = await self.handle_webcall("GET", url, {})
-                    _LOGGER.debug(
-                        "BUFFER READ (%s) STATUS: %s",
-                        id_request,
-                        res_get.get("jobAnswerStatus"),
-                    )
-                    if res_get.get("jobAnswerStatus") != "waiting":
-                        return res_get
+                _LOGGER.debug("BUFFER READ (%s) ATTEMPT %s", id_request, attempts)
+                res_get = await self.handle_webcall("GET", url, {})
+                _LOGGER.debug(
+                    "BUFFER READ (%s) STATUS: %s",
+                    id_request,
+                    res_get.get("jobAnswerStatus"),
+                )
+                if res_get.get("jobAnswerStatus") != "waiting":
+                    return res_get
 
-                    sleep_secs += 1
-                    attempts += 1
-            except asyncio.CancelledError:
-                raise
+                sleep_secs += 1
+                attempts += 1
 
         try:
             res = await asyncio.wait_for(
                 buffer_read_loop(res_req["idRequest"]),
                 self.buffer_read_timeout,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise AguaIOTUpdateError(
                 f"Timeout on waiting device buffer read to complete within {self.buffer_read_timeout} seconds."
             )
@@ -406,7 +411,7 @@ class aguaiot(object):
 
         if res.get("jobAnswerStatus") == "completed":
             current_i = 0
-            information_dict = dict()
+            information_dict = {}
             try:
                 for item in res["jobAnswerData"]["Items"]:
                     information_dict.update(
@@ -438,6 +443,12 @@ class aguaiot(object):
             set_values.append(items[key])
             set_bits.append(8)
             set_endians.append("L")
+
+        from .eeprom import reserve_device_write
+
+        await reserve_device_write(
+            self.hass, device, set_items, limits=self.eeprom_limits
+        )
 
         payload = {
             "id_device": device.id_device,
@@ -477,7 +488,7 @@ class aguaiot(object):
             raise AguaIOTError("Error while request device writing")
 
 
-class Device(object):
+class Device:
     """Agua IOT heating device representation"""
 
     def __init__(
@@ -493,6 +504,7 @@ class Device(object):
         aguaiot,
         device_info=None,
         register_map=None,
+        mac=None,
     ):
         self.id = id
         self.id_device = id_device
@@ -503,9 +515,10 @@ class Device(object):
         self.name_product = name_product
         self.id_registers_map = id_registers_map
         self.__aguaiot = aguaiot
-        self.__device_info = device_info or dict()
-        self.__register_map_dict = register_map or dict()
-        self.__information_dict = dict()
+        self.__device_info = device_info or {}
+        self.__register_map_dict = register_map or {}
+        self.__register_dict = {}
+        self.__mac = mac or self.__device_info.get("mac")
 
     async def update_mapping(self):
         self.__register_map_dict = await self.__aguaiot._fetch_device_registers_mapping(
@@ -513,7 +526,50 @@ class Device(object):
         )
 
     async def update(self):
-        self.__information_dict = await self.__aguaiot._fetch_device_information(self)
+        raw_data = await self.__aguaiot._fetch_device_information(self)
+        self.apply_raw_data(raw_data)
+
+    def apply_raw_data(self, raw_data):
+        """Build the register values from a raw buffer read."""
+        self.__register_dict = self.__build_register_dict(raw_data)
+
+    def __build_register_dict(self, raw_data):
+        register_dict = {}
+        for key, register in self.__register_map_dict.items():
+            if "offset" not in register:
+                continue
+            offset = register["offset"]
+            register_dict[key] = dict(register)
+            if offset in raw_data:
+                raw_value = raw_data[offset]
+                # Fix for reading errors from wifi module. Check the raw word,
+                # as masks and formulas hide the failed read value.
+                if int(raw_value) == READING_ERROR_VALUE:
+                    _LOGGER.debug(f"Dropped reading error value for register {key}")
+                    register_dict[key]["value_raw"] = None
+                    register_dict[key]["value"] = None
+                    continue
+                register_dict[key]["value_raw"] = str(raw_value & register["mask"])
+                try:
+                    formula = (
+                        register["formula"]
+                        .replace("#", register_dict[key]["value_raw"])
+                        .replace("Mod", "%")
+                    )
+                    register_dict[key]["value"] = simple_eval(
+                        formula,
+                        functions={
+                            "IF": lambda a, b, c: b if a else c,
+                            "int": lambda a: int(a),
+                        },
+                    )
+                except (KeyError, ValueError):
+                    register_dict[key]["value"] = None
+            else:
+                register_dict[key]["value_raw"] = None
+                register_dict[key]["value"] = None
+
+        return register_dict
 
     def __prepare_value_for_writing(self, item, value, limit_value_raw=False):
         set_min = self.__register_map_dict[item]["set_min"]
@@ -553,6 +609,11 @@ class Device(object):
         return self.__device_info
 
     @property
+    def wifi_mac(self):
+        """Return the Navel Wi-Fi MAC reported by the cloud."""
+        return self.__mac
+
+    @property
     def ble_mac(self):
         return self.__device_info.get("mac")
 
@@ -573,44 +634,16 @@ class Device(object):
             "is_online": self.is_online,
             "name_product": self.name_product,
             "id_registers_map": self.id_registers_map,
+            "mac": self.__mac,
             "device_info": copy.deepcopy(self.__device_info),
             "register_map": self.export_register_map(),
         }
 
     def get_register(self, key):
-        register = self.__register_map_dict.get(key, {})
-
-        try:
-            register["value_raw"] = str(
-                self.__information_dict[register["offset"]] & register["mask"]
-            )
-
-            formula = register["formula"].replace("#", register["value_raw"])
-            formula = formula.replace("Mod", "%")
-            register["value"] = simple_eval(
-                formula,
-                functions={
-                    "IF": lambda a, b, c: b if a else c,
-                    "int": lambda a: int(a),
-                },
-            )
-        except (KeyError, ValueError):
-            pass
-
-        return register
+        return self.__register_dict.get(key, {})
 
     def get_register_value(self, key):
         value = self.get_register(key).get("value")
-
-        # Fix for reading errors from wifi module
-        if (
-            self.__aguaiot.reading_error_fix
-            and int(self.get_register(key).get("value_raw", 0)) == 32768
-        ):
-            _LOGGER.debug(
-                f"Applied reading_error_fix. Dropped value {value} for register {key}"
-            )
-            return
 
         # Fix for stoves abusing air temp register
         if (
@@ -755,3 +788,26 @@ class AguaIOTUpdateError(AguaIOTError):
 
     def __init__(self, message):
         super().__init__(message)
+
+
+async def update_devices(devices, delay=0):
+    """Update the register values of all devices.
+
+    A failing device does not stop the other devices from being updated.
+    When every device failed the error is raised, so the coordinator can
+    mark the update as failed.
+    """
+    errors = []
+    for index, dev in enumerate(devices):
+        if index and delay:
+            await asyncio.sleep(delay)
+        try:
+            await dev.update()
+        except AguaIOTError as e:
+            _LOGGER.error("Failed to update device '%s': %s", dev.name, e)
+            errors.append(e)
+
+    if errors and len(errors) == len(devices):
+        raise AguaIOTUpdateError(
+            "Failed to update all devices: " + ", ".join(str(error) for error in errors)
+        )

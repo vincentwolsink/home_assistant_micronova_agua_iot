@@ -47,9 +47,17 @@ The options flow performs a real BLE validation before it accepts the local mode
 
 This mode has been validated on:
 
-- vendor app: `Jolly Mec Wi Fi`
-- stove / insert: `SYNTHESIS/1/80/M`
+- vendor apps: `Jolly Mec Wi Fi`, `Easy Connect Plus`
+- stove / insert: `SYNTHESIS/1/80/M`, `Cadel Wall 3 Plus`, `Cadel Kobe 11`
 - user-facing model reference: `Jolly Mec Modular Synthesis 80`
-- local BLE module advertising as `T009_*`
+- local BLE module advertising as `T009_*`, `Navel_*`
 
 If you test another stove or another vendor app and it works, please report the exact model and module details in your feedback.
+
+### Multiple stoves on Bluetooth
+
+If you run two or more stoves in local Bluetooth mode on the same Home Assistant Bluetooth adapter:
+
+- updates are serialized (one stove at a time) with a short pause between devices so the radio and BlueZ can settle
+- very old BlueZ stacks may not implement `AcquireNotify`; the integration forces `StartNotify` when supported by the installed Bleak version
+- weak signal or a single adapter serving distant modules can show `device not found` / cache errors; prefer a proxy or dongle close to each stove

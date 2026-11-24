@@ -1,11 +1,13 @@
 import logging
+
+from homeassistant.components.select import SelectEntity
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
-from homeassistant.components.select import SelectEntity
-from homeassistant.helpers.entity import DeviceInfo
-from .const import SELECTS, DOMAIN
+
 from .aguaiot import AguaIOTError
+from .const import DOMAIN, SELECTS
 
 _LOGGER = logging.getLogger(__name__)
 
