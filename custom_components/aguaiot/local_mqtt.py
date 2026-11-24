@@ -518,7 +518,7 @@ class LocalMqttAguaIOT:
                 mask = int(register["mask"])
                 item_offsets.append(int(register["offset"]))
                 masks.append(mask)
-                bit_data.append(16 if mask > 0xFF else 8)
+                bit_data.append(16 if register.get("is_word") else 8)
                 values.append(int(value))
 
             payload = {
