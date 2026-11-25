@@ -618,3 +618,51 @@ def test_cached_bit_fields_preserve_all_bits_at_a_shared_offset():
         }
     )
     assert client._register_values[32768] == 3
+
+
+@pytest.mark.asyncio
+async def test_update_captures_initial_eeprom_backup_once(mqtt_api):
+    client = make_test_instance(cached_devices=make_dummy_cached_devices())
+    await client.connect()
+    client._identity_ready.set()
+    eeprom_calls = 0
+
+    async def answer_reads(_hass, _topic, payload, **_kwargs):
+        nonlocal eeprom_calls
+        query = json.loads(payload)
+        if query["pl"]["Cmd"] != "RequestReading":
+            return
+        items = query["pl"]["Items"]
+        if items[0] >= 32768:
+            eeprom_calls += 1
+        values = [offset % 256 for offset in items]
+        await client._message_received(
+            message(
+                {
+                    "mt": "R",
+                    "pl": {
+                        "Cmd": "RequestReading",
+                        "Items": items,
+                        "Values": values,
+                    },
+                }
+            )
+        )
+
+    mqtt_api.async_publish.side_effect = answer_reads
+    try:
+        await client.update()
+        backup = client.devices[0].device_info_data["eeprom_backup"]
+        assert client.cache_dirty is True
+        assert "captured_at" in backup
+        assert len(backup["values"]) == 256
+        assert backup["values"]["32768"] == 0
+        assert backup["values"]["33023"] == 255
+        assert eeprom_calls == 16
+
+        client.mark_cache_persisted()
+        await client.update()
+        assert eeprom_calls == 16
+        assert client.cache_dirty is False
+    finally:
+        await client.close()

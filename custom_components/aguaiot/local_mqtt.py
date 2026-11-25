@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import asyncio
 import copy
-from datetime import UTC, datetime
 import json
 import logging
 import uuid
+from datetime import UTC, datetime
 from typing import Any
 
 from homeassistant.core import callback
@@ -387,6 +387,21 @@ class LocalMqttAguaIOT:
     async def update(self) -> None:
         """Poll the stove for latest readings and update device states."""
         await update_devices(self.devices)
+        if self._children:
+            for child in self._children:
+                for dev in child.devices:
+                    await child._ensure_eeprom_backup(dev)
+        else:
+            for dev in self.devices:
+                await self._ensure_eeprom_backup(dev)
+
+    async def _ensure_eeprom_backup(self, device: Device) -> None:
+        """Capture an initial EEPROM backup once if not yet present."""
+        if device.device_info_data.get("eeprom_backup"):
+            return
+        async with self._read_lock:
+            if not device.device_info_data.get("eeprom_backup"):
+                await self._backup_eeprom_locked(device)
 
     async def validate_local_connection(self) -> dict[str, Any]:
         """Require a fresh register reading from each stove."""
@@ -501,9 +516,6 @@ class LocalMqttAguaIOT:
             ) from err
         except (OSError, RuntimeError, AguaIOTError) as err:
             raise AguaIOTConnectionError("Could not read stove registers.") from err
-
-        if not device.device_info_data.get("eeprom_backup"):
-            await self._backup_eeprom_locked(device)
 
         return copy.deepcopy(self._register_values)
 
