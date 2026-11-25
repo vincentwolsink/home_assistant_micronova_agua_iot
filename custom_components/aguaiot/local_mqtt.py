@@ -7,6 +7,7 @@ import copy
 import json
 import logging
 import uuid
+from datetime import UTC, datetime
 from typing import Any
 
 from homeassistant.core import callback
@@ -32,6 +33,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 ACTIVE_EEPROM_PREFIXES = ("chrono_p",)
+EEPROM_BACKUP_START = 32768
+EEPROM_BACKUP_END = 33024
+EEPROM_BACKUP_CHUNK_SIZE = 16
 
 
 class LocalMqttSetupError(AguaIOTConnectionError):
@@ -100,6 +104,10 @@ class LocalMqttAguaIOT:
         self._security_code: str | None = None
         self._register_values: dict[int, int] = {}
         self._response_event = asyncio.Event()
+        self._backup_reply_event = asyncio.Event()
+        self._pending_backup_items: list[int] | None = None
+        self._backup_reply_values: dict[int, int] | None = None
+        self._eeprom_backup_attempted = False
         self._identity_ready = asyncio.Event()
         self._identity_pending = False
         self._read_lock = asyncio.Lock()
@@ -383,6 +391,29 @@ class LocalMqttAguaIOT:
     async def update(self) -> None:
         """Poll the stove for latest readings and update device states."""
         await update_devices(self.devices)
+        if self._children:
+            for child in self._children:
+                await child._ensure_eeprom_backup()
+        else:
+            await self._ensure_eeprom_backup()
+
+    def _has_eeprom_backup(self) -> bool:
+        """Return True if an EEPROM backup is already cached for this client."""
+        return any(dev.device_info_data.get("eeprom_backup") for dev in self.devices)
+
+    async def _ensure_eeprom_backup(self) -> None:
+        """Capture an initial EEPROM backup once per setup if not yet present."""
+        if (
+            self._eeprom_backup_attempted
+            or not self.devices
+            or self._has_eeprom_backup()
+        ):
+            return
+        async with self._read_lock:
+            if self._eeprom_backup_attempted or self._has_eeprom_backup():
+                return
+            self._eeprom_backup_attempted = True
+            await self._backup_eeprom_locked(self.devices[0])
 
     async def validate_local_connection(self) -> dict[str, Any]:
         """Require a fresh register reading from each stove."""
@@ -499,6 +530,74 @@ class LocalMqttAguaIOT:
             raise AguaIOTConnectionError("Could not read stove registers.") from err
 
         return copy.deepcopy(self._register_values)
+
+    async def _backup_eeprom_locked(self, device: Device) -> None:
+        """Read and persist an initial 0x8000-0x80FF EEPROM backup once."""
+        target_mac = self._device_mac
+        if (
+            not target_mac
+            or self._unsubscribe is None
+            or not self._mqtt.is_connected(self.hass)
+        ):
+            return
+        values: dict[str, int] = {}
+        chunk_timeout = min(self.buffer_read_timeout, 5)
+        try:
+            for start in range(
+                EEPROM_BACKUP_START, EEPROM_BACKUP_END, EEPROM_BACKUP_CHUNK_SIZE
+            ):
+                items = list(range(start, start + EEPROM_BACKUP_CHUNK_SIZE))
+                self._pending_backup_items = items
+                self._backup_reply_values = None
+                self._backup_reply_event.clear()
+                query = {
+                    "mi": str(uuid.uuid4()),
+                    "mt": "Q",
+                    "r": {"rj": "Navel"},
+                    "s": {"ss": "Apk", "sj": self._session_uuid},
+                    "pl": {
+                        "Cmd": "RequestReading",
+                        "Items": items,
+                        "Masks": [65535] * len(items),
+                        "BitData": [8] * len(items),
+                        "Endianess": ["L"] * len(items),
+                    },
+                }
+                # A reconnect can clear identity between chunks; re-check it
+                # before every publish, as normal register reads do.
+                await self._await_stove_identity()
+                await self._send_mqtt_publish(f"navel/{target_mac}", query)
+                await asyncio.wait_for(
+                    self._backup_reply_event.wait(),
+                    timeout=chunk_timeout,
+                )
+                reply_values = self._backup_reply_values
+                if reply_values is None:
+                    raise AguaIOTConnectionError("No EEPROM backup reply received.")
+                for offset in items:
+                    value = reply_values[offset]
+                    if not 0 <= value <= 255:
+                        raise AguaIOTConnectionError(
+                            f"Invalid EEPROM backup value at {offset}: {value}"
+                        )
+                    values[str(offset)] = value
+        except (TimeoutError, OSError, RuntimeError, AguaIOTError) as err:
+            _LOGGER.warning(
+                "Could not capture initial EEPROM backup for '%s': %s",
+                device.name,
+                err,
+            )
+            return
+        finally:
+            self._pending_backup_items = None
+            self._backup_reply_values = None
+
+        device.device_info_data["eeprom_backup"] = {
+            "mac": target_mac,
+            "captured_at": datetime.now(UTC).isoformat(),
+            "values": values,
+        }
+        self._cache_dirty = True
 
     async def _request_writing(
         self, device: Device, payload_or_items: dict[str, Any]
@@ -703,6 +802,12 @@ class LocalMqttAguaIOT:
             self._register_values.update(readings)
             self._read_generation += 1
             self._response_event.set()
+            if (
+                self._pending_backup_items is not None
+                and [int(item) for item in items] == self._pending_backup_items
+            ):
+                self._backup_reply_values = readings
+                self._backup_reply_event.set()
 
     async def close(self) -> None:
         """Remove subscriptions and close owned MQTT connections."""
