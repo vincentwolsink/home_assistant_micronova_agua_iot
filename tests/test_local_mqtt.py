@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import sys
 from types import SimpleNamespace
@@ -628,6 +629,27 @@ async def test_update_captures_initial_eeprom_backup_once(mqtt_api):
     # Pre-seed stale cache at 32768 to verify backup reads from the reply itself.
     client._register_values[32768] = 99
     eeprom_calls = 0
+    unrelated_sent = asyncio.Event()
+    release_first_chunk = asyncio.Event()
+    background_tasks: list[asyncio.Task] = []
+
+    async def deliver_reply(items):
+        await client._message_received(
+            message(
+                {
+                    "mt": "R",
+                    "pl": {
+                        "Cmd": "RequestReading",
+                        "Items": items,
+                        "Values": [offset % 256 for offset in items],
+                    },
+                }
+            )
+        )
+
+    async def deliver_first_chunk_later(items):
+        await release_first_chunk.wait()
+        await deliver_reply(items)
 
     async def answer_reads(_hass, _topic, payload, **_kwargs):
         nonlocal eeprom_calls
@@ -637,36 +659,40 @@ async def test_update_captures_initial_eeprom_backup_once(mqtt_api):
         items = query["pl"]["Items"]
         if items[0] >= 32768:
             eeprom_calls += 1
-            # Inject an unrelated reply first; it must not satisfy the backup chunk.
-            await client._message_received(
-                message(
-                    {
-                        "mt": "R",
-                        "pl": {
-                            "Cmd": "RequestReading",
-                            "Items": [1],
-                            "Values": [123],
-                        },
-                    }
+            if items[0] == 32768:
+                # Deliver an unrelated reply while the waiter is suspended, then hold
+                # the matching chunk reply so the test can assert it is still pending.
+                await client._message_received(
+                    message(
+                        {
+                            "mt": "R",
+                            "pl": {
+                                "Cmd": "RequestReading",
+                                "Items": [1],
+                                "Values": [123],
+                            },
+                        }
+                    )
                 )
-            )
-        values = [offset % 256 for offset in items]
-        await client._message_received(
-            message(
-                {
-                    "mt": "R",
-                    "pl": {
-                        "Cmd": "RequestReading",
-                        "Items": items,
-                        "Values": values,
-                    },
-                }
-            )
-        )
+                unrelated_sent.set()
+                background_tasks.append(
+                    asyncio.create_task(deliver_first_chunk_later(items))
+                )
+                return
+        await deliver_reply(items)
 
     mqtt_api.async_publish.side_effect = answer_reads
     try:
-        await client.update()
+        update_task = asyncio.create_task(client.update())
+        await unrelated_sent.wait()
+        await asyncio.sleep(0)
+        assert not client._backup_reply_event.is_set()
+        assert not update_task.done()
+
+        release_first_chunk.set()
+        await update_task
+        await asyncio.gather(*background_tasks)
+
         backup = client.devices[0].device_info_data["eeprom_backup"]
         assert client.cache_dirty is True
         assert backup["mac"] == "A1B2C3D4E5F6"
@@ -681,6 +707,8 @@ async def test_update_captures_initial_eeprom_backup_once(mqtt_api):
         assert eeprom_calls == 16
         assert client.cache_dirty is False
     finally:
+        release_first_chunk.set()
+        await asyncio.gather(*background_tasks, return_exceptions=True)
         await client.close()
 
 
