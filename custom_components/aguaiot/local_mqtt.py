@@ -399,9 +399,7 @@ class LocalMqttAguaIOT:
 
     def _has_eeprom_backup(self) -> bool:
         """Return True if an EEPROM backup is already cached for this client."""
-        return any(
-            dev.device_info_data.get("eeprom_backup") for dev in self.devices
-        )
+        return any(dev.device_info_data.get("eeprom_backup") for dev in self.devices)
 
     async def _ensure_eeprom_backup(self) -> None:
         """Capture an initial EEPROM backup once per setup if not yet present."""
