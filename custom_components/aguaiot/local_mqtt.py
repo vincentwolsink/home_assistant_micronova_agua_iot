@@ -543,7 +543,6 @@ class LocalMqttAguaIOT:
         values: dict[str, int] = {}
         chunk_timeout = min(self.buffer_read_timeout, 5)
         try:
-            await self._await_stove_identity()
             for start in range(
                 EEPROM_BACKUP_START, EEPROM_BACKUP_END, EEPROM_BACKUP_CHUNK_SIZE
             ):
@@ -564,6 +563,9 @@ class LocalMqttAguaIOT:
                         "Endianess": ["L"] * len(items),
                     },
                 }
+                # A reconnect can clear identity between chunks; re-check it
+                # before every publish, as normal register reads do.
+                await self._await_stove_identity()
                 await self._send_mqtt_publish(f"navel/{target_mac}", query)
                 await asyncio.wait_for(
                     self._backup_reply_event.wait(),
@@ -573,7 +575,12 @@ class LocalMqttAguaIOT:
                 if reply_values is None:
                     raise AguaIOTConnectionError("No EEPROM backup reply received.")
                 for offset in items:
-                    values[str(offset)] = reply_values[offset]
+                    value = reply_values[offset]
+                    if not 0 <= value <= 255:
+                        raise AguaIOTConnectionError(
+                            f"Invalid EEPROM backup value at {offset}: {value}"
+                        )
+                    values[str(offset)] = value
         except (TimeoutError, OSError, RuntimeError, AguaIOTError) as err:
             _LOGGER.warning(
                 "Could not capture initial EEPROM backup for '%s': %s",

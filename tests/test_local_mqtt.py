@@ -752,3 +752,80 @@ async def test_failed_eeprom_backup_is_only_attempted_once_per_setup(mqtt_api):
         assert eeprom_calls == 1
     finally:
         await client.close()
+
+
+@pytest.mark.asyncio
+async def test_eeprom_backup_rejects_values_outside_byte_range(mqtt_api):
+    client = make_test_instance(cached_devices=make_dummy_cached_devices())
+    await client.connect()
+    client._identity_ready.set()
+
+    async def answer_reads(_hass, _topic, payload, **_kwargs):
+        query = json.loads(payload)
+        if query["pl"]["Cmd"] != "RequestReading":
+            return
+        items = query["pl"]["Items"]
+        values = [0x8000 if item == 32768 else 0 for item in items]
+        await client._message_received(
+            message(
+                {
+                    "mt": "R",
+                    "pl": {"Cmd": "RequestReading", "Items": items, "Values": values},
+                }
+            )
+        )
+
+    mqtt_api.async_publish.side_effect = answer_reads
+    try:
+        await client.update()
+        assert "eeprom_backup" not in client.devices[0].device_info_data
+    finally:
+        await client.close()
+
+
+@pytest.mark.asyncio
+async def test_eeprom_backup_waits_for_identity_before_each_chunk(mqtt_api):
+    client = make_test_instance(cached_devices=make_dummy_cached_devices())
+    await client.connect()
+    client._identity_ready.set()
+    identity_checks_before_chunk: list[bool] = []
+    original_await_identity = client._await_stove_identity
+    awaited = False
+
+    async def tracking_await_identity():
+        nonlocal awaited
+        awaited = True
+        await original_await_identity()
+
+    client._await_stove_identity = tracking_await_identity
+
+    async def answer_reads(_hass, _topic, payload, **_kwargs):
+        nonlocal awaited
+        query = json.loads(payload)
+        if query["pl"]["Cmd"] != "RequestReading":
+            return
+        items = query["pl"]["Items"]
+        if items[0] >= 32768:
+            identity_checks_before_chunk.append(awaited)
+        awaited = False
+        await client._message_received(
+            message(
+                {
+                    "mt": "R",
+                    "pl": {
+                        "Cmd": "RequestReading",
+                        "Items": items,
+                        "Values": [0] * len(items),
+                    },
+                }
+            )
+        )
+
+    mqtt_api.async_publish.side_effect = answer_reads
+    try:
+        await client.update()
+        assert len(identity_checks_before_chunk) == 16
+        assert all(identity_checks_before_chunk)
+        assert "eeprom_backup" in client.devices[0].device_info_data
+    finally:
+        await client.close()
