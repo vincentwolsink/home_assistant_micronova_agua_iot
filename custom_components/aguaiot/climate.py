@@ -402,18 +402,8 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
         return self._device.get_register(self._temperature_set_key).get("step", 1)
 
     async def sync_clock(self):
-        dt_now = dt.now()
         try:
-            await self._device.set_register_values(
-                {
-                    "clock_hour_set": dt_now.hour,
-                    "clock_minute_set": dt_now.minute,
-                    "calendar_day_set": dt_now.day,
-                    "calendar_month_set": dt_now.month,
-                    "calendar_year_set": dt_now.year,
-                },
-                limit_value_raw=True,
-            )
+            await self._device.sync_clock(dt.now())
         except (ValueError, AguaIOTError) as err:
             _LOGGER.error("Failed to set value, error: %s", err)
 

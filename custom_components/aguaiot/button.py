@@ -5,9 +5,10 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
+from homeassistant.util import dt
 
 from .aguaiot import AguaIOTError
-from .const import BUTTONS, DOMAIN
+from .const import BUTTONS, CLOCK_REGISTERS, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,16 +20,19 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     buttons = []
     for device in agua.devices:
         for button in BUTTONS:
+            if button.sync_clock:
+                if all(key in device.registers for key in CLOCK_REGISTERS):
+                    buttons.append(AguaIOTClockSyncButton(coordinator, device, button))
             # The enable register depends on the stove state, so it drives
             # availability instead of creation.
-            if button.key in device.registers:
+            elif button.key in device.registers:
                 buttons.append(AguaIOTHeatingButton(coordinator, device, button))
 
     async_add_entities(buttons, True)
 
 
-class AguaIOTHeatingButton(CoordinatorEntity, ButtonEntity):
-    """Button entity"""
+class AguaIOTButton(CoordinatorEntity, ButtonEntity):
+    """Base button entity."""
 
     _attr_has_entity_name = True
 
@@ -58,6 +62,10 @@ class AguaIOTHeatingButton(CoordinatorEntity, ButtonEntity):
             model=self._device.name_product,
         )
 
+
+class AguaIOTHeatingButton(AguaIOTButton):
+    """Button entity"""
+
     @property
     def available(self):
         """Only available when the stove accepts the command."""
@@ -78,5 +86,21 @@ class AguaIOTHeatingButton(CoordinatorEntity, ButtonEntity):
             _LOGGER.error(
                 "Failed to press '%s', error: %s",
                 f"{self._device.name} {self.entity_description.name}",
+                err,
+            )
+
+
+class AguaIOTClockSyncButton(AguaIOTButton):
+    """Button that synchronizes the stove clock with Home Assistant."""
+
+    async def async_press(self):
+        """Synchronize the stove clock."""
+        try:
+            await self._device.sync_clock(dt.now())
+            await self.coordinator.async_request_refresh()
+        except (ValueError, AguaIOTError) as err:
+            _LOGGER.error(
+                "Failed to synchronize the clock of '%s', error: %s",
+                self._device.name,
                 err,
             )
