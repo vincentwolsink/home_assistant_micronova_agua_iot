@@ -157,6 +157,11 @@ ENDPOINTS = {
         CONF_CUSTOMER_CODE: "354925",
         CONF_API_URL: "https://remote.mcz.it",
     },
+    "EK Home (Edilkamin)": {
+        CONF_CUSTOMER_CODE: "315792",
+        CONF_API_URL: "https://iot-01.edilkamin.com",
+        CONF_BRAND_ID: "1",
+    },
     "Elcofire Pellet Home": {
         CONF_CUSTOMER_CODE: "132679",
         CONF_API_URL: "https://elcofire.agua-iot.com",
