@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import copy
+from datetime import UTC, datetime
 import json
 import logging
 import uuid
@@ -32,6 +33,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 ACTIVE_EEPROM_PREFIXES = ("chrono_p",)
+EEPROM_BACKUP_START = 32768
+EEPROM_BACKUP_END = 33024
+EEPROM_BACKUP_CHUNK_SIZE = 16
 
 
 class LocalMqttSetupError(AguaIOTConnectionError):
@@ -498,7 +502,57 @@ class LocalMqttAguaIOT:
         except (OSError, RuntimeError, AguaIOTError) as err:
             raise AguaIOTConnectionError("Could not read stove registers.") from err
 
+        if not device.device_info_data.get("eeprom_backup"):
+            await self._backup_eeprom_locked(device)
+
         return copy.deepcopy(self._register_values)
+
+    async def _backup_eeprom_locked(self, device: Device) -> None:
+        """Read and persist an initial 0x8000-0x80FF EEPROM backup once."""
+        target_mac = self._device_mac
+        if not target_mac:
+            return
+        values: dict[str, int] = {}
+        chunk_timeout = min(self.buffer_read_timeout, 5)
+        try:
+            for start in range(
+                EEPROM_BACKUP_START, EEPROM_BACKUP_END, EEPROM_BACKUP_CHUNK_SIZE
+            ):
+                items = list(range(start, start + EEPROM_BACKUP_CHUNK_SIZE))
+                self._response_event.clear()
+                query = {
+                    "mi": str(uuid.uuid4()),
+                    "mt": "Q",
+                    "r": {"rj": "Navel"},
+                    "s": {"ss": "Apk", "sj": self._session_uuid},
+                    "pl": {
+                        "Cmd": "RequestReading",
+                        "Items": items,
+                        "Masks": [65535] * len(items),
+                        "BitData": [8] * len(items),
+                        "Endianess": ["L"] * len(items),
+                    },
+                }
+                await self._send_mqtt_publish(f"navel/{target_mac}", query)
+                await asyncio.wait_for(
+                    self._response_event.wait(),
+                    timeout=chunk_timeout,
+                )
+                for offset in items:
+                    values[str(offset)] = self._register_values[offset]
+        except (TimeoutError, KeyError, OSError, RuntimeError, AguaIOTError) as err:
+            _LOGGER.warning(
+                "Could not capture initial EEPROM backup for '%s': %s",
+                device.name,
+                err,
+            )
+            return
+
+        device.device_info_data["eeprom_backup"] = {
+            "captured_at": datetime.now(UTC).isoformat(),
+            "values": values,
+        }
+        self._cache_dirty = True
 
     async def _request_writing(
         self, device: Device, payload_or_items: dict[str, Any]
