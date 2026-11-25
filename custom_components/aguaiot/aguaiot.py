@@ -744,6 +744,19 @@ class Device:
                 f"Error while trying to set: items={items} ({err})"
             ) from err
 
+    async def sync_clock(self, now):
+        """Set the stove clock to the given time and date."""
+        await self.set_register_values(
+            {
+                "clock_hour_set": now.hour,
+                "clock_minute_set": now.minute,
+                "calendar_day_set": now.day,
+                "calendar_month_set": now.month,
+                "calendar_year_set": now.year,
+            },
+            limit_value_raw=True,
+        )
+
     async def set_register_value_description(
         self, key, value_description, value_fallback=None, language=None
     ):

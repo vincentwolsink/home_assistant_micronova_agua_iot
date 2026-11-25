@@ -57,6 +57,11 @@ class AguaIOTNumberEntityDescription(NumberEntityDescription):
 
 
 @dataclass
+class AguaIOTButtonEntityDescription(ButtonEntityDescription):
+    sync_clock: bool = False
+
+
+@dataclass
 class AguaIOTCanalizationEntityDescription(ClimateEntityDescription):
     key_temp_set: str | None = None
     key_temp_get: str | None = None
@@ -97,6 +102,14 @@ WATER_VARIANTS = ["water", "water_boiler", "water_puffer", "h2o", "h2o_mandata"]
 
 MODE_WOOD = "Wood"
 MODE_PELLETS = "Pellet"
+
+CLOCK_REGISTERS = (
+    "clock_hour_set",
+    "clock_minute_set",
+    "calendar_day_set",
+    "calendar_month_set",
+    "calendar_year_set",
+)
 
 STATUS_OFF = ["OFF", "FINAL CLEANING", "CLEANING FINAL", "STOP", "SHUT OFF", "0", "6"]
 STATUS_IDLE = [
@@ -663,10 +676,17 @@ SWITCHES = (
 )
 
 BUTTONS = (
-    ButtonEntityDescription(
+    AguaIOTButtonEntityDescription(
         key="allarm_reset_set",
         name="Reset Alarm",
         icon="mdi:alarm-light-off-outline",
+    ),
+    AguaIOTButtonEntityDescription(
+        key="sync_clock",
+        name="Sync Clock",
+        icon="mdi:clock-check-outline",
+        sync_clock=True,
+        entity_category=EntityCategory.CONFIG,
     ),
 )
 
