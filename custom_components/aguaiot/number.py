@@ -8,6 +8,7 @@ from homeassistant.helpers.update_coordinator import (
 
 from .aguaiot import AguaIOTError
 from .const import DOMAIN, NUMBERS
+from .registers import bind_descriptions
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,17 +21,15 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     for device in agua.devices:
         hybrid = "power_wood_set" in device.registers
 
-        for number in NUMBERS:
-            if (
-                number.key in device.registers
-                and (number.force_enabled or device.get_register_enabled(number.key))
-                and (
-                    (number.hybrid_only and hybrid)
-                    or (number.hybrid_exclude and not hybrid)
-                    or (not number.hybrid_only and not number.hybrid_exclude)
-                )
-            ):
-                numbers.append(AguaIOTHeatingNumber(coordinator, device, number))
+        descriptions = [
+            number
+            for number in NUMBERS
+            if (number.hybrid_only and hybrid)
+            or (number.hybrid_exclude and not hybrid)
+            or (not number.hybrid_only and not number.hybrid_exclude)
+        ]
+        for number in bind_descriptions(device, descriptions):
+            numbers.append(AguaIOTHeatingNumber(coordinator, device, number))
 
     async_add_entities(numbers, True)
 

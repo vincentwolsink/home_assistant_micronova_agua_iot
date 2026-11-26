@@ -12,6 +12,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .const import DOMAIN, SENSORS
+from .registers import bind_descriptions
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -22,17 +23,15 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     for device in agua.devices:
         hybrid = "power_wood_set" in device.registers
 
-        for sensor in SENSORS:
-            if (
-                sensor.key in device.registers
-                and (sensor.force_enabled or device.get_register_enabled(sensor.key))
-                and (
-                    (sensor.hybrid_only and hybrid)
-                    or (sensor.hybrid_exclude and not hybrid)
-                    or (not sensor.hybrid_only and not sensor.hybrid_exclude)
-                )
-            ):
-                sensors.append(AguaIOTHeatingSensor(coordinator, device, sensor))
+        descriptions = [
+            sensor
+            for sensor in SENSORS
+            if (sensor.hybrid_only and hybrid)
+            or (sensor.hybrid_exclude and not hybrid)
+            or (not sensor.hybrid_only and not sensor.hybrid_exclude)
+        ]
+        for sensor in bind_descriptions(device, descriptions):
+            sensors.append(AguaIOTHeatingSensor(coordinator, device, sensor))
 
         sensors.append(AguaIOTEepromWritesSensor(coordinator, device))
 

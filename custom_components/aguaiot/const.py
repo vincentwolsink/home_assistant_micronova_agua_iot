@@ -65,10 +65,8 @@ class AguaIOTButtonEntityDescription(ButtonEntityDescription):
 class AguaIOTCanalizationEntityDescription(ClimateEntityDescription):
     key_temp_set: str | None = None
     key_temp_get: str | None = None
-    key_temp2_get: str | None = None
     key_vent_set: str | None = None
     key_enable: str | None = None
-    key2_enable: str | None = None
 
 
 DOMAIN = "aguaiot"
@@ -97,7 +95,8 @@ CONNECTION_MODE_CLOUD = "connection_cloud"
 CONNECTION_MODE_BLUETOOTH = "connection_bluetooth"
 CONNECTION_MODE_LOCAL_MQTT = "connection_local_mqtt"
 
-AIR_VARIANTS = ["air", "air2", "air3", "air_palm"]
+# Naming variants such as temp_air2_get are found by the register aliases.
+AIR_VARIANTS = ["air", "air_palm"]
 WATER_VARIANTS = ["water", "water_boiler", "water_puffer", "h2o", "h2o_mandata"]
 
 MODE_WOOD = "Wood"
@@ -793,10 +792,8 @@ CLIMATE_CANALIZATIONS = (
         name="Canalization {id}",
         key=r"canalization_(?P<id>[a-zA-Z0-9]+)_set",
         key_enable="canalization_{id}_enable",
-        key2_enable="canalization_2{id}_enable",
         key_temp_set="canalization_{id}_temp_air_set",
         key_temp_get="canalization_{id}_temp_air_get",
-        key_temp2_get="canalization_2{id}_temp_air_get",
         key_vent_set="canalization_{id}_vent_set",
         icon="mdi:fan",
     ),
@@ -809,10 +806,8 @@ CLIMATE_CANALIZATIONS = (
         name="Vent {id}",
         key=r"vent_(?P<id>(front|rear))_set",
         key_enable="vent_{id}_enable",
-        key2_enable="vent_{id}2_enable",
         key_temp_set="temp_{id}_set",
         key_temp_get="temp_{id}_get",
-        key_temp2_get="temp_{id}2_get",
         icon="mdi:fan",
     ),
     AguaIOTCanalizationEntityDescription(

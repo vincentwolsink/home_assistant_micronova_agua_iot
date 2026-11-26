@@ -11,6 +11,8 @@ import httpx
 import jwt
 from simpleeval import simple_eval
 
+from .registers import RegisterAliases, canonical_key, with_role
+
 _LOGGER = logging.getLogger(__name__)
 
 API_PATH_APP_SIGNUP = "/appSignup"
@@ -518,12 +520,14 @@ class Device:
         self.__device_info = device_info or {}
         self.__register_map_dict = register_map or {}
         self.__register_dict = {}
+        self.__register_aliases = None
         self.__mac = mac or self.__device_info.get("mac")
 
     async def update_mapping(self):
         self.__register_map_dict = await self.__aguaiot._fetch_device_registers_mapping(
             self
         )
+        self.__register_aliases = None
 
     async def update(self):
         raw_data = await self.__aguaiot._fetch_device_information(self)
@@ -603,6 +607,29 @@ class Device:
     @property
     def registers(self):
         return list(self.__register_map_dict.keys())
+
+    def register_aliases(self, key):
+        """Return the registers matching the key or a naming variant of it.
+
+        The key itself comes first when it exists, see ``registers.py``.
+        """
+        if self.__register_aliases is None:
+            self.__register_aliases = RegisterAliases(self.__register_map_dict)
+        return self.__register_aliases.aliases(key)
+
+    def find_register(self, key, enabled=False, has_value=False):
+        """Return the best existing register for the key, or None.
+
+        Naming variants are used when the key itself does not exist or does
+        not meet the conditions.
+        """
+        for candidate in self.register_aliases(key):
+            if enabled and not self.get_register_enabled(candidate):
+                continue
+            if has_value and not self.get_register_value(candidate):
+                continue
+            return candidate
+        return None
 
     @property
     def device_info_data(self):
@@ -699,8 +726,14 @@ class Device:
         return set()
 
     def get_register_enabled(self, key):
-        enable_key = key.rsplit("_", 1)[0] + "_enable"
-        if enable_key not in self.registers or not self.get_register(enable_key):
+        enable_key = with_role(key, "enable")
+        if enable_key not in self.__register_map_dict:
+            # The enable register may be named without the variant digit of
+            # the register itself (vent_front2_set with vent_front_enable).
+            enable_key = canonical_key(enable_key)
+        if enable_key not in self.__register_map_dict or not self.get_register(
+            enable_key
+        ):
             # Always enabled if no enable register present
             return True
 

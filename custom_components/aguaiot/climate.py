@@ -1,6 +1,6 @@
 """Support for Agua IOT heating devices."""
 
-import copy
+import dataclasses
 import logging
 import numbers
 import re
@@ -34,6 +34,7 @@ from .const import (
     STATUS_OFF,
     WATER_VARIANTS,
 )
+from .registers import canonical_key
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -65,53 +66,15 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         stove = AguaIOTAirDevice(coordinator, device)
         entities.append(stove)
 
-        if any(f"temp_{variant}_set" in device.registers for variant in WATER_VARIANTS):
+        if any(
+            device.find_register(f"temp_{variant}_set") for variant in WATER_VARIANTS
+        ):
             entities.append(AguaIOTWaterDevice(coordinator, device, stove))
 
-        for canalization in CLIMATE_CANALIZATIONS:
-            for c_found in [
-                m
-                for i in device.registers
-                for m in [re.match(canalization.key, i.lower())]
-                if m
-            ]:
-                if (
-                    (
-                        canalization.key_enable
-                        and device.get_register_enabled(
-                            canalization.key_enable.format(id=c_found.group(1))
-                        )
-                    )
-                    or (
-                        canalization.key2_enable
-                        and device.get_register_enabled(
-                            canalization.key2_enable.format(id=c_found.group(1))
-                        )
-                    )
-                    or (
-                        not canalization.key_enable
-                        and device.get_register_enabled(c_found.group(0))
-                    )
-                ):
-                    c_copy = copy.deepcopy(canalization)
-                    c_copy.key = c_found.group(0)
-                    for key in [
-                        "name",
-                        "key_temp_set",
-                        "key_temp_get",
-                        "key_temp2_get",
-                        "key_vent_set",
-                    ]:
-                        if getattr(c_copy, key):
-                            setattr(
-                                c_copy,
-                                key,
-                                getattr(c_copy, key).format_map(c_found.groupdict()),
-                            )
-
-                    entities.append(
-                        AguaIOTCanalizationDevice(coordinator, device, c_copy, stove)
-                    )
+        for description in _canalization_descriptions(device):
+            entities.append(
+                AguaIOTCanalizationDevice(coordinator, device, description, stove)
+            )
 
     async_add_entities(entities, True)
 
@@ -121,6 +84,52 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         {},
         "sync_clock",
     )
+
+
+def _canalization_descriptions(device):
+    """Return the canalization descriptions bound to the device registers.
+
+    The description keys are matched against the canonical register keys, so
+    naming variants (``vent_front2_set``, ``canalization_2dx_set``) are found
+    as well. The entity keeps the real register key.
+    """
+    descriptions = []
+    bound = set()
+    for canalization in CLIMATE_CANALIZATIONS:
+        # Variant free registers first, so they win over their variants. Then
+        # alphabetical, so the result does not depend on the register map order.
+        for register in sorted(
+            device.registers, key=lambda r: (canonical_key(r) != r.lower(), r.lower())
+        ):
+            canonical = canonical_key(register)
+            match = re.match(canalization.key, canonical)
+            # Two variants of the same register describe the same function.
+            if not match or match.group(0) in bound:
+                continue
+            key = register if match.end() == len(canonical) else match.group(0)
+
+            ids = match.groupdict()
+            if canalization.key_enable:
+                enable_key = canalization.key_enable.format_map(ids)
+                # Enabled when any variant of the enable register is
+                # (vent_front_enable or vent_front2_enable). Without an
+                # enable register, the canalization is always enabled.
+                enabled = any(
+                    device.get_register_enabled(k)
+                    for k in device.register_aliases(enable_key) or [enable_key]
+                )
+            else:
+                enabled = device.get_register_enabled(key)
+            if not enabled:
+                continue
+
+            bound.add(match.group(0))
+            fields = {"key": key}
+            for field in ("name", "key_temp_set", "key_temp_get", "key_vent_set"):
+                if value := getattr(canalization, field):
+                    fields[field] = value.format_map(ids)
+            descriptions.append(dataclasses.replace(canalization, **fields))
+    return descriptions
 
 
 class AguaIOTClimateDevice(CoordinatorEntity, ClimateEntity):
@@ -152,12 +161,10 @@ class AguaIOTClimateDevice(CoordinatorEntity, ClimateEntity):
         during initialization.
         """
         for variant in variants:
-            key = f"temp_{variant}_{suffix}"
-            if (
-                key in self._device.registers
-                and self._device.get_register_enabled(key)
-                and self._device.get_register_value(key)
-            ):
+            key = self._device.find_register(
+                f"temp_{variant}_{suffix}", enabled=True, has_value=True
+            )
+            if key:
                 return key
         return None
 
@@ -548,13 +555,22 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
         self._device = device
         self._parent = parent
         self.entity_description = description
-        self._fan_register = self.entity_description.key
+        self._vent_register = self._find_register(description.key_vent_set)
+        self._fan_register = self._vent_register or description.key
 
-        if (
-            self.entity_description.key_vent_set
-            and self.entity_description.key_vent_set in self._device.registers
-        ):
-            self._fan_register = self.entity_description.key_vent_set
+    def _find_register(self, key, enabled=False):
+        """Return the register for a description key, also as naming variant."""
+        if not key:
+            return None
+        return self._device.find_register(key, enabled=enabled)
+
+    @property
+    def _temp_set_register(self):
+        return self._find_register(self.entity_description.key_temp_set)
+
+    @property
+    def _temp_get_register(self):
+        return self._find_register(self.entity_description.key_temp_get, enabled=True)
 
     @property
     def unique_id(self):
@@ -567,16 +583,11 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     @property
     def supported_features(self):
         features = ClimateEntityFeature.FAN_MODE
-        if (
-            self.entity_description.key_temp_set
-            and self.entity_description.key_temp_set in self._device.registers
-            and self._device.get_register_enabled(self.entity_description.key_temp_set)
+        if self._temp_set_register and self._device.get_register_enabled(
+            self._temp_set_register
         ):
             features |= ClimateEntityFeature.TARGET_TEMPERATURE
-        if (
-            self.entity_description.key_vent_set
-            and self.entity_description.key_vent_set in self._device.registers
-        ):
+        if self._vent_register:
             features |= ClimateEntityFeature.PRESET_MODE
 
         return features
@@ -661,59 +672,39 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     @property
     def min_temp(self):
         """Return the minimum temperature to set."""
-        if self.entity_description.key_temp_set in self._device.registers:
-            return self._min_temperature(self.entity_description.key_temp_set)
+        if self._temp_set_register:
+            return self._min_temperature(self._temp_set_register)
         return None
 
     @property
     def max_temp(self):
         """Return the maximum temperature to set."""
-        if self.entity_description.key_temp_set in self._device.registers:
-            return self._max_temperature(self.entity_description.key_temp_set)
+        if self._temp_set_register:
+            return self._max_temperature(self._temp_set_register)
         return None
 
     @property
     def native_target_temperature(self):
         """Return the temperature we try to reach."""
-        if (
-            self.entity_description.key_temp_set in self._device.registers
-            and self.native_current_temperature
-        ):
-            return self._device.get_register_value(self.entity_description.key_temp_set)
+        if self._temp_set_register and self.native_current_temperature:
+            return self._device.get_register_value(self._temp_set_register)
 
     @property
     def native_current_temperature(self):
         """Return the current temperature."""
-        if (
-            self.entity_description.key_temp_get in self._device.registers
-            and self._device.get_register_enabled(self.entity_description.key_temp_get)
-        ):
-            value = self._device.get_register_value_description(
-                self.entity_description.key_temp_get
-            )
-            if isinstance(value, numbers.Number):
-                return value
-        elif (
-            self.entity_description.key_temp2_get
-            and self.entity_description.key_temp2_get in self._device.registers
-            and self._device.get_register_enabled(self.entity_description.key_temp2_get)
-        ):
-            value = self._device.get_register_value_description(
-                self.entity_description.key_temp2_get
-            )
+        if self._temp_get_register:
+            value = self._device.get_register_value_description(self._temp_get_register)
             if isinstance(value, numbers.Number):
                 return value
 
     async def async_set_temperature(self, **kwargs):
         """Set new target temperature."""
         temperature = kwargs.get(ATTR_TEMPERATURE)
-        if temperature is None:
+        if temperature is None or not self._temp_set_register:
             return
 
         try:
-            await self._device.set_register_value(
-                self.entity_description.key_temp_set, temperature
-            )
+            await self._device.set_register_value(self._temp_set_register, temperature)
             await self.coordinator.async_request_refresh()
         except (ValueError, AguaIOTError) as err:
             _LOGGER.error("Failed to set temperature, error: %s", err)
@@ -721,7 +712,5 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     @property
     def target_temperature_step(self):
         """Return the supported step of target temperature."""
-        if self.entity_description.key_temp_set in self._device.registers:
-            return self._device.get_register(self.entity_description.key_temp_set).get(
-                "step", 1
-            )
+        if self._temp_set_register:
+            return self._device.get_register(self._temp_set_register).get("step", 1)
