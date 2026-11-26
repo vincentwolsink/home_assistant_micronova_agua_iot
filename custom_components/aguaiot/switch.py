@@ -8,6 +8,7 @@ from homeassistant.helpers.update_coordinator import (
 
 from .aguaiot import AguaIOTError
 from .const import DOMAIN, SWITCHES
+from .registers import bind_descriptions
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,11 +19,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     switches = []
     for device in agua.devices:
-        for switch in SWITCHES:
-            if switch.key in device.registers and device.get_register_enabled(
-                switch.key
-            ):
-                switches.append(AguaIOTHeatingSwitch(coordinator, device, switch))
+        for switch in bind_descriptions(device, SWITCHES):
+            switches.append(AguaIOTHeatingSwitch(coordinator, device, switch))
 
     async_add_entities(switches, True)
 

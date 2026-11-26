@@ -9,6 +9,7 @@ from homeassistant.util import dt
 
 from .aguaiot import AguaIOTError
 from .const import BUTTONS, CLOCK_REGISTERS, DOMAIN
+from .registers import bind_descriptions
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,13 +21,15 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     buttons = []
     for device in agua.devices:
         for button in BUTTONS:
-            if button.sync_clock:
-                if all(key in device.registers for key in CLOCK_REGISTERS):
-                    buttons.append(AguaIOTClockSyncButton(coordinator, device, button))
-            # The enable register depends on the stove state, so it drives
-            # availability instead of creation.
-            elif button.key in device.registers:
-                buttons.append(AguaIOTHeatingButton(coordinator, device, button))
+            if button.sync_clock and all(
+                key in device.registers for key in CLOCK_REGISTERS
+            ):
+                buttons.append(AguaIOTClockSyncButton(coordinator, device, button))
+        # The enable register depends on the stove state, so it drives
+        # availability instead of creation.
+        register_buttons = [button for button in BUTTONS if not button.sync_clock]
+        for button in bind_descriptions(device, register_buttons, check_enabled=False):
+            buttons.append(AguaIOTHeatingButton(coordinator, device, button))
 
     async_add_entities(buttons, True)
 
