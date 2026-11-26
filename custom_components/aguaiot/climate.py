@@ -96,9 +96,10 @@ def _canalization_descriptions(device):
     descriptions = []
     bound = set()
     for canalization in CLIMATE_CANALIZATIONS:
-        # Variant free registers first, so they win over their variants.
+        # Variant free registers first, so they win over their variants. Then
+        # alphabetical, so the result does not depend on the register map order.
         for register in sorted(
-            device.registers, key=lambda r: canonical_key(r) != r.lower()
+            device.registers, key=lambda r: (canonical_key(r) != r.lower(), r.lower())
         ):
             canonical = canonical_key(register)
             match = re.match(canalization.key, canonical)

@@ -66,7 +66,9 @@ async def fixture_entities(aguaiot_mock, name, register_map, monkeypatch):
             None, config_entry, lambda new, update=False, out=created: out.extend(new)
         )
         for entity in created:
-            entities[f"{platform}.{entity.unique_id}"] = entity.name
+            entity_id = f"{platform}.{entity.unique_id}"
+            assert entity_id not in entities, f"Duplicate entity {entity_id}"
+            entities[entity_id] = entity.name
     return dict(sorted(entities.items()))
 
 
