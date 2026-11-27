@@ -43,7 +43,8 @@
           "device_fixes": {
             "name": "Apparaat specifieke fixes",
             "data": {
-              "air_temp_fix": "[Jolly Mec] Negeer foutieve air temperature bij gebruik van een externe thermostaat."
+              "air_temp_fix": "[Jolly Mec] Negeer foutieve air temperature bij gebruik van een externe thermostaat.",
+              "fan_modes_fix": "Toon ventilatormodi die de kachel buiten zijn limieten beschrijft, zoals OFF. Ventilatoren die deze niet ondersteunen kunnen fouten geven of zich onverwacht gedragen."
             }
           }
         }

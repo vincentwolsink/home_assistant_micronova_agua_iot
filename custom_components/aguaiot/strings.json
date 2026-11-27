@@ -46,7 +46,8 @@
           "device_fixes": {
             "name": "Device specific fixes",
             "data": {
-              "air_temp_fix": "[Jolly Mec] Ignore incorrect air temperature when using external themostat."
+              "air_temp_fix": "[Jolly Mec] Ignore incorrect air temperature when using external themostat.",
+              "fan_modes_fix": "Offer fan modes the stove describes outside its limits, such as OFF. Fans that do not support them may give errors or behave unexpectedly."
             }
           }
         }

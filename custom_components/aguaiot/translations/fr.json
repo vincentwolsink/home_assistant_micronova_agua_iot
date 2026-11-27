@@ -42,7 +42,8 @@
           "device_fixes": {
             "name": "Correctifs spécifiques aux appareils",
             "data": {
-              "air_temp_fix": "[Jolly Mec] Ignorer la température de l'air incorrecte lors de l'utilisation d'un thermostat externe."
+              "air_temp_fix": "[Jolly Mec] Ignorer la température de l'air incorrecte lors de l'utilisation d'un thermostat externe.",
+              "fan_modes_fix": "Proposer les modes de ventilation que le poêle décrit en dehors de ses limites, par exemple OFF. Les ventilateurs qui ne les prennent pas en charge peuvent provoquer des erreurs ou se comporter de manière inattendue."
             }
           }
         }

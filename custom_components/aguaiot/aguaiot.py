@@ -575,11 +575,30 @@ class Device:
 
         return register_dict
 
-    def __prepare_value_for_writing(self, item, value, limit_value_raw=False):
+    def __is_described_value(self, item, value) -> bool:
+        """Return True when the register map describes the value."""
+        return any(
+            float(option["value"]) == float(value)
+            for option in self.__register_map_dict[item].get("enc_val", [])
+        )
+
+    def __prepare_value_for_writing(
+        self, item, value, limit_value_raw=False, allow_described: bool = False
+    ):
+        """Return the raw value to write for a register value.
+
+        With allow_described, a value outside the register limits is accepted
+        when the register map describes it. Some register maps describe a
+        value, such as 0 for off, that their limits exclude.
+        """
         set_min = self.__register_map_dict[item]["set_min"]
         set_max = self.__register_map_dict[item]["set_max"]
 
-        if not limit_value_raw and (float(value) < set_min or float(value) > set_max):
+        if (
+            not limit_value_raw
+            and (float(value) < set_min or float(value) > set_max)
+            and not (allow_described and self.__is_described_value(item, value))
+        ):
             raise ValueError(f"Value must be between {set_min} and {set_max}: {value}")
 
         formula = self.__register_map_dict[item]["formula_inverse"]
@@ -748,12 +767,17 @@ class Device:
         else:
             return self.get_register_value(enable_key) == 1
 
-    async def set_register_value(self, key, value, limit_value_raw=False):
+    async def set_register_value(
+        self, key, value, limit_value_raw=False, allow_described: bool = False
+    ):
         if value is None:
             raise AguaIOTError(f"Error while trying to set '{key}' to None")
 
         value = self.__prepare_value_for_writing(
-            key, value, limit_value_raw=limit_value_raw
+            key,
+            value,
+            limit_value_raw=limit_value_raw,
+            allow_described=allow_described,
         )
         items = {key: value}
 
@@ -791,7 +815,12 @@ class Device:
         )
 
     async def set_register_value_description(
-        self, key, value_description, value_fallback=None, language=None
+        self,
+        key,
+        value_description,
+        value_fallback=None,
+        language=None,
+        allow_described: bool = False,
     ):
         try:
             options = self.get_register_value_options(key, language)
@@ -805,7 +834,7 @@ class Device:
         except ValueError:
             value = value_fallback
 
-        await self.set_register_value(key, value)
+        await self.set_register_value(key, value, allow_described=allow_described)
 
 
 class AguaIOTError(Exception):

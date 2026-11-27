@@ -1,6 +1,6 @@
 """Test the climate platform, also for devices without (successful) read data."""
 
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -322,3 +322,142 @@ class TestClimateEntitiesCanBeAdded:
         for entity in entities:
             entity.hass = FakeHass()
             assert entity.capability_attributes is not None
+
+
+class TestCanalizationWithFanModesFix:
+    """A fan register describing a mode its limits exclude.
+
+    The limits of the LOTO Multiair fans allow the values 1 to 6, while their
+    register maps also describe 0 as off. The stove itself can turn its main
+    fan off, so the value is offered once the fan modes fix is enabled.
+    """
+
+    @pytest.fixture
+    def coordinator_mock(self):
+        coordinator_mock = MagicMock()
+        coordinator_mock.last_update_success = True
+        coordinator_mock.async_request_refresh = AsyncMock()
+        return coordinator_mock
+
+    @pytest.fixture
+    def device(self, aguaiot_mock, fixture_data):
+        aguaiot_mock._request_writing = AsyncMock()
+        return build_device_from_fixture(
+            aguaiot_mock, "loto_multiair", fixture_data["loto_multiair"]
+        )
+
+    @pytest.fixture
+    def descriptions(self, device):
+        return {
+            description.key: description
+            for description in climate._canalization_descriptions(device)
+        }
+
+    @pytest.fixture
+    def entity(self, coordinator_mock, device, descriptions):
+        return climate.AguaIOTCanalizationDevice(
+            coordinator_mock, device, descriptions["vent_main_set"], MagicMock()
+        )
+
+    @pytest.fixture
+    def entity_with_fix(self, coordinator_mock, device, descriptions):
+        return climate.AguaIOTCanalizationDevice(
+            coordinator_mock,
+            device,
+            descriptions["vent_main_set"],
+            MagicMock(),
+            fan_modes_fix=True,
+        )
+
+    def test_fan_mode_success_fix_enabled(self, entity_with_fix):
+        # The fan has been turned off on the stove itself.
+        assert entity_with_fix.fan_mode == "Off"
+        assert entity_with_fix.fan_mode in entity_with_fix.fan_modes
+
+    def test_fan_modes_success_fix_disabled(self, entity):
+        assert entity.fan_modes == ["1", "2", "3", "4", "5", "Auto"]
+
+    def test_fan_modes_success_fix_enabled(self, entity_with_fix):
+        assert entity_with_fix.fan_modes == ["Off", "1", "2", "3", "4", "5", "Auto"]
+
+    @pytest.mark.parametrize("key", ["canalization_1_set", "canalization_2_set"])
+    def test_fan_modes_success_fix_enabled_for_every_fan(
+        self, coordinator_mock, device, descriptions, key
+    ):
+        # The fix can not tell which fans really accept the described mode.
+        entity = climate.AguaIOTCanalizationDevice(
+            coordinator_mock, device, descriptions[key], MagicMock(), fan_modes_fix=True
+        )
+        assert entity.fan_modes == ["OFF", "1", "2", "3", "4", "5", "Auto"]
+
+    def test_fan_modes_success_fix_enabled_without_described_modes(
+        self, aguaiot_mock, coordinator_mock
+    ):
+        device = build_device_from_fixture(
+            aguaiot_mock, "canalization", FLOAT_CANALIZATION_REGISTER_MAP
+        )
+        entity = climate.AguaIOTCanalizationDevice(
+            coordinator_mock,
+            device,
+            const.AguaIOTCanalizationEntityDescription(
+                name="Canalization 1", key="canalization_1_set"
+            ),
+            MagicMock(),
+            fan_modes_fix=True,
+        )
+        assert entity.fan_modes == ["0", "1", "2", "3", "4", "5", "6"]
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        ("fan_mode", "value"),
+        [("Off", 0), ("3", 3), ("Auto", 6)],
+    )
+    async def test_async_set_fan_mode_success_fix_enabled(
+        self, aguaiot_mock, coordinator_mock, device, entity_with_fix, fan_mode, value
+    ):
+        await entity_with_fix.async_set_fan_mode(fan_mode)
+
+        aguaiot_mock._request_writing.assert_awaited_once_with(
+            device, {"vent_main_set": value}
+        )
+        coordinator_mock.async_request_refresh.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_async_set_fan_mode_failure_fix_disabled(self, aguaiot_mock, entity):
+        with pytest.raises(ValueError):
+            await entity.async_set_fan_mode("Off")
+
+        aguaiot_mock._request_writing.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("options", "off_offered"),
+    [
+        ({}, False),
+        ({"device_fixes": {}}, False),
+        ({"device_fixes": {"fan_modes_fix": False}}, False),
+        ({"device_fixes": {"fan_modes_fix": True}}, True),
+    ],
+)
+async def test_async_setup_entry_success_fan_modes_fix(
+    aguaiot_mock, fixture_data, monkeypatch, options, off_offered
+):
+    device = build_device_from_fixture(
+        aguaiot_mock, "loto_multiair", fixture_data["loto_multiair"]
+    )
+    coordinator_mock = MagicMock()
+    coordinator_mock.agua.devices = [device]
+    config_entry_mock = MagicMock(options=options, runtime_data=coordinator_mock)
+    add_entities_mock = MagicMock()
+    monkeypatch.setattr(
+        climate.entity_platform, "async_get_current_platform", MagicMock
+    )
+
+    await climate.async_setup_entry(MagicMock(), config_entry_mock, add_entities_mock)
+
+    entities = {
+        entity.unique_id: entity for entity in add_entities_mock.call_args.args[0]
+    }
+    fan_modes = entities["loto_multiair_vent_main_set"].fan_modes
+    assert ("Off" in fan_modes) is off_offered

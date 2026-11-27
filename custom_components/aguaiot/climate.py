@@ -27,6 +27,8 @@ from .aguaiot import AguaIOTError
 from .const import (
     AIR_VARIANTS,
     CLIMATE_CANALIZATIONS,
+    CONF_DEVICE_FIXES,
+    CONF_FAN_MODES_FIX,
     DOMAIN,
     MODE_PELLETS,
     MODE_WOOD,
@@ -57,9 +59,32 @@ def _fan_mode_description(device, key):
     return str(options.get(value, value))
 
 
+def _fan_modes(device, key, include_described: bool = False) -> list[str]:
+    """Return the fan modes of a register.
+
+    The fan modes are the values within the register limits. Some register
+    maps also describe a value outside those limits, such as 0 for off while
+    the minimum is 1. These are only offered with include_described, as not
+    every fan accepts them.
+    """
+    min_value = device.get_register_value_min(key)
+    max_value = device.get_register_value_max(key)
+    if min_value is None or max_value is None:
+        # The device has not been read successfully (yet).
+        return []
+
+    options = device.get_register_value_options(key)
+    values = set(range(int(min_value), int(max_value) + 1))
+    if include_described:
+        values.update(options)
+    return [str(options.get(value, value)) for value in sorted(values)]
+
+
 async def async_setup_entry(hass, config_entry, async_add_entities):
     coordinator = config_entry.runtime_data
     agua = coordinator.agua
+    device_fixes = config_entry.options.get(CONF_DEVICE_FIXES) or {}
+    fan_modes_fix = device_fixes.get(CONF_FAN_MODES_FIX, False)
 
     entities = []
     for device in agua.devices:
@@ -73,7 +98,13 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
         for description in _canalization_descriptions(device):
             entities.append(
-                AguaIOTCanalizationDevice(coordinator, device, description, stove)
+                AguaIOTCanalizationDevice(
+                    coordinator,
+                    device,
+                    description,
+                    stove,
+                    fan_modes_fix=fan_modes_fix,
+                )
             )
 
     async_add_entities(entities, True)
@@ -299,20 +330,10 @@ class AguaIOTAirDevice(AguaIOTClimateDevice):
     @property
     def fan_modes(self):
         """Return the list of available fan modes."""
-        fan_modes = []
         power_register = (
             "power_wood_set" if self.hybrid_mode == MODE_WOOD else "power_set"
         )
-        min_value = self._device.get_register_value_min(power_register)
-        max_value = self._device.get_register_value_max(power_register)
-        if min_value is None or max_value is None:
-            # The device has not been read successfully (yet).
-            return fan_modes
-        for x in range(int(min_value), (int(max_value) + 1)):
-            fan_modes.append(
-                str(self._device.get_register_value_options(power_register).get(x, x))
-            )
-        return fan_modes
+        return _fan_modes(self._device, power_register)
 
     @property
     def preset_modes(self):
@@ -549,11 +570,14 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
 
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator, device, description, parent):
+    def __init__(
+        self, coordinator, device, description, parent, fan_modes_fix: bool = False
+    ):
         super().__init__(coordinator)
         self._enable_turn_on_off_backwards_compatibility = False
         self._device = device
         self._parent = parent
+        self._fan_modes_fix = fan_modes_fix
         self.entity_description = description
         self._vent_register = self._find_register(description.key_vent_set)
         self._fan_register = self._vent_register or description.key
@@ -600,27 +624,15 @@ class AguaIOTCanalizationDevice(AguaIOTClimateDevice):
     @property
     def fan_modes(self):
         """Return the list of available fan modes."""
-        fan_modes = []
-        min_value = self._device.get_register_value_min(self._fan_register)
-        max_value = self._device.get_register_value_max(self._fan_register)
-        if min_value is None or max_value is None:
-            # The device has not been read successfully (yet).
-            return fan_modes
-        for x in range(int(min_value), (int(max_value) + 1)):
-            fan_modes.append(
-                str(
-                    self._device.get_register_value_options(self._fan_register).get(
-                        x, x
-                    )
-                )
-            )
-        return fan_modes
+        return _fan_modes(
+            self._device, self._fan_register, include_described=self._fan_modes_fix
+        )
 
     async def async_set_fan_mode(self, fan_mode):
         """Set new target fan mode."""
         try:
             await self._device.set_register_value_description(
-                self._fan_register, fan_mode
+                self._fan_register, fan_mode, allow_described=self._fan_modes_fix
             )
             await self.coordinator.async_request_refresh()
         except AguaIOTError as err:

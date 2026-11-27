@@ -35,6 +35,7 @@ from .const import (
     CONF_DEVICE_FIXES,
     CONF_ENDPOINT,
     CONF_FAILURE_THRESHOLD,
+    CONF_FAN_MODES_FIX,
     CONF_HTTP_TIMEOUT,
     CONF_LANGUAGE,
     CONF_LOGIN_API_URL,
@@ -246,6 +247,9 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                 self.config_entry.options.get(CONF_AIR_TEMP_FIX, False),
             ),
         )
+        fan_modes_fix_default = submitted_fixes.get(
+            CONF_FAN_MODES_FIX, stored_fixes.get(CONF_FAN_MODES_FIX, False)
+        )
         schema = {
             vol.Optional(
                 CONF_CONNECTION_MODE,
@@ -318,6 +322,10 @@ class AguaIOTOptionsFlowHandler(OptionsFlowWithReload):
                         vol.Optional(
                             CONF_AIR_TEMP_FIX,
                             default=air_temp_fix_default,
+                        ): bool,
+                        vol.Optional(
+                            CONF_FAN_MODES_FIX,
+                            default=fan_modes_fix_default,
                         ): bool,
                     }
                 )
