@@ -39,7 +39,8 @@
           "device_fixes": {
             "name": "Gerätespezifische korrekturen",
             "data": {
-              "air_temp_fix": "[Jolly Mec] Inkorrekte Lufttemperatur bei Verwendung eines externen Thermostats ignorieren."
+              "air_temp_fix": "[Jolly Mec] Inkorrekte Lufttemperatur bei Verwendung eines externen Thermostats ignorieren.",
+              "fan_modes_fix": "Lüftermodi anbieten, die der Ofen außerhalb seiner Grenzwerte beschreibt, zum Beispiel OFF. Lüfter, die diese nicht unterstützen, können Fehler verursachen oder sich unerwartet verhalten."
             }
           }
         }

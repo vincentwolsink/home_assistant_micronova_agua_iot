@@ -169,3 +169,24 @@ def test_empty_runtime_languages_preserve_existing_language(monkeypatch):
     assert "DEU" in options._languages()
     validated = options._build_schema()({"device_fixes": {}, "language": "DEU"})
     assert validated["language"] == "DEU"
+
+
+@pytest.mark.parametrize(
+    ("stored_options", "expected"),
+    [
+        ({}, False),
+        ({"device_fixes": {"air_temp_fix": True}}, False),
+        ({"device_fixes": {"fan_modes_fix": True}}, True),
+    ],
+)
+def test__build_schema_success_fan_modes_fix_default(
+    monkeypatch, stored_options, expected
+):
+    options = flow.AguaIOTOptionsFlowHandler()
+    entry = MagicMock(options=stored_options, runtime_data=MagicMock())
+    monkeypatch.setattr(type(options), "config_entry", property(lambda _self: entry))
+    monkeypatch.setattr(options, "_languages", lambda: ["ENG"])
+
+    validated = options._build_schema()({"device_fixes": {}})
+
+    assert validated["device_fixes"]["fan_modes_fix"] is expected

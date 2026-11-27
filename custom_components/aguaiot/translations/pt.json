@@ -39,7 +39,8 @@
           "device_fixes": {
             "name": "Poprawki specyficzne dla urządzeń",
             "data": {
-              "air_temp_fix": "[Jolly Mec] Ignorar temperatura do ar incorreta ao usar termostato externo."
+              "air_temp_fix": "[Jolly Mec] Ignorar temperatura do ar incorreta ao usar termostato externo.",
+              "fan_modes_fix": "Disponibilizar os modos de ventilação que a salamandra descreve fora dos seus limites, por exemplo OFF. Os ventiladores que não os suportem podem dar erros ou comportar-se de forma inesperada."
             }
           }
         }

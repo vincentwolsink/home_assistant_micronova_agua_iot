@@ -1,8 +1,36 @@
 """Test the Device class using fixture data as simulated API responses."""
 
+from unittest.mock import AsyncMock
+
 import pytest
 
 from tests.helpers import AguaIOTError, build_device_from_fixture
+
+# The limits allow the values 1 to 6, while 0 is described as off.
+FAN_REGISTER_MAP = {
+    "vent_main_set": {
+        "reg_key": "vent_main_set",
+        "offset": 1,
+        "mask": 255,
+        "formula": "#",
+        "formula_inverse": "#",
+        "set_min": 1,
+        "set_max": 6,
+        "is_hex": False,
+        "value_raw": "3",
+        "value": 3,
+        "enc_val": [
+            {"value": 0, "lang": "ENG", "description": "Off"},
+            {"value": 6, "lang": "ENG", "description": "Auto"},
+        ],
+    },
+}
+
+
+@pytest.fixture
+def fan_device(aguaiot_mock):
+    aguaiot_mock._request_writing = AsyncMock()
+    return build_device_from_fixture(aguaiot_mock, "fan", FAN_REGISTER_MAP)
 
 
 class TestGetRegister:
@@ -541,6 +569,63 @@ class TestPrepareValueForWriting:
         assert device._Device__prepare_value_for_writing("calendar_day_set", 8) == int(
             "0x8", 16
         )
+
+    def test__prepare_value_for_writing_success_described_value_allowed(
+        self, fan_device
+    ):
+        value = fan_device._Device__prepare_value_for_writing(
+            "vent_main_set", 0, allow_described=True
+        )
+        assert value == 0
+
+    def test__prepare_value_for_writing_failure_described_value_not_allowed(
+        self, fan_device
+    ):
+        with pytest.raises(ValueError):
+            fan_device._Device__prepare_value_for_writing("vent_main_set", 0)
+
+    def test__prepare_value_for_writing_failure_undescribed_value(self, fan_device):
+        with pytest.raises(ValueError):
+            fan_device._Device__prepare_value_for_writing(
+                "vent_main_set", 7, allow_described=True
+            )
+
+
+class TestSetRegisterValueDescription:
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        ("description", "value"),
+        [("3", 3), ("Auto", 6)],
+    )
+    async def test_set_register_value_description_success(
+        self, aguaiot_mock, fan_device, description, value
+    ):
+        await fan_device.set_register_value_description("vent_main_set", description)
+
+        aguaiot_mock._request_writing.assert_awaited_once_with(
+            fan_device, {"vent_main_set": value}
+        )
+
+    @pytest.mark.asyncio
+    async def test_set_register_value_description_success_described_value_allowed(
+        self, aguaiot_mock, fan_device
+    ):
+        await fan_device.set_register_value_description(
+            "vent_main_set", "Off", allow_described=True
+        )
+
+        aguaiot_mock._request_writing.assert_awaited_once_with(
+            fan_device, {"vent_main_set": 0}
+        )
+
+    @pytest.mark.asyncio
+    async def test_set_register_value_description_failure_described_value_not_allowed(
+        self, aguaiot_mock, fan_device
+    ):
+        with pytest.raises(ValueError):
+            await fan_device.set_register_value_description("vent_main_set", "Off")
+
+        aguaiot_mock._request_writing.assert_not_awaited()
 
 
 class TestRegistersProperty:
